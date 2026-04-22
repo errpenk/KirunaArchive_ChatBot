@@ -1,0 +1,2 @@
+/api/*  __RAILWAY_API_ORIGIN__/api/:splat  200
+/*      /index.html                        200
