@@ -7,6 +7,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+console.log("ARK_API_KEY:", process.env.ARK_API_KEY);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PUBLIC_DIR = path.join(__dirname, "public");
@@ -19,6 +20,8 @@ const MAX_HISTORY_TURNS = 6;
 const MAX_SOURCE_CARDS = 6;
 const BLOCKED_WEB_DOMAINS = ["reddit.com", "quora.com"];
 const MAX_WEAK_WEB_SOURCES = 8;
+
+
 
 const client = process.env.ARK_API_KEY
   ? ArkRuntimeClient.withApiKey(
