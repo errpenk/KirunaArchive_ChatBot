@@ -851,30 +851,62 @@ function isWebSearchUnavailableError(error) {
   );
 }
 
+function canonicalizeAnswerUnit(text) {
+  return normalizeWhitespace(text)
+    .toLowerCase()
+    .replace(/[“”"'`´’]/g, "")
+    .replace(/[.,!?;:()[\]{}\-_/\\]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function dedupeAnswerText(text) {
+  const normalized = String(text || "").trim();
+  if (!normalized) return "";
+
+  const units = normalized
+    .split(/\n{2,}|(?<=[。！？!?])\s+|(?<=[.?!])\s+/)
+    .map((unit) => normalizeWhitespace(unit))
+    .filter(Boolean);
+
+  const seen = new Set();
+  const deduped = [];
+  for (const unit of units) {
+    const canonical = canonicalizeAnswerUnit(unit);
+    if (!canonical || seen.has(canonical)) continue;
+    seen.add(canonical);
+    deduped.push(unit);
+  }
+
+  return normalizeWhitespace(deduped.join(" "));
+}
+
 function extractResponseText(response) {
-  const directText = normalizeWhitespace(response?.output_text || "");
+  const directText = dedupeAnswerText(response?.output_text || "");
   if (directText) return directText;
 
-  const segments = [];
+  const assistantSegments = [];
+  const fallbackSegments = [];
 
   for (const item of response?.output || []) {
+    const isAssistantMessage = item?.type === "message" && item?.role === "assistant";
     for (const content of item?.content || []) {
       const text = normalizeWhitespace(content?.text || "");
-      if (text) segments.push(text);
-    }
-
-    for (const part of item?.summary || []) {
-      const text = normalizeWhitespace(part?.text || "");
-      if (text) segments.push(text);
+      if (!text) continue;
+      if (isAssistantMessage) assistantSegments.push(text);
+      else fallbackSegments.push(text);
     }
 
     for (const block of item?.blocks || []) {
       const text = normalizeWhitespace(block?.text || "");
-      if (text) segments.push(text);
+      if (!text) continue;
+      if (isAssistantMessage) assistantSegments.push(text);
+      else fallbackSegments.push(text);
     }
   }
 
-  return normalizeWhitespace(segments.join("\n\n"));
+  const preferred = assistantSegments.length ? assistantSegments : fallbackSegments;
+  return dedupeAnswerText(preferred.join("\n\n"));
 }
 
 function extractWebSources(response) {
