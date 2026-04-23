@@ -843,6 +843,15 @@ function getErrorMessage(error) {
   );
 }
 
+function isWebSearchUnavailableError(error) {
+  const message = getErrorMessage(error).toLowerCase();
+  if (!message) return false;
+  return (
+    message.includes("has not activated web search") ||
+    message.includes("cc_content_plugin")
+  );
+}
+
 function extractResponseText(response) {
   const directText = normalizeWhitespace(response?.output_text || "");
   if (directText) return directText;
@@ -940,6 +949,78 @@ function buildModelInput(question, history, archiveHits) {
   ].join("\n");
 }
 
+function buildArchiveOnlyModelInput(question, history, archiveHits) {
+  return [
+    "Conversation so far:",
+    buildConversationContext(history),
+    "",
+    "Local archive context:",
+    buildArchiveContext(archiveHits),
+    "",
+    "User question:",
+    question,
+    "",
+    "Answer requirements:",
+    "- Answer only from the supplied archive context.",
+    "- Do not use outside knowledge or claim web findings.",
+    "- If the archive context only partially answers the question, say so briefly.",
+    "- Keep the answer concise and factual."
+  ].join("\n");
+}
+
+async function generateArchiveHitAnswer(question, history, archiveHits) {
+  if (!archiveHits.length) {
+    return {
+      answer: "",
+      sources: [],
+      mode: "archive-missing",
+      used_ai: false
+    };
+  }
+
+  if (!client || !MODEL) {
+    return {
+      answer: buildArchiveOnlyAnswer(
+        question,
+        archiveHits,
+        buildLiveModelUnavailableReason()
+      ),
+      sources: archiveHits.map(toArchiveSource).slice(0, MAX_SOURCE_CARDS),
+      mode: "archive-only",
+      used_ai: false
+    };
+  }
+
+  const response = await client.createResponses(
+    buildResponsesRequest(MODEL, {
+      instructions:
+        "You are the Kiruna Archive assistant. Answer only from the provided archive excerpts. Do not use web search or outside facts. If the archive evidence is partial, say so clearly and avoid guessing.",
+      input: buildResponsesUserInput(
+        buildArchiveOnlyModelInput(question, history, archiveHits)
+      )
+    })
+  );
+
+  if (response?.error?.message) {
+    throw new Error(response.error.message);
+  }
+
+  const answerText = extractResponseText(response);
+
+  return {
+    answer:
+      answerText ||
+      buildArchiveOnlyAnswer(
+        question,
+        archiveHits,
+        "The model returned an empty answer."
+      ),
+    sources: archiveHits.map(toArchiveSource).slice(0, MAX_SOURCE_CARDS),
+    mode: "archive",
+    used_ai: Boolean(answerText)
+  };
+}
+
 async function generateArchiveEnhancedAnswer(question, history, providedSources) {
   const archiveSources = (Array.isArray(providedSources) ? providedSources : [])
     .map((source, index) => sanitizeClientArchiveSource(source, index))
@@ -1012,25 +1093,48 @@ async function generateAnswer(question, history, archiveHits) {
     };
   }
 
-  const response = await client.createResponses(
-    buildResponsesRequest(MODEL, {
-      instructions:
-        "You are the Kiruna Archive assistant. Help users understand Kiruna, LKAB, urban relocation, heritage, mining, public discourse, Sami land questions, and related topics. Prefer the supplied archive context when it is enough. If you use web search, stay tightly anchored to Kiruna or directly connected LKAB/Norrbotten developments rather than broad Sweden news. Cite multiple sources when possible and never fabricate facts or sources.",
-      tools: [
-        {
-          type: "web_search",
-          user_location: {
-            type: "approximate",
-            country: "SE",
-            region: "Norrbotten",
-            city: "Kiruna"
+  let response;
+  try {
+    response = await client.createResponses(
+      buildResponsesRequest(MODEL, {
+        instructions:
+          "You are the Kiruna Archive assistant. Help users understand Kiruna, LKAB, urban relocation, heritage, mining, public discourse, Sami land questions, and related topics. Prefer the supplied archive context when it is enough. If you use web search, stay tightly anchored to Kiruna or directly connected LKAB/Norrbotten developments rather than broad Sweden news. Cite multiple sources when possible and never fabricate facts or sources.",
+        tools: [
+          {
+            type: "web_search",
+            user_location: {
+              type: "approximate",
+              country: "SE",
+              region: "Norrbotten",
+              city: "Kiruna"
+            }
           }
-        }
-      ],
-      tool_choice: "auto",
-      input: buildResponsesUserInput(buildModelInput(question, history, archiveHits))
-    })
-  );
+        ],
+        tool_choice: "auto",
+        input: buildResponsesUserInput(buildModelInput(question, history, archiveHits))
+      })
+    );
+  } catch (error) {
+    if (isWebSearchUnavailableError(error)) {
+      if (archiveHits.length) {
+        const archiveResult = await generateArchiveHitAnswer(question, history, archiveHits);
+        return {
+          ...archiveResult,
+          error_detail: getErrorMessage(error),
+          web_search_unavailable: true
+        };
+      }
+      return {
+        answer: "",
+        sources: [],
+        mode: "web-search-unavailable",
+        used_ai: false,
+        error_detail: getErrorMessage(error),
+        web_search_unavailable: true
+      };
+    }
+    throw error;
+  }
 
   if (response?.error?.message) {
     throw new Error(response.error.message);
@@ -1048,7 +1152,9 @@ async function generateAnswer(question, history, archiveHits) {
     answer: answerText || buildArchiveOnlyAnswer(question, archiveHits, "The model returned an empty answer."),
     sources,
     mode: webSources.length ? "hybrid" : "archive",
-    used_ai: Boolean(answerText)
+    used_ai: Boolean(answerText),
+    error_detail: undefined,
+    web_search_unavailable: false
   };
 }
 
@@ -1103,7 +1209,9 @@ app.post("/api/archive-answer", async (req, res) => {
       answer: result.answer,
       sources: result.sources,
       mode: result.mode,
-      used_ai: result.used_ai
+      used_ai: result.used_ai,
+      error_detail: result.error_detail,
+      web_search_unavailable: result.web_search_unavailable === true
     });
   } catch (error) {
     const errorMessage = getErrorMessage(error);
