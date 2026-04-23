@@ -798,6 +798,49 @@ function buildLiveModelUnavailableReason() {
   return `Add ${missing.join(" and ")} to enable live Ark web-backed answers.`;
 }
 
+function modelSupportsReasoning(model) {
+  const normalized = normalizeWhitespace(model).toLowerCase();
+  if (!normalized) return false;
+  return /\b(r1|reason|thinking)\b/.test(normalized);
+}
+
+function buildResponsesUserInput(text) {
+  return [
+    {
+      role: "user",
+      content: [
+        {
+          type: "input_text",
+          text: normalizeWhitespace(text)
+        }
+      ]
+    }
+  ];
+}
+
+function buildResponsesRequest(model, overrides = {}) {
+  const request = {
+    model,
+    ...overrides
+  };
+
+  if (modelSupportsReasoning(model)) {
+    request.reasoning = { effort: "low" };
+  }
+
+  return request;
+}
+
+function getErrorMessage(error) {
+  return normalizeWhitespace(
+    error?.message ||
+      error?.response?.data?.error?.message ||
+      error?.response?.data?.message ||
+      error?.error?.message ||
+      ""
+  );
+}
+
 function extractResponseText(response) {
   const directText = normalizeWhitespace(response?.output_text || "");
   if (directText) return directText;
@@ -923,13 +966,15 @@ async function generateArchiveEnhancedAnswer(question, history, providedSources)
     };
   }
 
-  const response = await client.createResponses({
-    model: MODEL,
-    reasoning: { effort: "low" },
-    instructions:
-      "You are the Kiruna Archive assistant. Answer only from the provided archive excerpts. Do not use web search or outside facts. If the local evidence is partial, say so clearly and avoid guessing.",
-    input: buildArchiveEnhancementInput(question, history, archiveSources)
-  });
+  const response = await client.createResponses(
+    buildResponsesRequest(MODEL, {
+      instructions:
+        "You are the Kiruna Archive assistant. Answer only from the provided archive excerpts. Do not use web search or outside facts. If the local evidence is partial, say so clearly and avoid guessing.",
+      input: buildResponsesUserInput(
+        buildArchiveEnhancementInput(question, history, archiveSources)
+      )
+    })
+  );
 
   if (response?.error?.message) {
     throw new Error(response.error.message);
@@ -965,25 +1010,25 @@ async function generateAnswer(question, history, archiveHits) {
     };
   }
 
-  const response = await client.createResponses({
-    model: MODEL,
-    reasoning: { effort: "low" },
-    instructions:
-      "You are the Kiruna Archive assistant. Help users understand Kiruna, LKAB, urban relocation, heritage, mining, public discourse, Sami land questions, and related topics. Prefer the supplied archive context when it is enough. If you use web search, stay tightly anchored to Kiruna or directly connected LKAB/Norrbotten developments rather than broad Sweden news. Cite multiple sources when possible and never fabricate facts or sources.",
-    tools: [
-      {
-        type: "web_search",
-        user_location: {
-          type: "approximate",
-          country: "SE",
-          region: "Norrbotten",
-          city: "Kiruna"
+  const response = await client.createResponses(
+    buildResponsesRequest(MODEL, {
+      instructions:
+        "You are the Kiruna Archive assistant. Help users understand Kiruna, LKAB, urban relocation, heritage, mining, public discourse, Sami land questions, and related topics. Prefer the supplied archive context when it is enough. If you use web search, stay tightly anchored to Kiruna or directly connected LKAB/Norrbotten developments rather than broad Sweden news. Cite multiple sources when possible and never fabricate facts or sources.",
+      tools: [
+        {
+          type: "web_search",
+          user_location: {
+            type: "approximate",
+            country: "SE",
+            region: "Norrbotten",
+            city: "Kiruna"
+          }
         }
-      }
-    ],
-    tool_choice: "auto",
-    input: buildModelInput(question, history, archiveHits)
-  });
+      ],
+      tool_choice: "auto",
+      input: buildResponsesUserInput(buildModelInput(question, history, archiveHits))
+    })
+  );
 
   if (response?.error?.message) {
     throw new Error(response.error.message);
@@ -1056,16 +1101,21 @@ app.post("/api/archive-answer", async (req, res) => {
       used_ai: result.used_ai
     });
   } catch (error) {
+    const errorMessage = getErrorMessage(error);
+    console.error("Ark archive-answer failed:", errorMessage || error);
     const safeSources = sources
       .map((source, index) => sanitizeClientArchiveSource(source, index))
       .filter(Boolean)
       .slice(0, MAX_SOURCE_CARDS);
     return res.status(500).json({
       error: "The archive assistant could not complete the request.",
+      error_detail: errorMessage || undefined,
       answer: buildProvidedArchiveAnswer(
         question,
         safeSources,
-        "The live model request failed, so this is a local archive fallback."
+        errorMessage
+          ? `The live model request failed (${errorMessage}), so this is a local archive fallback.`
+          : "The live model request failed, so this is a local archive fallback."
       ),
       sources: safeSources.map(stripSourceAnswerText),
       mode: "archive-fallback",
@@ -1093,13 +1143,18 @@ app.post("/api/chat", async (req, res) => {
       used_ai: result.used_ai
     });
   } catch (error) {
+    const errorMessage = getErrorMessage(error);
+    console.error("Ark chat failed:", errorMessage || error);
     const archiveHits = searchArchive(question, MAX_ARCHIVE_HITS);
     return res.status(500).json({
       error: "The assistant could not complete the request.",
+      error_detail: errorMessage || undefined,
       answer: buildArchiveOnlyAnswer(
         question,
         archiveHits,
-        "The live model request failed, so this is a local archive fallback."
+        errorMessage
+          ? `The live model request failed (${errorMessage}), so this is a local archive fallback.`
+          : "The live model request failed, so this is a local archive fallback."
       ),
       sources: archiveHits.map(toArchiveSource).slice(0, MAX_SOURCE_CARDS),
       mode: "archive-fallback",
