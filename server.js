@@ -110,6 +110,37 @@ const KIRUNA_CONTEXT_TOKENS = new Set([
   "sapmi",
   "geijer"
 ]);
+const TOKEN_ALIASES = {
+  raddit: "reddit",
+  redddit: "reddit",
+  redit: "reddit",
+  subreddits: "subreddit",
+  twiter: "twitter",
+  tweets: "twitter",
+  tweet: "twitter",
+  xcom: "twitter",
+  discource: "discourse",
+  discussion: "discourse",
+  discussions: "discourse",
+  dataset: "data",
+  datasets: "data",
+  statistic: "data",
+  statistics: "data",
+  stats: "data",
+  records: "data",
+  replies: "reply",
+  replys: "reply",
+  posts: "post"
+};
+const TOKEN_EXPANSIONS = {
+  reddit: ["reddit", "subreddit", "subreddits", "reply", "post", "discussion"],
+  subreddit: ["subreddit", "subreddits", "reddit"],
+  twitter: ["twitter", "post", "reply", "discourse"],
+  discourse: ["discourse", "analysis", "sentiment", "keyword", "discussion"],
+  data: ["data", "analysis", "records", "sentiment", "keyword"],
+  reply: ["reply", "replies", "discussion"],
+  post: ["post", "posts"]
+};
 const KIRUNA_TOPIC_REGEX = /\b(kiruna|kirunavaara|lkab|norrbotten|geijer)\b/i;
 const SWEDEN_CONTEXT_REGEX = /\b(sweden|swedish|sverige|swiden|sami|sapmi)\b/i;
 
@@ -117,11 +148,53 @@ function normalizeWhitespace(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
 }
 
+function decodeHtmlEntities(value, passes = 2) {
+  let decoded = String(value || "");
+  const maxPasses = Math.max(1, Number(passes) || 2);
+  for (let index = 0; index < maxPasses; index += 1) {
+    const next = decoded
+      .replace(/&amp;/g, "&")
+      .replace(/&quot;/g, '"')
+      .replace(/&#34;/g, '"')
+      .replace(/&apos;/g, "'")
+      .replace(/&#39;/g, "'")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">");
+    if (next === decoded) break;
+    decoded = next;
+  }
+  return decoded;
+}
+
+function canonicalizeToken(token) {
+  const lowered = String(token || "").toLowerCase();
+  return TOKEN_ALIASES[lowered] || lowered;
+}
+
+function expandToken(token) {
+  const canonical = canonicalizeToken(token);
+  return [canonical].concat(TOKEN_EXPANSIONS[canonical] || []);
+}
+
 function tokenize(value) {
-  return normalizeWhitespace(value)
+  const baseTokens = normalizeWhitespace(value)
     .toLowerCase()
+    .replace(/\bx\/twitter\b/g, " twitter ")
+    .replace(/\btwitter\/x\b/g, " twitter ")
+    .replace(/\bx\b/g, " twitter ")
+    .replace(/\br\/\b/g, " reddit ")
     .split(/[^a-z0-9]+/i)
+    .map(canonicalizeToken)
     .filter((token) => token.length > 2 && !STOPWORDS.has(token));
+  const expanded = [];
+  for (const token of baseTokens) {
+    for (const nextToken of expandToken(token)) {
+      if (nextToken.length > 2 && !STOPWORDS.has(nextToken)) {
+        expanded.push(nextToken);
+      }
+    }
+  }
+  return expanded;
 }
 
 function escapeRegExp(value) {
@@ -152,6 +225,22 @@ function uniqueBy(items, keyFn) {
     seen.add(key);
     return true;
   });
+}
+
+function getSourceTargetKey(source) {
+  if (source?.url) return `url:${source.url}`;
+  const locator = source?.locator || {};
+  if (locator.type === "event") {
+    return `event:${locator.pageId || "page-timeline2"}:${String(locator.eventId ?? source?.title ?? "")}`;
+  }
+  if (locator.type === "outside-doc") {
+    return `outside:${locator.pageId || "page-timeline2"}:${String(locator.docIdx ?? source?.title ?? "")}`;
+  }
+  const pageId = locator.pageId || source?.pageId || "page-home";
+  const sectionId = locator.sectionId || source?.sectionId || "";
+  if (sectionId) return `text:${pageId}:${sectionId}`;
+  const heading = normalizeWhitespace(locator.heading || source?.title || source?.heading || "").toLowerCase();
+  return `text:${pageId}:${heading || "page-root"}`;
 }
 
 function questionHasKirunaContext(question) {
@@ -419,7 +508,7 @@ function buildArchiveEntries($) {
   root.find("script, style, noscript").remove();
   root.find("#chat-panel, #page-chat, #nav, #toc-panel, #toc-tab, #toc-trigger, #toc-edge-cue, #chat-fab").remove();
 
-  root.find("h1, h2, h3, h4, p, li").each((_, el) => {
+  root.find("h1, h2, h3, h4, p, li, .sec-title, .sub, .src-title, .src-group-label, .dc-h2, .dc-p, .dc-chart-title, .dc-chart-desc").each((_, el) => {
     const tag = el.tagName.toLowerCase();
     const text = normalizeWhitespace($(el).text());
     const pageId = $(el).closest(".page").attr("id") || "page-home";
@@ -451,6 +540,103 @@ function buildArchiveEntries($) {
   return entries;
 }
 
+function buildTimelineFrameEntries($) {
+  const entries = [];
+  const root = $("body");
+  let currentHeading = "Time";
+
+  root.find("script, style, noscript").remove();
+
+  root.find("h1, h2, h3, h4, p, li, .cph-title, .peb-evt-title, .txt-title, .txt-label, .dc-chart-title, .dc-chart-desc, .eyebrow, .ribbon-label").each((_, el) => {
+    const text = normalizeWhitespace($(el).text());
+    if (!text) return;
+    const isHeading =
+      /^h[1-4]$/i.test(el.tagName || "") ||
+      $(el).is(".cph-title, .peb-evt-title, .txt-title, .txt-label");
+    if (isHeading) {
+      currentHeading = text;
+      if (text.length < 18) return;
+    }
+    if (text.length < (isHeading ? 18 : 36)) return;
+    if (/^(overview|calendar|inside map|outside map|viewing)$/i.test(text)) return;
+    const sectionRoot = $(el).closest("[id], .peb-era-block, .txt-col, .dtl-col");
+    const sectionId = sectionRoot.attr("id") || "";
+    entries.push({
+      heading: currentHeading,
+      text,
+      pageId: "page-timeline2",
+      sectionId,
+      locationLabel: ["Time", "Inside Map", currentHeading].filter(Boolean).join(" · ")
+    });
+  });
+
+  return entries;
+}
+
+function buildTimelineOutsideEntries(srcdoc) {
+  const decoded = decodeHtmlEntities(srcdoc, 3);
+  const rawMatch = decoded.match(/const RAW = \[([\s\S]*?)\];\s*const FIELD_META = \{/);
+  if (!rawMatch) return [];
+  const fieldMatch = decoded.match(/const FIELD_META = \{([\s\S]*?)\};\s*const FIELDS =/);
+
+  let rawDocs = [];
+  let fieldMeta = {};
+  try {
+    rawDocs = Function(`"use strict"; return ([${rawMatch[1]}]);`)();
+    fieldMeta = fieldMatch ? Function(`"use strict"; return ({${fieldMatch[1]}});`)() : {};
+  } catch {
+    return [];
+  }
+
+  const monthMap = {
+    january: 1,
+    february: 2,
+    march: 3,
+    april: 4,
+    may: 5,
+    june: 6,
+    july: 7,
+    august: 8,
+    september: 9,
+    october: 10,
+    november: 11,
+    december: 12
+  };
+
+  const getYear = (rawDate) => {
+    const parts = String(rawDate || "").replace(/[~]/g, "").trim().split(/\s+/);
+    return Number(parts.length === 2 ? parts[1] : parts[0]) || null;
+  };
+
+  return Array.isArray(rawDocs)
+    ? rawDocs
+        .map((row, index) => {
+          const rawDate = normalizeWhitespace(row?.[0] || "");
+          const title = normalizeWhitespace(row?.[1] || "");
+          const actor = normalizeWhitespace(row?.[2] || "");
+          const field = normalizeWhitespace(row?.[3] || "");
+          const label = normalizeWhitespace(row?.[4] || "");
+          const desc = normalizeWhitespace(row?.[5] || "");
+          if (!title || !rawDate) return null;
+          const monthToken = String(rawDate).toLowerCase().split(/\s+/)[0];
+          const year = getYear(rawDate);
+          return {
+            heading: title,
+            text: [rawDate, actor, field, label, desc].filter(Boolean).join(" · "),
+            pageId: "page-timeline2",
+            sectionId: `outside-doc-${index + 1}`,
+            locationLabel: ["Time", "Outside Map", rawDate].filter(Boolean).join(" · "),
+            sourceType: "outside-doc",
+            docIdx: index + 1,
+            year,
+            month: monthMap[monthToken] || 0,
+            fieldColor: fieldMeta?.[field]?.color || "#86868b"
+          };
+        })
+        .filter(Boolean)
+    : [];
+}
+
 function chunkArchiveEntries(entries) {
   const chunks = [];
   let current = null;
@@ -469,7 +655,10 @@ function chunkArchiveEntries(entries) {
         text: entry.text,
         pageId: entry.pageId,
         sectionId: entry.sectionId,
-        locationLabel: entry.locationLabel
+        locationLabel: entry.locationLabel,
+        sourceType: entry.sourceType || "text",
+        docIdx: entry.docIdx ?? null,
+        year: entry.year ?? null
       };
       continue;
     }
@@ -490,6 +679,9 @@ function chunkArchiveEntries(entries) {
       pageId: chunk.pageId,
       sectionId: chunk.sectionId,
       locationLabel: chunk.locationLabel,
+      sourceType: chunk.sourceType || "text",
+      docIdx: chunk.docIdx ?? null,
+      year: chunk.year ?? null,
       searchText: normalizeWhitespace(chunk.heading + " " + chunk.text).toLowerCase(),
       headingTokens: new Set(headingTokens),
       tokenFreq: buildTokenFrequency(bodyTokens)
@@ -501,6 +693,13 @@ async function loadArchiveChunks() {
   const html = await fs.readFile(INDEX_FILE, "utf8");
   const $ = cheerio.load(html);
   const entries = buildArchiveEntries($);
+  try {
+    const timelineHtml = $("#timeline2-frame").attr("srcdoc") || "";
+    if (!timelineHtml) throw new Error("Timeline srcdoc missing.");
+    const timeline$ = cheerio.load(timelineHtml);
+    entries.push(...buildTimelineFrameEntries(timeline$));
+    entries.push(...buildTimelineOutsideEntries(timelineHtml));
+  } catch {}
   return chunkArchiveEntries(entries);
 }
 
@@ -595,7 +794,23 @@ function isStrongArchiveHit(question, hit, topScore) {
   return hit.score >= Math.max(12, topScore * 0.78);
 }
 
-function searchArchive(question, limit = MAX_ARCHIVE_HITS) {
+function isReliableArchiveHit(question, hit, topScore) {
+  const questionYears = extractQuestionYears(question);
+  const nonYearTokens = getRelevantTokens(question).filter((token) => !/^\d{4}$/.test(token));
+  if (questionYears.length && !sourceMatchesArchiveQuestionYears(hit, questionYears)) return false;
+  const tokenMatches = countArchiveTokenMatches(hit, nonYearTokens);
+  if (questionYears.length) {
+    if (nonYearTokens.length) return hit.score >= 12 && tokenMatches >= 1;
+    return hit.score >= 12;
+  }
+  if (needsFreshWebContext(question)) {
+    return hit.score >= Math.max(14, topScore * 0.72) && tokenMatches >= Math.min(2, Math.max(1, nonYearTokens.length || 1));
+  }
+  if (tokenMatches >= 1 && hit.score >= 10) return true;
+  return hit.score >= Math.max(11, topScore * 0.62);
+}
+
+function searchArchive(question, limit = MAX_ARCHIVE_HITS, options = {}) {
   const scored = archiveChunks
     .map((chunk) => ({
       ...chunk,
@@ -607,8 +822,14 @@ function searchArchive(question, limit = MAX_ARCHIVE_HITS) {
   if (!scored.length) return [];
 
   const topScore = scored[0].score || 0;
-  return scored
+  const strongHits = scored
     .filter((chunk) => isStrongArchiveHit(question, chunk, topScore))
+    .slice(0, limit);
+  if (strongHits.length || options.allowFallback !== true) {
+    return strongHits;
+  }
+  return scored
+    .filter((chunk) => isReliableArchiveHit(question, chunk, topScore))
     .slice(0, limit);
 }
 
@@ -735,6 +956,28 @@ function buildArchiveEnhancementInput(question, history, sources) {
 }
 
 function toArchiveSource(hit) {
+  if (hit.sourceType === "outside-doc") {
+    return {
+      kind: "archive",
+      sourceType: "outside-doc",
+      title: hit.heading,
+      domain: "Kiruna Web Archive",
+      url: "",
+      snippet: hit.text.slice(0, 180),
+      locationLabel: hit.locationLabel,
+      locator: {
+        type: "outside-doc",
+        pageId: hit.pageId || "page-timeline2",
+        docIdx: Number(hit.docIdx) || null,
+        year: Number(hit.year) || null,
+        query: hit.text.slice(0, 220),
+        heading: hit.heading,
+        matchText: hit.text,
+        highlightText: hit.text.slice(0, 120),
+        queryTokens: tokenize(hit.heading + " " + hit.text).slice(0, 12)
+      }
+    };
+  }
   return {
     kind: "archive",
     title: hit.heading,
@@ -1055,10 +1298,10 @@ async function generateArchiveHitAnswer(question, history, archiveHits) {
 }
 
 async function generateArchiveEnhancedAnswer(question, history, providedSources) {
-  const archiveSources = (Array.isArray(providedSources) ? providedSources : [])
+  const archiveSources = uniqueBy((Array.isArray(providedSources) ? providedSources : [])
     .map((source, index) => sanitizeClientArchiveSource(source, index))
     .filter(Boolean)
-    .slice(0, MAX_SOURCE_CARDS);
+    , (source) => getSourceTargetKey(source)).slice(0, MAX_SOURCE_CARDS);
 
   if (!archiveSources.length) {
     return {
@@ -1175,9 +1418,8 @@ async function generateAnswer(question, history, archiveHits) {
 
   const webSources = extractWebSources(response);
   const archiveSources = archiveHits.map(toArchiveSource);
-  const sources = uniqueBy([...webSources, ...archiveSources], (source) => {
-    return source.url || `${source.kind}:${source.title}:${source.snippet}`;
-  }).slice(0, MAX_SOURCE_CARDS);
+  const sources = uniqueBy([...webSources, ...archiveSources], (source) => getSourceTargetKey(source))
+    .slice(0, MAX_SOURCE_CARDS);
 
   const answerText = extractResponseText(response);
 
@@ -1249,10 +1491,10 @@ app.post("/api/archive-answer", async (req, res) => {
   } catch (error) {
     const errorMessage = getErrorMessage(error);
     console.error("Ark archive-answer failed:", errorMessage || error);
-    const safeSources = sources
+    const safeSources = uniqueBy(sources
       .map((source, index) => sanitizeClientArchiveSource(source, index))
       .filter(Boolean)
-      .slice(0, MAX_SOURCE_CARDS);
+      , (source) => getSourceTargetKey(source)).slice(0, MAX_SOURCE_CARDS);
     return res.status(500).json({
       error: "The archive assistant could not complete the request.",
       error_detail: errorMessage || undefined,
@@ -1281,12 +1523,28 @@ app.post("/api/chat", async (req, res) => {
   try {
     const archiveHits = searchArchive(question, MAX_ARCHIVE_HITS);
     const result = await generateAnswer(question, history, archiveHits);
+    if (result.mode === "web-search-unavailable" && !archiveHits.length) {
+      const fallbackArchiveHits = searchArchive(question, MAX_ARCHIVE_HITS, { allowFallback: true });
+      if (fallbackArchiveHits.length) {
+        const archiveFallback = await generateArchiveHitAnswer(question, history, fallbackArchiveHits);
+        return res.json({
+          answer: archiveFallback.answer,
+          sources: archiveFallback.sources,
+          mode: archiveFallback.mode,
+          used_ai: archiveFallback.used_ai,
+          error_detail: result.error_detail,
+          web_search_unavailable: true
+        });
+      }
+    }
 
     return res.json({
       answer: result.answer,
       sources: result.sources,
       mode: result.mode,
-      used_ai: result.used_ai
+      used_ai: result.used_ai,
+      error_detail: result.error_detail,
+      web_search_unavailable: result.web_search_unavailable === true
     });
   } catch (error) {
     const errorMessage = getErrorMessage(error);
