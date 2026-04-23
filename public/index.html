@@ -21463,7 +21463,9 @@ body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
   const CHAT_FAB_KEY='kiruna_chat_fab_position_v1';
   const CHAT_MAX_TURNS=48;
   const MAX_SOURCE_CARDS=6;
+  const AI_SOURCE_CARD_LIMIT=3;
   const CHAT_API_ENDPOINT='/api/chat';
+  const CHAT_ARCHIVE_ANSWER_ENDPOINT='/api/archive-answer';
   const CHAT_WEAK_WEB_ENDPOINT='/api/weak-web-search';
   const TESTING_REPLY='This feature is still in testing.';
   const state={
@@ -22143,8 +22145,8 @@ body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
 
   function buildApiUnavailableMessage(question){
     return containsCjk(question)
-      ? '我没有在当前 archive web 里找到足够强的匹配，而且现在也连不上 `/api/chat`，所以暂时不能继续用 AI 补答。通常这是因为页面是直接静态打开的，或者本地/Railway 服务还没启动。'
-      : 'I could not find a strong local match in this archive web, and I also could not reach `/api/chat` for the AI fallback. This usually means the page is being opened statically or the local/Railway server is not running.';
+      ? '我没有在当前 archive web 里找到足够强的匹配，而且现在也连不上 AI API，所以暂时不能继续用 AI 补答。通常这是因为页面是直接静态打开的，或者本地/Railway 服务还没启动。'
+      : 'I could not find a strong local match in this archive web, and I also could not reach the AI API for the fallback answer. This usually means the page is being opened statically or the local/Railway server is not running.';
   }
 
   function escapeHtml(value){
@@ -22164,6 +22166,42 @@ body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
         role:turn.role,
         text:String(turn.text||'')
       }));
+  }
+
+  function canReachChatApi(){
+    return window.location.protocol!=='file:'&&window.location.origin!=='null';
+  }
+
+  function trimSourcesForTurn(sources,limit){
+    return Array.isArray(sources)
+      ? sources.filter(Boolean).slice(0,Number(limit)||MAX_SOURCE_CARDS)
+      : [];
+  }
+
+  async function requestAssistantPayload(endpoint,body){
+    const response=await fetch(endpoint,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(body||{})
+    });
+    const payload=await response.json().catch(()=>null);
+    return {response,payload};
+  }
+
+  function hasArchiveEnhancedPayload(payload){
+    return Boolean(
+      String(payload?.answer||'').trim()&&
+      (payload?.used_ai===true||payload?.mode==='archive-enhanced')
+    );
+  }
+
+  function hasStrongAiAnswerPayload(payload){
+    const answer=String(payload?.answer||'').trim();
+    const sources=trimSourcesForTurn(payload?.sources,AI_SOURCE_CARD_LIMIT);
+    const mode=String(payload?.mode||'');
+    if(!answer||!sources.length) return false;
+    if(payload?.used_ai!==true) return false;
+    return mode!=='archive-only'&&mode!=='archive-fallback'&&mode!=='archive-missing';
   }
 
   function findTurnById(turnId){
@@ -23362,14 +23400,52 @@ body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
         return;
       }
       const localSearch=searchLocalArchive(question);
-      if(localSearch.strongSources.length){
+      const strongLocalSources=trimSourcesForTurn(localSearch.strongSources,MAX_SOURCE_CARDS);
+      if(strongLocalSources.length){
+        let archiveEnhancedPayload=null;
+        if(canReachChatApi()){
+          try{
+            const {response,payload}=await requestAssistantPayload(CHAT_ARCHIVE_ANSWER_ENDPOINT,{
+              question,
+              history,
+              sources:strongLocalSources
+            });
+            if(response.ok&&hasArchiveEnhancedPayload(payload)){
+              archiveEnhancedPayload=payload;
+            }
+          }catch(e){}
+        }
         updateTurn(pendingTurn.id,{
           pending:false,
-          text:buildLocalAnswer(question,localSearch.strongSources),
-          sources:localSearch.strongSources.slice(0,MAX_SOURCE_CARDS)
+          text:archiveEnhancedPayload?.answer
+            ? String(archiveEnhancedPayload.answer)
+            : buildLocalAnswer(question,strongLocalSources),
+          sources:strongLocalSources
         });
         return;
       }
+      let apiError=null;
+      if(canReachChatApi()){
+        try{
+          const {response,payload}=await requestAssistantPayload(CHAT_API_ENDPOINT,{question,history});
+          if(response.ok&&hasStrongAiAnswerPayload(payload)){
+            updateTurn(pendingTurn.id,{
+              pending:false,
+              text:String(payload?.answer||'No answer returned.'),
+              sources:trimSourcesForTurn(payload?.sources,AI_SOURCE_CARD_LIMIT)
+            });
+            return;
+          }
+          if(!response.ok){
+            apiError=new Error(payload?.error||'The assistant request failed.');
+          }
+        }catch(error){
+          apiError=error;
+        }
+      }else{
+        apiError=new Error('The AI API is not reachable from a static page context.');
+      }
+
       let weakWebSuggestion=null;
       try{
         weakWebSuggestion=await fetchWeakWebSuggestion(question);
@@ -23390,49 +23466,20 @@ body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
         });
         return;
       }
-      if(window.location.protocol==='file:'||window.location.origin==='null'||!questionNeedsFreshContext(question)){
+
+      if(apiError){
         updateTurn(pendingTurn.id,{
           pending:false,
-          text:buildNotFoundMessage(question),
+          text:buildApiUnavailableMessage(question),
           sources:[]
         });
         return;
       }
-      const response=await fetch(CHAT_API_ENDPOINT,{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({question,history})
-      });
-      const payload=await response.json().catch(()=>null);
-      if(!response.ok){
-        const errorWebBackedSources=Array.isArray(payload?.sources)
-          ? payload.sources.filter(source=>Boolean(source&&source.url))
-          : [];
-        if(payload?.answer&&errorWebBackedSources.length){
-          updateTurn(pendingTurn.id,{
-            pending:false,
-            text:String(payload.answer),
-            sources:Array.isArray(payload?.sources)?payload.sources.slice(0,MAX_SOURCE_CARDS):[]
-          });
-          return;
-        }
-        throw new Error(payload?.error||'The assistant request failed.');
-      }
-      const webBackedSources=Array.isArray(payload?.sources)
-        ? payload.sources.filter(source=>Boolean(source&&source.url))
-        : [];
-      if(!webBackedSources.length){
-        updateTurn(pendingTurn.id,{
-          pending:false,
-          text:buildNotFoundMessage(question),
-          sources:[]
-        });
-        return;
-      }
+
       updateTurn(pendingTurn.id,{
         pending:false,
-        text:String(payload?.answer||'No answer returned.'),
-        sources:Array.isArray(payload?.sources)?payload.sources.slice(0,MAX_SOURCE_CARDS):[]
+        text:buildNotFoundMessage(question),
+        sources:[]
       });
     }catch(error){
       setPendingWeakSuggestion(null);

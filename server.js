@@ -626,6 +626,61 @@ function buildArchiveContext(hits) {
     .join("\n\n");
 }
 
+function sanitizeClientArchiveSource(source, index) {
+  const title = normalizeWhitespace(
+    source?.title || source?.locator?.heading || `Archive source ${index + 1}`
+  );
+  const snippet = normalizeWhitespace(
+    source?.snippet ||
+      source?.locator?.highlightText ||
+      source?.locator?.matchText ||
+      source?.locator?.query ||
+      ""
+  );
+  const answerText = normalizeWhitespace(
+    source?.locator?.matchText || source?.locator?.query || source?.snippet || ""
+  );
+
+  if (!title || !snippet) return null;
+
+  return {
+    kind: "archive",
+    sourceType: normalizeWhitespace(source?.sourceType || "text") || "text",
+    title,
+    domain: normalizeWhitespace(source?.domain || "Kiruna Archive") || "Kiruna Archive",
+    url: "",
+    snippet: snippet.slice(0, 320),
+    locationLabel: normalizeWhitespace(source?.locationLabel || ""),
+    locator: source?.locator && typeof source.locator === "object" ? source.locator : null,
+    answerText: answerText.slice(0, 1800)
+  };
+}
+
+function stripSourceAnswerText(source) {
+  if (!source) return source;
+  const { answerText, ...rest } = source;
+  return rest;
+}
+
+function buildClientArchiveContext(sources) {
+  if (!sources.length) {
+    return "No strong client-side archive sources were supplied.";
+  }
+
+  return sources
+    .map((source, index) => {
+      return [
+        `[Client archive source ${index + 1}]`,
+        `Title: ${source.title}`,
+        source.locationLabel ? `Location: ${source.locationLabel}` : "",
+        source.answerText
+      ]
+        .filter(Boolean)
+        .join("\n");
+    })
+    .join("\n\n");
+}
+
 function buildConversationContext(history) {
   if (!Array.isArray(history) || !history.length) return "No previous conversation.";
 
@@ -643,6 +698,25 @@ function needsFreshWebContext(question) {
   return /\b(latest|recent|current|today|now|newest|202[4-9]|this year|updated)\b/i.test(
     question
   );
+}
+
+function buildArchiveEnhancementInput(question, history, sources) {
+  return [
+    "Conversation so far:",
+    buildConversationContext(history),
+    "",
+    "Direct local archive sources selected by the client:",
+    buildClientArchiveContext(sources),
+    "",
+    "User question:",
+    question,
+    "",
+    "Answer requirements:",
+    "- Answer only from the provided local archive sources.",
+    "- Do not use outside knowledge or web facts.",
+    "- If the provided sources only partially answer the question, say so briefly instead of guessing.",
+    "- Keep the answer concise, accurate, and easy to verify against the supplied archive sources."
+  ].join("\n");
 }
 
 function toArchiveSource(hit) {
@@ -686,6 +760,26 @@ function buildArchiveOnlyAnswer(question, hits, reason) {
 
   return [
     `I answered from the local archive because live web-backed synthesis is not available right now.${suffix}`,
+    excerpts,
+    "",
+    `Question: ${question}`
+  ].join("\n");
+}
+
+function buildProvidedArchiveAnswer(question, sources, reason) {
+  if (!sources.length) {
+    const suffix = reason ? ` ${reason}` : "";
+    return `I could not find a strong match in the local archive for "${question}".${suffix}`;
+  }
+
+  const excerpts = sources
+    .slice(0, 2)
+    .map((source) => `- ${source.title}: ${source.answerText.slice(0, 220)}`)
+    .join("\n");
+  const suffix = reason ? ` ${reason}` : "";
+
+  return [
+    `I answered from the local archive sources already matched in this archive web.${suffix}`,
     excerpts,
     "",
     `Question: ${question}`
@@ -772,6 +866,9 @@ function extractWebSources(response) {
 }
 
 function buildModelInput(question, history, archiveHits) {
+  const archiveRule = archiveHits.length
+    ? "Strong local archive matches are available. Use them first, and only add web search if they are not sufficient."
+    : "No strong local archive matches were found. You should use web search and answer only when you find directly relevant Kiruna-related evidence.";
   const freshnessRule = needsFreshWebContext(question)
     ? "This question explicitly asks for recent or current information, so you should use web search before answering."
     : "Use web search if the local archive context is not sufficient or if current developments would materially improve the answer.";
@@ -789,12 +886,69 @@ function buildModelInput(question, history, archiveHits) {
     "Answer requirements:",
     "- Always ground the answer in multiple sources when available.",
     "- Prioritize the local Kiruna archive excerpts when they already answer the question.",
+    `- ${archiveRule}`,
     `- ${freshnessRule}`,
     "- Keep the answer concise and factual.",
     "- If you are unsure, say what is uncertain.",
     "- Do not invent dates, figures, quotes, or sources.",
     "- When web search is used, let the built-in citations remain in the answer."
   ].join("\n");
+}
+
+async function generateArchiveEnhancedAnswer(question, history, providedSources) {
+  const archiveSources = (Array.isArray(providedSources) ? providedSources : [])
+    .map((source, index) => sanitizeClientArchiveSource(source, index))
+    .filter(Boolean)
+    .slice(0, MAX_SOURCE_CARDS);
+
+  if (!archiveSources.length) {
+    return {
+      answer: "",
+      sources: [],
+      mode: "archive-missing",
+      used_ai: false
+    };
+  }
+
+  if (!client || !MODEL) {
+    return {
+      answer: buildProvidedArchiveAnswer(
+        question,
+        archiveSources,
+        buildLiveModelUnavailableReason()
+      ),
+      sources: archiveSources.map(stripSourceAnswerText),
+      mode: "archive-only",
+      used_ai: false
+    };
+  }
+
+  const response = await client.createResponses({
+    model: MODEL,
+    reasoning: { effort: "low" },
+    instructions:
+      "You are the Kiruna Archive assistant. Answer only from the provided archive excerpts. Do not use web search or outside facts. If the local evidence is partial, say so clearly and avoid guessing.",
+    input: buildArchiveEnhancementInput(question, history, archiveSources)
+  });
+
+  if (response?.error?.message) {
+    throw new Error(response.error.message);
+  }
+
+  const answerText = extractResponseText(response);
+
+  return {
+    answer:
+      answerText ||
+      buildProvidedArchiveAnswer(
+        question,
+        archiveSources,
+        "The model returned an empty answer."
+      ),
+    sources: archiveSources.map(stripSourceAnswerText),
+    mode: "archive-enhanced",
+    used_ai: Boolean(answerText)
+  };
 }
 
 async function generateAnswer(question, history, archiveHits) {
@@ -806,7 +960,8 @@ async function generateAnswer(question, history, archiveHits) {
         buildLiveModelUnavailableReason()
       ),
       sources: archiveHits.map(toArchiveSource).slice(0, MAX_SOURCE_CARDS),
-      mode: "archive-only"
+      mode: "archive-only",
+      used_ai: false
     };
   }
 
@@ -845,7 +1000,8 @@ async function generateAnswer(question, history, archiveHits) {
   return {
     answer: answerText || buildArchiveOnlyAnswer(question, archiveHits, "The model returned an empty answer."),
     sources,
-    mode: webSources.length ? "hybrid" : "archive"
+    mode: webSources.length ? "hybrid" : "archive",
+    used_ai: Boolean(answerText)
   };
 }
 
@@ -882,6 +1038,42 @@ app.post("/api/weak-web-search", async (req, res) => {
   }
 });
 
+app.post("/api/archive-answer", async (req, res) => {
+  const question = normalizeWhitespace(req.body?.question || "");
+  const history = Array.isArray(req.body?.history) ? req.body.history : [];
+  const sources = Array.isArray(req.body?.sources) ? req.body.sources : [];
+
+  if (!question) {
+    return res.status(400).json({ error: "Question is required." });
+  }
+
+  try {
+    const result = await generateArchiveEnhancedAnswer(question, history, sources);
+    return res.json({
+      answer: result.answer,
+      sources: result.sources,
+      mode: result.mode,
+      used_ai: result.used_ai
+    });
+  } catch (error) {
+    const safeSources = sources
+      .map((source, index) => sanitizeClientArchiveSource(source, index))
+      .filter(Boolean)
+      .slice(0, MAX_SOURCE_CARDS);
+    return res.status(500).json({
+      error: "The archive assistant could not complete the request.",
+      answer: buildProvidedArchiveAnswer(
+        question,
+        safeSources,
+        "The live model request failed, so this is a local archive fallback."
+      ),
+      sources: safeSources.map(stripSourceAnswerText),
+      mode: "archive-fallback",
+      used_ai: false
+    });
+  }
+});
+
 app.post("/api/chat", async (req, res) => {
   const question = normalizeWhitespace(req.body?.question || "");
   const history = Array.isArray(req.body?.history) ? req.body.history : [];
@@ -897,7 +1089,8 @@ app.post("/api/chat", async (req, res) => {
     return res.json({
       answer: result.answer,
       sources: result.sources,
-      mode: result.mode
+      mode: result.mode,
+      used_ai: result.used_ai
     });
   } catch (error) {
     const archiveHits = searchArchive(question, MAX_ARCHIVE_HITS);
@@ -909,7 +1102,8 @@ app.post("/api/chat", async (req, res) => {
         "The live model request failed, so this is a local archive fallback."
       ),
       sources: archiveHits.map(toArchiveSource).slice(0, MAX_SOURCE_CARDS),
-      mode: "archive-fallback"
+      mode: "archive-fallback",
+      used_ai: false
     });
   }
 });

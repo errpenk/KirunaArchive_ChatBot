@@ -14,7 +14,7 @@
   "dependencies": {
     "@volcengine/ark-runtime": "1.0.5",
     "cheerio": "^1.0.0",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.6.1",
     "express": "^4.21.2"
   }
 }
