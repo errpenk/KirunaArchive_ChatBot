@@ -22099,54 +22099,30 @@ body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
     if(!Array.isArray(sources)||!sources.length) return '';
     const chinese=containsCjk(question);
     const lead=sources[0];
-    const second=sources[1]||null;
     const mapSource=sources.find(source=>source.locator?.type==='event')||null;
     const outsideSource=sources.find(source=>source.locator?.type==='outside-doc')||null;
-    const textSource=sources.find(source=>source.locator?.type==='text')||null;
     if(chinese){
-      const parts=['我先在当前 archive web 里找到了相关内容。'];
       if(mapSource){
-        parts.push('最接近的问题命中是地图事件“'+mapSource.title+'”，相关说明是：'+mapSource.snippet);
-      }else if(outsideSource){
-        parts.push('最接近的问题命中是 Outside Map 文档“'+outsideSource.title+'”，相关内容是：'+outsideSource.snippet);
-      }else{
-        parts.push('最接近的问题命中是“'+lead.title+'”，相关原文是：'+lead.snippet);
+        return '我在 archive 里找到直接命中：地图事件“'+mapSource.title+'”。'+mapSource.snippet+' 可用下面的来源卡片直接跳转。';
       }
-      if(outsideSource&&outsideSource!==mapSource&&outsideSource!==lead){
-        parts.push('同时，Outside Map 里还有一条可直接定位的补充文档：'+outsideSource.snippet);
+      if(outsideSource){
+        return '我在 archive 里找到直接命中：Outside Map 文档“'+outsideSource.title+'”。'+outsideSource.snippet+' 可用下面的来源卡片直接跳转。';
       }
-      if(textSource&&textSource!==mapSource&&textSource!==outsideSource){
-        parts.push('同时，文本区还有一条可直接定位的补充信息：'+textSource.snippet);
-      }else if(second){
-        parts.push('另外一个相关来源是“'+second.title+'”：'+second.snippet);
-      }
-      parts.push('下面的来源卡片都可以直接跳转；命中文本会用黄色高亮，Outside Map 文档也会直接定位。');
-      return parts.join(' ');
+      return '我在 archive 里找到直接命中：“'+lead.title+'”。'+lead.snippet+' 可用下面的来源卡片直接跳转到对应位置。';
     }
-    const parts=['I found relevant material directly inside this archive web.'];
     if(mapSource){
-      parts.push('The closest map match is "'+mapSource.title+'": '+mapSource.snippet);
-    }else if(outsideSource){
-      parts.push('The closest Outside Map document is "'+outsideSource.title+'": '+outsideSource.snippet);
-    }else{
-      parts.push('The closest text match is "'+lead.title+'": '+lead.snippet);
+      return 'I found a direct archive match: map event "'+mapSource.title+'". '+mapSource.snippet+' Use the source card to jump there.';
     }
-    if(outsideSource&&outsideSource!==mapSource&&outsideSource!==lead){
-      parts.push('A supporting Outside Map document also appears in "'+outsideSource.title+'": '+outsideSource.snippet);
+    if(outsideSource){
+      return 'I found a direct archive match: Outside Map document "'+outsideSource.title+'". '+outsideSource.snippet+' Use the source card to jump there.';
     }
-    if(textSource&&textSource!==mapSource&&textSource!==outsideSource){
-      parts.push('A supporting passage also appears in "'+textSource.title+'": '+textSource.snippet);
-    }else if(second){
-      parts.push('A second supporting source is "'+second.title+'": '+second.snippet);
-    }
-    parts.push('Use the source cards below to jump directly to the event, highlighted passage, or Outside Map document.');
-    return parts.join(' ');
+    return 'I found a direct archive match: "'+lead.title+'". '+lead.snippet+' Use the source card to jump there.';
   }
 
   function buildApiUnavailableMessage(question){
     return containsCjk(question)
-      ? '我没有在当前 archive web 里找到足够强的匹配，而且现在也连不上 AI API，所以暂时不能继续用 AI 补答。通常这是因为页面是直接静态打开的，或者本地/Railway 服务还没启动。'
-      : 'I could not find a strong local match in this archive web, and I also could not reach the AI API for the fallback answer. This usually means the page is being opened statically or the local/Railway server is not running.';
+      ? '我没有找到强直接命中，而且当前连不上 AI API。'
+      : 'I could not find a strong direct match, and the AI API is unavailable right now.';
   }
 
   function escapeHtml(value){
@@ -23177,9 +23153,9 @@ body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
   function buildWeakWebPrompt(question,sources){
     const chinese=containsCjk(question);
     if(chinese){
-      return '我没有在 archive 里找到强直接答案，但找到了其他可能相关的线索。你想看弱相关的 web 回答吗？可以点击下面的 Yes / No，也可以直接输入。';
+      return '我没有找到强直接答案，但找到了弱相关的 web 线索。要展开看吗？可点 Yes / No，或直接输入。';
     }
-    return 'I could not find a strong direct answer in the archive, but I found other potentially related clues. Do you want the weaker-related web answer? Use the Yes or No buttons below or type.';
+    return 'I could not find a strong direct archive answer, but I found weaker web clues. Show them? Use Yes / No below or type.';
   }
 
   function buildWeakWebAnswer(question,sources){
@@ -23188,33 +23164,25 @@ body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
     const second=sources[1]||null;
     const third=sources[2]||null;
     if(chinese){
-      const parts=[
-        '这是你确认后展开的弱相关 web 回答，不是 archive 内部的直接命中。',
-        '目前最接近的 Kiruna 相关外部线索是“'+lead.title+'”'
-      ];
-      if(lead.domain) parts.push('，来源于 '+lead.domain+'。');
-      else parts.push('。');
-      if(lead.snippet) parts.push('摘要：'+lead.snippet);
-      if(second) parts.push('另一条接近的来源是“'+second.title+'”。');
-      if(third) parts.push('第三条可交叉核对的来源是“'+third.title+'”。');
-      parts.push('你可以直接打开下面的来源卡片继续核对。');
-      return parts.join(' ');
+      let text='这是弱相关 web 结果。最接近的线索是“'+lead.title+'”';
+      if(lead.domain) text+='，来源于 '+lead.domain;
+      text+='。';
+      if(lead.snippet) text+=' '+lead.snippet;
+      if(second) text+=' 另一个来源是“'+second.title+'”。';
+      if(third) text+=' 还可交叉查看“'+third.title+'”。';
+      return text;
     }
-    const parts=[
-      'This is the weaker-related web answer you confirmed, not a direct archive hit.',
-      'The closest Kiruna-related outside source I found is "'+lead.title+'".'
-    ];
-    if(lead.snippet) parts.push('Snippet: '+lead.snippet);
-    if(second) parts.push('A second nearby lead is "'+second.title+'".');
-    if(third) parts.push('A third cross-check source is "'+third.title+'".');
-    parts.push('Use the source cards below to inspect the web sources directly.');
-    return parts.join(' ');
+    let text='This is the weaker web result. The closest lead is "'+lead.title+'".';
+    if(lead.snippet) text+=' '+lead.snippet;
+    if(second) text+=' Another source is "'+second.title+'".';
+    if(third) text+=' You can also cross-check "'+third.title+'".';
+    return text;
   }
 
   function buildNotFoundMessage(question){
     return containsCjk(question)
-      ? '我没有在当前 archive web 里找到足够强相关的内容，也没有找到值得继续展开的弱相关 web 线索，所以先不乱答。你可以换一种问法，或者补一个年份、地点、人物或主题词。'
-      : 'I could not find a strongly related answer in this archive web, and I did not find a weak web lead worth expanding, so I am not going to guess. Try adding a year, place, person, or topic keyword.';
+      ? '我没有找到足够相关的答案。可以补一个年份、地点、人物或主题词。'
+      : 'I could not find a reliable answer. Try adding a year, place, person, or topic keyword.';
   }
 
   function questionNeedsFreshContext(question){

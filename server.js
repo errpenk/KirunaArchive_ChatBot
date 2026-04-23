@@ -702,6 +702,18 @@ function needsFreshWebContext(question) {
   );
 }
 
+function containsCjk(value) {
+  return /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/.test(String(value || ""));
+}
+
+function buildResponseStyleRules(question) {
+  return [
+    "- Reply in the same language as the user's question.",
+    "- Answer directly; do not start with meta phrases like 'Based solely on' or 'According to the archive'.",
+    "- Keep the answer short, ideally 1-3 sentences unless the question clearly needs more detail."
+  ];
+}
+
 function buildArchiveEnhancementInput(question, history, sources) {
   return [
     "Conversation so far:",
@@ -717,7 +729,8 @@ function buildArchiveEnhancementInput(question, history, sources) {
     "- Answer only from the provided local archive sources.",
     "- Do not use outside knowledge or web facts.",
     "- If the provided sources only partially answer the question, say so briefly instead of guessing.",
-    "- Keep the answer concise, accurate, and easy to verify against the supplied archive sources."
+    "- Keep the answer concise, accurate, and easy to verify against the supplied archive sources.",
+    ...buildResponseStyleRules(question)
   ].join("\n");
 }
 
@@ -743,49 +756,35 @@ function toArchiveSource(hit) {
 }
 
 function buildArchiveOnlyAnswer(question, hits, reason) {
+  const chinese = containsCjk(question);
   if (!hits.length) {
-    const suffix = reason
-      ? ` ${reason}`
-      : "";
-    return `I could not find a strong match in the local archive for "${question}".${suffix}`;
+    const suffix = reason ? ` ${reason}` : "";
+    return chinese
+      ? `我没有在本地 archive 里找到足够强的直接匹配。${suffix}`.trim()
+      : `I could not find a strong direct archive match.${suffix}`.trim();
   }
 
   const lead = hits[0];
-  const excerpts = hits
-    .slice(0, 2)
-    .map((hit) => `- ${hit.heading}: ${hit.text.slice(0, 220)}`)
-    .join("\n");
-
-  const suffix = reason
-    ? ` ${reason}`
-    : "";
-
-  return [
-    `I answered from the local archive because live web-backed synthesis is not available right now.${suffix}`,
-    excerpts,
-    "",
-    `Question: ${question}`
-  ].join("\n");
+  if (chinese) {
+    return `本地 archive 的最接近结果是“${lead.heading}”：${lead.text.slice(0, 180)}`;
+  }
+  return `The closest archive match is "${lead.heading}": ${lead.text.slice(0, 180)}`;
 }
 
 function buildProvidedArchiveAnswer(question, sources, reason) {
+  const chinese = containsCjk(question);
   if (!sources.length) {
     const suffix = reason ? ` ${reason}` : "";
-    return `I could not find a strong match in the local archive for "${question}".${suffix}`;
+    return chinese
+      ? `我没有在本地 archive 里找到足够强的直接匹配。${suffix}`.trim()
+      : `I could not find a strong direct archive match.${suffix}`.trim();
   }
 
-  const excerpts = sources
-    .slice(0, 2)
-    .map((source) => `- ${source.title}: ${source.answerText.slice(0, 220)}`)
-    .join("\n");
-  const suffix = reason ? ` ${reason}` : "";
-
-  return [
-    `I answered from the local archive sources already matched in this archive web.${suffix}`,
-    excerpts,
-    "",
-    `Question: ${question}`
-  ].join("\n");
+  const lead = sources[0];
+  if (chinese) {
+    return `本地 archive 的直接命中是“${lead.title}”：${lead.answerText.slice(0, 180)}`;
+  }
+  return `The direct archive hit is "${lead.title}": ${lead.answerText.slice(0, 180)}`;
 }
 
 function buildLiveModelUnavailableReason() {
@@ -945,7 +944,8 @@ function buildModelInput(question, history, archiveHits) {
     "- Keep the answer concise and factual.",
     "- If you are unsure, say what is uncertain.",
     "- Do not invent dates, figures, quotes, or sources.",
-    "- When web search is used, let the built-in citations remain in the answer."
+    "- When web search is used, let the built-in citations remain in the answer.",
+    ...buildResponseStyleRules(question)
   ].join("\n");
 }
 
@@ -964,7 +964,8 @@ function buildArchiveOnlyModelInput(question, history, archiveHits) {
     "- Answer only from the supplied archive context.",
     "- Do not use outside knowledge or claim web findings.",
     "- If the archive context only partially answers the question, say so briefly.",
-    "- Keep the answer concise and factual."
+    "- Keep the answer concise and factual.",
+    ...buildResponseStyleRules(question)
   ].join("\n");
 }
 
@@ -994,7 +995,7 @@ async function generateArchiveHitAnswer(question, history, archiveHits) {
   const response = await client.createResponses(
     buildResponsesRequest(MODEL, {
       instructions:
-        "You are the Kiruna Archive assistant. Answer only from the provided archive excerpts. Do not use web search or outside facts. If the archive evidence is partial, say so clearly and avoid guessing.",
+        "You are the Kiruna Archive assistant. Answer only from the provided archive excerpts. Do not use web search or outside facts. If the archive evidence is partial, say so clearly and avoid guessing. Reply in the user's language and answer directly without meta framing.",
       input: buildResponsesUserInput(
         buildArchiveOnlyModelInput(question, history, archiveHits)
       )
@@ -1052,7 +1053,7 @@ async function generateArchiveEnhancedAnswer(question, history, providedSources)
   const response = await client.createResponses(
     buildResponsesRequest(MODEL, {
       instructions:
-        "You are the Kiruna Archive assistant. Answer only from the provided archive excerpts. Do not use web search or outside facts. If the local evidence is partial, say so clearly and avoid guessing.",
+        "You are the Kiruna Archive assistant. Answer only from the provided archive excerpts. Do not use web search or outside facts. If the local evidence is partial, say so clearly and avoid guessing. Reply in the user's language and answer directly without meta framing.",
       input: buildResponsesUserInput(
         buildArchiveEnhancementInput(question, history, archiveSources)
       )
@@ -1098,7 +1099,7 @@ async function generateAnswer(question, history, archiveHits) {
     response = await client.createResponses(
       buildResponsesRequest(MODEL, {
         instructions:
-          "You are the Kiruna Archive assistant. Help users understand Kiruna, LKAB, urban relocation, heritage, mining, public discourse, Sami land questions, and related topics. Prefer the supplied archive context when it is enough. If you use web search, stay tightly anchored to Kiruna or directly connected LKAB/Norrbotten developments rather than broad Sweden news. Cite multiple sources when possible and never fabricate facts or sources.",
+          "You are the Kiruna Archive assistant. Help users understand Kiruna, LKAB, urban relocation, heritage, mining, public discourse, Sami land questions, and related topics. Prefer the supplied archive context when it is enough. If you use web search, stay tightly anchored to Kiruna or directly connected LKAB/Norrbotten developments rather than broad Sweden news. Cite multiple sources when possible and never fabricate facts or sources. Reply in the user's language and answer directly without meta framing.",
         tools: [
           {
             type: "web_search",
