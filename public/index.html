@@ -21183,7 +21183,10 @@ function initDiscourse(){
   margin-bottom:4px;
 }
 .chat-source-title{display:block;font-size:12px;line-height:1.5;font-weight:600;color:var(--b);letter-spacing:-.01em}
-.chat-source-snippet{display:block;margin-top:5px;font-size:11px;line-height:1.55;color:var(--g2)}
+.chat-source-snippet{
+  display:-webkit-box;margin-top:5px;font-size:11px;line-height:1.55;color:var(--g2);
+  overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:4;
+}
 .chat-source-link{display:inline-flex;margin-top:6px;font-size:11px;color:var(--b);opacity:.6}
 .chat-source-jump{
   width:100%;text-align:left;cursor:pointer;font-family:var(--sans);
@@ -21543,6 +21546,7 @@ body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
     panelOpen:false,
     activeTurnId:null,
     pendingWeakSuggestion:null,
+    pendingExternalSuggestion:null,
     fabPos:loadFabPos(),
     drag:null,
     suppressFabClick:false
@@ -21634,6 +21638,7 @@ body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
   let chatSourceReturnPositionFrame=null;
   let chatSourceReturnRetryTimer=null;
   let chatSourceReturnFollowTimers=[];
+  let outsideDocFlashTimers=[];
   let archiveHighlightRefreshToken=0;
   let archiveHighlightRefreshTimers=[];
 
@@ -21796,6 +21801,19 @@ body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
     return /[\u3400-\u9fff]/.test(String(value||''));
   }
 
+  function detectQuestionLanguage(value){
+    const text=normalizeSearchText(value).toLowerCase();
+    if(containsCjk(text)) return 'zh';
+    const italianMatches=text.match(/\b(il|lo|la|gli|le|un|uno|una|che|chi|come|dove|quando|quale|quali|per|con|senza|sono|sei|siamo|voglio|vorrei|mostra|dimmi|trova|spiega|recenti|ultimi|ultime|relazione|spostamento|discorso|dati|mappa|tempo|fuori|archivio)\b/g)||[];
+    if(italianMatches.length>=2||/[àèéìòù]/.test(text)) return 'it';
+    return 'en';
+  }
+
+  function localizeForQuestion(question,messages){
+    const language=detectQuestionLanguage(question);
+    return messages[language]||messages.en;
+  }
+
   function extractQuestionYears(value){
     return [...new Set(
       (String(value||'').match(/\b(18|19|20)\d{2}\b/g)||[]).map(Number)
@@ -21813,11 +21831,11 @@ body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
   }
 
   function isAffirmativeReply(value){
-    return /^(yes|y|yeah|yep|sure|ok|okay|please do|go ahead|是|对|好|好的|可以|行|要|想)$/i.test(normalizeSearchText(value));
+    return /^(yes|y|yeah|yep|sure|ok|okay|please do|go ahead|si|sì|certo|va bene|mostra|procedi|是|对|好|好的|可以|行|要|想)$/i.test(normalizeSearchText(value));
   }
 
   function isNegativeReply(value){
-    return /^(no|n|nope|nah|not now|不是|否|不要|不用|不想|不对|不是这个)$/i.test(normalizeSearchText(value));
+    return /^(no|n|nope|nah|not now|non ora|no grazie|不是|否|不要|不用|不想|不对|不是这个)$/i.test(normalizeSearchText(value));
   }
 
   function getPageLabel(pageId){
@@ -22280,56 +22298,100 @@ body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
 
   function buildLocalAnswer(question,sources){
     if(!Array.isArray(sources)||!sources.length) return '';
-    const chinese=containsCjk(question);
     const lead=sources[0];
     const eventSource=sources.find(source=>source.locator?.type==='event')||null;
     const outsideSource=sources.find(source=>source.locator?.type==='outside-doc')||null;
-    if(chinese){
-      if(eventSource){
-        return '我在 archive 里找到直接命中：Time / Inside Map 事件“'+eventSource.title+'”。'+eventSource.snippet+' 可用下面的来源卡片直接跳转。';
-      }
-      if(outsideSource){
-        return '我在 archive 里找到直接命中：Outside Map 文档“'+outsideSource.title+'”。'+outsideSource.snippet+' 可用下面的来源卡片直接跳转。';
-      }
-      return '我在 archive 里找到直接命中：“'+lead.title+'”。'+lead.snippet+' 可用下面的来源卡片直接跳转到对应位置。';
-    }
     if(eventSource){
-      return 'I found a direct archive match: Time / Inside Map event "'+eventSource.title+'". '+eventSource.snippet+' Use the source card to jump there.';
+      return localizeForQuestion(question,{
+        zh:'我在 archive web 里找到直接命中：Time / Inside Map 事件“'+eventSource.title+'”。'+eventSource.snippet+' 可用下面的来源卡片直接跳转。',
+        it:'Ho trovato una corrispondenza diretta nell\'archive web: l\'evento Time / Inside Map "'+eventSource.title+'". '+eventSource.snippet+' Usa la scheda fonte qui sotto per saltarci.',
+        en:'I found a direct match in the archive web: the Time / Inside Map event "'+eventSource.title+'". '+eventSource.snippet+' Use the source card below to jump there.'
+      });
     }
     if(outsideSource){
-      return 'I found a direct archive match: Outside Map document "'+outsideSource.title+'". '+outsideSource.snippet+' Use the source card to jump there.';
+      return localizeForQuestion(question,{
+        zh:'我在 archive web 里找到直接命中：Outside Map 文档“'+outsideSource.title+'”。'+outsideSource.snippet+' 可用下面的来源卡片直接跳转。',
+        it:'Ho trovato una corrispondenza diretta nell\'archive web: il documento Outside Map "'+outsideSource.title+'". '+outsideSource.snippet+' Usa la scheda fonte qui sotto per saltarci.',
+        en:'I found a direct match in the archive web: the Outside Map document "'+outsideSource.title+'". '+outsideSource.snippet+' Use the source card below to jump there.'
+      });
     }
-    return 'I found a direct archive match: "'+lead.title+'". '+lead.snippet+' Use the source card to jump there.';
+    return localizeForQuestion(question,{
+      zh:'我在 archive web 里找到直接命中：“'+lead.title+'”。'+lead.snippet+' 可用下面的来源卡片直接跳转到对应位置。',
+      it:'Ho trovato una corrispondenza diretta nell\'archive web: "'+lead.title+'". '+lead.snippet+' Usa la scheda fonte qui sotto per saltarci.',
+      en:'I found a direct match in the archive web: "'+lead.title+'". '+lead.snippet+' Use the source card below to jump there.'
+    });
   }
 
   function buildLocalArchiveLeadAnswer(question,sources){
     if(!Array.isArray(sources)||!sources.length) return '';
-    const chinese=containsCjk(question);
     const lead=sources[0];
     const eventSource=sources.find(source=>source.locator?.type==='event')||null;
     const outsideSource=sources.find(source=>source.locator?.type==='outside-doc')||null;
-    if(chinese){
-      if(eventSource){
-        return '我没有找到特别强的直接命中，但在 archive 里找到最接近的 Time / Inside Map 事件“'+eventSource.title+'”。'+eventSource.snippet;
-      }
-      if(outsideSource){
-        return '我没有找到特别强的直接命中，但在 archive 里找到最接近的 Outside Map 文档“'+outsideSource.title+'”。'+outsideSource.snippet;
-      }
-      return '我没有找到特别强的直接命中，但在 archive 里找到最接近的内容“'+lead.title+'”。'+lead.snippet;
-    }
     if(eventSource){
-      return 'I did not find a very strong direct archive hit, but the closest local lead is the Time / Inside Map event "'+eventSource.title+'". '+eventSource.snippet;
+      return localizeForQuestion(question,{
+        zh:'我没有找到特别强的直接命中，但在 archive web 里找到最接近的 Time / Inside Map 事件“'+eventSource.title+'”。'+eventSource.snippet,
+        it:'Non ho trovato una corrispondenza diretta molto forte, ma il lead più vicino nell\'archive web è l\'evento Time / Inside Map "'+eventSource.title+'". '+eventSource.snippet,
+        en:'I did not find a very strong direct archive hit, but the closest lead in the archive web is the Time / Inside Map event "'+eventSource.title+'". '+eventSource.snippet
+      });
     }
     if(outsideSource){
-      return 'I did not find a very strong direct archive hit, but the closest local lead is the Outside Map document "'+outsideSource.title+'". '+outsideSource.snippet;
+      return localizeForQuestion(question,{
+        zh:'我没有找到特别强的直接命中，但在 archive web 里找到最接近的 Outside Map 文档“'+outsideSource.title+'”。'+outsideSource.snippet,
+        it:'Non ho trovato una corrispondenza diretta molto forte, ma il lead più vicino nell\'archive web è il documento Outside Map "'+outsideSource.title+'". '+outsideSource.snippet,
+        en:'I did not find a very strong direct archive hit, but the closest lead in the archive web is the Outside Map document "'+outsideSource.title+'". '+outsideSource.snippet
+      });
     }
-    return 'I did not find a very strong direct archive hit, but the closest local lead is "'+lead.title+'". '+lead.snippet;
+    return localizeForQuestion(question,{
+      zh:'我没有找到特别强的直接命中，但在 archive web 里找到最接近的内容“'+lead.title+'”。'+lead.snippet,
+      it:'Non ho trovato una corrispondenza diretta molto forte, ma il lead più vicino nell\'archive web è "'+lead.title+'". '+lead.snippet,
+      en:'I did not find a very strong direct archive hit, but the closest lead in the archive web is "'+lead.title+'". '+lead.snippet
+    });
   }
 
   function buildApiUnavailableMessage(question){
-    return containsCjk(question)
-      ? '我没有找到强直接命中，而且当前连不上 AI API。'
-      : 'I could not find a strong direct match, and the AI API is unavailable right now.';
+    return localizeForQuestion(question,{
+      zh:'我没有找到强直接命中，而且当前连不上 AI API。',
+      it:'Non ho trovato una corrispondenza diretta forte e l\'API AI non è disponibile in questo momento.',
+      en:'I could not find a strong direct match, and the AI API is unavailable right now.'
+    });
+  }
+
+  function sourceIsExternalResource(source){
+    return Boolean(String(source?.url||'').trim());
+  }
+
+  function splitAssistantSourcesForDisclosure(sources){
+    const trimmed=Array.isArray(sources)
+      ? uniqueBy(sources.filter(Boolean),source=>source.url||getArchiveSourceTargetKey(source))
+      : [];
+    return {
+      archiveSources:trimmed.filter(source=>!sourceIsExternalResource(source)).slice(0,AI_SOURCE_CARD_LIMIT),
+      externalSources:trimmed.filter(source=>sourceIsExternalResource(source)).slice(0,AI_SOURCE_CARD_LIMIT)
+    };
+  }
+
+  function buildExternalSourcesPrompt(question){
+    return localizeForQuestion(question,{
+      zh:'我还找到了外部来源。要显示吗？可点 Yes / No，或直接输入。',
+      it:'Ho trovato anche fonti esterne. Vuoi vederle? Usa Yes / No qui sotto oppure scrivi.',
+      en:'I also found external sources. Show them? Use Yes / No below or type.'
+    });
+  }
+
+  function buildExternalSourcesAnswer(question){
+    return localizeForQuestion(question,{
+      zh:'这是我找到的外部来源。',
+      it:'Ecco le fonti esterne che ho trovato.',
+      en:'Here are the external sources I found.'
+    });
+  }
+
+  function buildExternalSourcesDeclineMessage(question){
+    return localizeForQuestion(question,{
+      zh:'好，我先保留当前的 archive 回答，不展开外部来源。',
+      it:'Va bene, per ora tengo solo la risposta dell\'archive senza mostrare le fonti esterne.',
+      en:'Okay, I will keep the archive answer only for now and not open the external sources.'
+    });
   }
 
   function escapeHtml(value){
@@ -22472,6 +22534,7 @@ body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
   function clearChatSourceReturnAnchor(){
     clearChatSourceReturnRetry();
     clearChatSourceReturnFollowTimers();
+    clearOutsideDocFlashTimers();
     chatSourceReturnAnchor=null;
     if(chatSourceReturnPositionFrame){
       cancelAnimationFrame(chatSourceReturnPositionFrame);
@@ -22621,36 +22684,53 @@ body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
 
   function flashOutsideDocRow(row){
     if(!row) return;
-    const previous=row._chatFlashRestore||{
-      background:row.style.background||'',
-      outline:row.style.outline||'',
-      outlineOffset:row.style.outlineOffset||'',
-      boxShadow:row.style.boxShadow||'',
-      transition:row.style.transition||''
-    };
-    row._chatFlashRestore=previous;
-    row.style.transition='background .26s ease, box-shadow .26s ease, outline-color .26s ease';
-    row.style.background='rgba(255,241,168,.45)';
-    row.style.outline='2px solid rgba(255,205,64,.95)';
-    row.style.outlineOffset='2px';
-    row.style.boxShadow='0 0 0 7px rgba(255,241,168,.34)';
+    const doc=row.ownerDocument;
+    if(doc&&!doc.getElementById('chat-outside-highlight-style')){
+      const style=doc.createElement('style');
+      style.id='chat-outside-highlight-style';
+      style.textContent='' +
+        '.ov-event-row.chat-outside-highlight{' +
+          'background:rgba(255,241,168,.55)!important;' +
+          'outline:2px solid rgba(255,205,64,.95)!important;' +
+          'outline-offset:2px!important;' +
+          'box-shadow:0 0 0 8px rgba(255,241,168,.36)!important;' +
+          'transition:background .26s ease,box-shadow .26s ease,outline-color .26s ease;' +
+        '}' +
+        '.ov-event-row.chat-outside-highlight .ov-ev-title,' +
+        '.ov-event-row.chat-outside-highlight .ov-ev-date,' +
+        '.ov-event-row.chat-outside-highlight .ov-ev-field,' +
+        '.ov-event-row.chat-outside-highlight .ov-ev-actor{' +
+          'background:rgba(255,241,168,.18)!important;' +
+          'border-radius:8px;' +
+        '}';
+      (doc.head||doc.documentElement||doc.body).appendChild(style);
+    }
+    row.classList.add('chat-outside-highlight');
     clearTimeout(row._chatFlashTimer);
     row._chatFlashTimer=setTimeout(()=>{
       if(!row.isConnected) return;
-      const restore=row._chatFlashRestore||{};
-      row.style.background=restore.background||'';
-      row.style.outline=restore.outline||'';
-      row.style.outlineOffset=restore.outlineOffset||'';
-      row.style.boxShadow=restore.boxShadow||'';
-      row.style.transition=restore.transition||'';
-    },1800);
+      row.classList.remove('chat-outside-highlight');
+    },2200);
+  }
+
+  function clearOutsideDocFlashTimers(){
+    outsideDocFlashTimers.forEach(timer=>clearTimeout(timer));
+    outsideDocFlashTimers=[];
   }
 
   function attachChatReturnToOutsideDoc(docIdx,attempt){
     const tries=Number(attempt||0);
     const row=getOutsideDocRow(docIdx);
     if(row){
+      clearOutsideDocFlashTimers();
       flashOutsideDocRow(row);
+      [160,420,880,1480].forEach(delay=>{
+        const timer=setTimeout(()=>{
+          const currentRow=getOutsideDocRow(docIdx);
+          if(currentRow) flashOutsideDocRow(currentRow);
+        },delay);
+        outsideDocFlashTimers.push(timer);
+      });
       setChatSourceReturnAnchor({
         prefer:'text',
         getElement:()=>getOutsideDocRow(docIdx)
@@ -23033,6 +23113,13 @@ body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
           action?.kind==='weak-web-choice'&&
           state.pendingWeakSuggestion&&
           state.pendingWeakSuggestion.turnId===targetTurn?.id
+        ){
+          submitQuestion(action.value);
+        }
+        if(
+          action?.kind==='external-source-choice'&&
+          state.pendingExternalSuggestion&&
+          state.pendingExternalSuggestion.turnId===targetTurn?.id
         ){
           submitQuestion(action.value);
         }
@@ -23446,38 +23533,50 @@ body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
   }
 
   function buildWeakWebPrompt(question,sources){
-    const chinese=containsCjk(question);
-    if(chinese){
-      return '我没有找到强直接答案，但找到了弱相关的 web 线索。要展开看吗？可点 Yes / No，或直接输入。';
-    }
-    return 'I could not find a strong direct archive answer, but I found weaker web clues. Show them? Use Yes / No below or type.';
+    return localizeForQuestion(question,{
+      zh:'我没有找到强直接答案，但找到了弱相关的 web 线索。要展开看吗？可点 Yes / No，或直接输入。',
+      it:'Non ho trovato una risposta diretta forte nell\'archive web, ma ho trovato indizi web più deboli. Vuoi vederli? Usa Yes / No qui sotto oppure scrivi.',
+      en:'I could not find a strong direct archive answer, but I found weaker web clues. Show them? Use Yes / No below or type.'
+    });
   }
 
   function buildWeakWebAnswer(question,sources){
-    const chinese=containsCjk(question);
     const lead=sources[0];
     const second=sources[1]||null;
     const third=sources[2]||null;
-    if(chinese){
-      let text='这是弱相关 web 结果。最接近的线索是“'+lead.title+'”';
-      if(lead.domain) text+='，来源于 '+lead.domain;
-      text+='。';
-      if(lead.snippet) text+=' '+lead.snippet;
-      if(second) text+=' 另一个来源是“'+second.title+'”。';
-      if(third) text+=' 还可交叉查看“'+third.title+'”。';
-      return text;
-    }
-    let text='This is the weaker web result. The closest lead is "'+lead.title+'".';
-    if(lead.snippet) text+=' '+lead.snippet;
-    if(second) text+=' Another source is "'+second.title+'".';
-    if(third) text+=' You can also cross-check "'+third.title+'".';
-    return text;
+    return localizeForQuestion(question,{
+      zh:(()=>{
+        let text='这是弱相关 web 结果。最接近的线索是“'+lead.title+'”';
+        if(lead.domain) text+='，来源于 '+lead.domain;
+        text+='。';
+        if(lead.snippet) text+=' '+lead.snippet;
+        if(second) text+=' 另一个来源是“'+second.title+'”。';
+        if(third) text+=' 还可交叉查看“'+third.title+'”。';
+        return text;
+      })(),
+      it:(()=>{
+        let text='Questo è il risultato web più debole. Il lead più vicino è "'+lead.title+'".';
+        if(lead.snippet) text+=' '+lead.snippet;
+        if(second) text+=' Un\'altra fonte è "'+second.title+'".';
+        if(third) text+=' Puoi anche confrontare "'+third.title+'".';
+        return text;
+      })(),
+      en:(()=>{
+        let text='This is the weaker web result. The closest lead is "'+lead.title+'".';
+        if(lead.snippet) text+=' '+lead.snippet;
+        if(second) text+=' Another source is "'+second.title+'".';
+        if(third) text+=' You can also cross-check "'+third.title+'".';
+        return text;
+      })()
+    });
   }
 
   function buildNotFoundMessage(question){
-    return containsCjk(question)
-      ? '我没有找到足够相关的答案。可以补一个年份、地点、人物或主题词。'
-      : 'I could not find a reliable answer. Try adding a year, place, person, or topic keyword.';
+    return localizeForQuestion(question,{
+      zh:'我没有找到足够相关的答案。可以补一个年份、地点、人物或主题词。',
+      it:'Non ho trovato una risposta affidabile. Prova ad aggiungere anno, luogo, persona o parola chiave.',
+      en:'I could not find a reliable answer. Try adding a year, place, person, or topic keyword.'
+    });
   }
 
   function questionNeedsFreshContext(question){
@@ -23494,6 +23593,14 @@ body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
       updateTurn(previous.turnId,{actions:[]});
     }
     state.pendingWeakSuggestion=nextSuggestion||null;
+  }
+
+  function setPendingExternalSuggestion(nextSuggestion){
+    const previous=state.pendingExternalSuggestion;
+    if(previous?.turnId){
+      updateTurn(previous.turnId,{actions:[]});
+    }
+    state.pendingExternalSuggestion=nextSuggestion||null;
   }
 
   function emptyStateMarkup(){
@@ -23622,8 +23729,12 @@ body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
     clearChatActiveTurn(true);
     state.requestInFlight=true;
     const pendingWeakSuggestion=state.pendingWeakSuggestion;
+    const pendingExternalSuggestion=state.pendingExternalSuggestion;
     if(pendingWeakSuggestion&&!isAffirmativeReply(question)&&!isNegativeReply(question)){
       setPendingWeakSuggestion(null);
+    }
+    if(pendingExternalSuggestion&&!isAffirmativeReply(question)&&!isNegativeReply(question)){
+      setPendingExternalSuggestion(null);
     }
     const history=buildRequestHistory();
 
@@ -23644,6 +23755,24 @@ body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
     });
 
     try{
+      if(pendingExternalSuggestion&&isAffirmativeReply(question)){
+        setPendingExternalSuggestion(null);
+        updateTurn(pendingTurn.id,{
+          pending:false,
+          text:buildExternalSourcesAnswer(pendingExternalSuggestion.question||question),
+          sources:Array.isArray(pendingExternalSuggestion.sources)?pendingExternalSuggestion.sources.slice(0,AI_SOURCE_CARD_LIMIT):[]
+        });
+        return;
+      }
+      if(pendingExternalSuggestion&&isNegativeReply(question)){
+        setPendingExternalSuggestion(null);
+        updateTurn(pendingTurn.id,{
+          pending:false,
+          text:buildExternalSourcesDeclineMessage(pendingExternalSuggestion.question||question),
+          sources:[]
+        });
+        return;
+      }
       if(pendingWeakSuggestion&&isAffirmativeReply(question)){
         setPendingWeakSuggestion(null);
         updateTurn(pendingTurn.id,{
@@ -23695,9 +23824,30 @@ body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
         try{
           const {response,payload}=await requestAssistantPayload(CHAT_API_ENDPOINT,{question,history});
           if(response.ok&&hasStrongAiAnswerPayload(payload)){
+            const answerText=String(payload?.answer||'No answer returned.');
+            const disclosedSources=splitAssistantSourcesForDisclosure(payload?.sources);
+            if(disclosedSources.externalSources.length){
+              const nextExternalSuggestion={
+                question,
+                turnId:pendingTurn.id,
+                answer:answerText,
+                sources:disclosedSources.externalSources
+              };
+              setPendingExternalSuggestion(nextExternalSuggestion);
+              updateTurn(pendingTurn.id,{
+                pending:false,
+                text:answerText+' '+buildExternalSourcesPrompt(question),
+                actions:[
+                  {kind:'external-source-choice',label:'Yes',value:'Yes',style:'primary'},
+                  {kind:'external-source-choice',label:'No',value:'No'}
+                ],
+                sources:disclosedSources.archiveSources
+              });
+              return;
+            }
             updateTurn(pendingTurn.id,{
               pending:false,
-              text:String(payload?.answer||'No answer returned.'),
+              text:answerText,
               sources:trimSourcesForTurn(payload?.sources,AI_SOURCE_CARD_LIMIT)
             });
             return;

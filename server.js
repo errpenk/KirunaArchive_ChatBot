@@ -927,9 +927,32 @@ function containsCjk(value) {
   return /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/.test(String(value || ""));
 }
 
+function detectResponseLanguage(question) {
+  const text = normalizeWhitespace(question).toLowerCase();
+  if (containsCjk(text)) return "zh";
+  const italianMatches =
+    text.match(
+      /\b(il|lo|la|gli|le|un|uno|una|che|chi|come|dove|quando|quale|quali|per|con|senza|sono|sei|siamo|voglio|vorrei|mostra|dimmi|trova|spiega|recenti|ultimi|ultime|relazione|spostamento|discorso|dati|mappa|tempo|fuori|archivio)\b/g
+    ) || [];
+  if (italianMatches.length >= 2 || /[àèéìòù]/.test(text)) {
+    return "it";
+  }
+  return "en";
+}
+
+function localizeForQuestion(question, messages) {
+  const language = detectResponseLanguage(question);
+  return messages[language] || messages.en;
+}
+
 function buildResponseStyleRules(question) {
+  const languageInstruction = localizeForQuestion(question, {
+    zh: "- The current user question is in Chinese. Answer in Chinese even if earlier turns used another language.",
+    it: "- The current user question is in Italian. Answer in Italian even if earlier turns used another language.",
+    en: "- The current user question is in English. Answer in English even if earlier turns used another language."
+  });
   return [
-    "- Reply in the same language as the user's question.",
+    languageInstruction,
     "- Answer directly; do not start with meta phrases like 'Based solely on' or 'According to the archive'.",
     "- Keep the answer short, ideally 1-3 sentences unless the question clearly needs more detail."
   ];
@@ -999,35 +1022,37 @@ function toArchiveSource(hit) {
 }
 
 function buildArchiveOnlyAnswer(question, hits, reason) {
-  const chinese = containsCjk(question);
   if (!hits.length) {
-    const suffix = reason ? ` ${reason}` : "";
-    return chinese
-      ? `我没有在本地 archive 里找到足够强的直接匹配。${suffix}`.trim()
-      : `I could not find a strong direct archive match.${suffix}`.trim();
+    return localizeForQuestion(question, {
+      zh: "我没有在本地 archive web 里找到足够强的直接匹配。",
+      it: "Non ho trovato una corrispondenza diretta abbastanza forte nell'archive web locale.",
+      en: "I could not find a strong direct match in the local archive web."
+    });
   }
 
   const lead = hits[0];
-  if (chinese) {
-    return `本地 archive 的最接近结果是“${lead.heading}”：${lead.text.slice(0, 180)}`;
-  }
-  return `The closest archive match is "${lead.heading}": ${lead.text.slice(0, 180)}`;
+  return localizeForQuestion(question, {
+    zh: `本地 archive web 里最接近的结果是“${lead.heading}”：${lead.text.slice(0, 180)}`,
+    it: `Il risultato più vicino nell'archive web locale è "${lead.heading}": ${lead.text.slice(0, 180)}`,
+    en: `The closest match in the local archive web is "${lead.heading}": ${lead.text.slice(0, 180)}`
+  });
 }
 
 function buildProvidedArchiveAnswer(question, sources, reason) {
-  const chinese = containsCjk(question);
   if (!sources.length) {
-    const suffix = reason ? ` ${reason}` : "";
-    return chinese
-      ? `我没有在本地 archive 里找到足够强的直接匹配。${suffix}`.trim()
-      : `I could not find a strong direct archive match.${suffix}`.trim();
+    return localizeForQuestion(question, {
+      zh: "我没有在本地 archive web 里找到足够强的直接匹配。",
+      it: "Non ho trovato una corrispondenza diretta abbastanza forte nell'archive web locale.",
+      en: "I could not find a strong direct match in the local archive web."
+    });
   }
 
   const lead = sources[0];
-  if (chinese) {
-    return `本地 archive 的直接命中是“${lead.title}”：${lead.answerText.slice(0, 180)}`;
-  }
-  return `The direct archive hit is "${lead.title}": ${lead.answerText.slice(0, 180)}`;
+  return localizeForQuestion(question, {
+    zh: `本地 archive web 的直接命中是“${lead.title}”：${lead.answerText.slice(0, 180)}`,
+    it: `La corrispondenza diretta nell'archive web è "${lead.title}": ${lead.answerText.slice(0, 180)}`,
+    en: `The direct archive hit in the archive web is "${lead.title}": ${lead.answerText.slice(0, 180)}`
+  });
 }
 
 function buildLiveModelUnavailableReason() {
