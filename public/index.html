@@ -5967,15 +5967,8 @@ html.tablet-app .peb-event:hover{
 html.phone-app .cph{
   padding:18px 16px 10px;
 }
-html.phone-app .cpbody{
-  display:block;
-  padding:0 16px calc(28px + env(safe-area-inset-bottom));
-  overflow:visible;
-}
-html.phone-app .cpgrid-panel{
-  margin-bottom:14px;
-  overflow:hidden;
-}
+
+
 html.phone-app #cal-grid-wrap{
   overflow:visible;
   max-height:none;
@@ -5996,14 +5989,8 @@ html.phone-app .cp-ev-tag{
   font-size:9px;
   line-height:1.2;
 }
-html.phone-app .cpevs-panel{
-  width:100%;
-  height:auto;
-  min-height:240px;
-}
-html.phone-app .cpe-list{
-  max-height:none;
-}
+
+
 html.phone-app .cp-back{
   display:none;
 }
@@ -6425,16 +6412,9 @@ html.phone-app #dtl-text-body .txt-col{
   min-height:82px!important;
   padding:0 0 16px 52px!important;
 }
-html.phone-app #page-cal .cpevs-panel{
-  height:248px!important;
-  min-height:248px!important;
-  max-height:248px!important;
-  overflow:hidden!important;
-}
-html.phone-app #page-cal .cpe-list{
-  overflow-y:auto!important;
-  -webkit-overflow-scrolling:touch!important;
-}
+
+
+
 @keyframes phoneSheetNudge{
   0%,100%{transform:translateY(0);}
   38%{transform:translateY(14px);}
@@ -6636,50 +6616,8 @@ html.phone-app .popup-expand-loc { display:none!important; }
 html.phone-app .popup-short-desc { display:none!important; }
 html.phone-app .popup-btn-row { display:none!important; }
 
-/* 14. Calendar events list: show scrollbar when content overflows */
-html.phone-app #page-cal .cpevs-panel { ; }
-html.phone-app #page-cal .cpe-list {
-  overflow-y:auto!important;
-  overflow-x:hidden!important;
-  -webkit-overflow-scrolling:touch!important;
-  touch-action:pan-y!important;
-  overscroll-behavior-y:contain!important;
-  scrollbar-width:thin!important;
-  scrollbar-color:rgba(0,0,0,.22) transparent!important;
-  min-height:0!important;
-  flex:1 1 auto!important;
-}
-html.phone-app .cpevs-panel{
-  height:clamp(220px,38svh,340px)!important;
-  max-height:clamp(220px,38svh,340px)!important;
-  display:flex!important;
-  flex-direction:column!important;
-  overflow:hidden!important;
-}
-html.phone-app .cpe-head{
-  flex-shrink:0!important;
-}
-html.phone-app #page-cal .cpe-list::-webkit-scrollbar { width:4px!important; }
-html.phone-app #page-cal .cpe-list::-webkit-scrollbar-track { background:transparent!important; }
-html.phone-app #page-cal .cpe-list::-webkit-scrollbar-thumb { background:rgba(0,0,0,.2)!important; border-radius:2px!important; }
-/* Tablet calendar events scroll */
-html.tablet-app .cpe-list{
-  overflow-y:auto!important;
-  overflow-x:hidden!important;
-  -webkit-overflow-scrolling:touch!important;
-  touch-action:pan-y!important;
-  overscroll-behavior-y:contain!important;
-  flex:1 1 auto!important;
-  min-height:0!important;
-}
-html.tablet-app .cpevs-panel{
-  display:flex!important;
-  flex-direction:column!important;
-  overflow:hidden!important;
-}
-html.tablet-app .cpe-head{
-  flex-shrink:0!important;
-}
+
+
 
 
 /* Tablet keeps the phone-side refinements elsewhere, but timeline follows the desktop/web layout. */
@@ -9325,6 +9263,46 @@ html.embedded-tablet .txt-title{font-size:9px}
 .stage-nav-btn:disabled{opacity:.28;cursor:default;pointer-events:none}
 /* Hide nav arrows in calendar mode */
 #shell.calendar-mode .stage-nav{opacity:0!important;pointer-events:none!important}
+
+/* ── Gesture hint: phone overview only ── */
+#gesture-hint{
+  display:none;
+  position:absolute;bottom:0;left:0;right:0;
+  flex-direction:column;align-items:center;gap:8px;
+  padding:10px 0 14px;pointer-events:none;
+  z-index:5;
+}
+html.embedded-phone #gesture-hint{display:flex;}
+html.embedded-phone #shell.calendar-mode #gesture-hint{display:none;}
+html.embedded-tablet #gesture-hint{display:flex;}
+html.embedded-tablet #shell.calendar-mode #gesture-hint{display:none;}
+html.embedded-phone #shell.outside-active #gesture-hint,
+html.embedded-tablet #shell.outside-active #gesture-hint{display:none;}
+html.embedded-tablet #gesture-hint .gh-row:first-child{display:none;}
+.gh-row{
+  display:flex;align-items:center;gap:9px;
+  font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
+  font-size:0.62rem;color:rgba(29,29,31,.45);letter-spacing:-.01em;
+}
+.gh-track{
+  display:inline-block;position:relative;
+  width:44px;height:3px;background:rgba(29,29,31,.14);
+  border-radius:2px;overflow:hidden;flex-shrink:0;
+}
+.gh-thumb{
+  position:absolute;left:0;top:0;height:100%;width:14px;
+  background:rgba(29,29,31,.45);border-radius:2px;
+  animation:gh-slide 2s cubic-bezier(.4,0,.2,1) infinite;
+}
+@keyframes gh-slide{
+  0%{left:0}45%{left:calc(100% - 14px)}55%{left:calc(100% - 14px)}100%{left:0}
+}
+.gh-pinch{
+  display:inline-flex;align-items:center;gap:3px;flex-shrink:0;
+  animation:gh-pinch 2.4s cubic-bezier(.4,0,.2,1) infinite;
+}
+.gh-f{width:7px;height:12px;border:1.5px solid rgba(29,29,31,.4);border-radius:4px;}
+@keyframes gh-pinch{0%,100%{gap:3px}40%{gap:9px}60%{gap:9px}}
 </style>
 </head>
 <body>
@@ -9412,6 +9390,17 @@ html.embedded-tablet .txt-title{font-size:9px}
       <div id=&quot;onboard-caption&quot;>Scroll to zoom through time</div>
       <button id=&quot;onboard-skip&quot;>Skip</button>
     </div>
+  <!-- GESTURE HINT: phone/tablet overview only -->
+  <div id=&quot;gesture-hint&quot; aria-hidden=&quot;true&quot;>
+    <div class=&quot;gh-row&quot;>
+      <span class=&quot;gh-track&quot;><span class=&quot;gh-thumb&quot;></span></span>
+      <span class=&quot;gh-text&quot;>Swipe THERE to explore</span>
+    </div>
+    <div class=&quot;gh-row&quot;>
+      <span class=&quot;gh-pinch&quot;><span class=&quot;gh-f gh-fl&quot;></span><span class=&quot;gh-f gh-fr&quot;></span></span>
+      <span class=&quot;gh-text&quot;>Pinch to zoom</span>
+    </div>
+  </div>
   </div>
 
   <!-- RIBBON -->
@@ -11141,8 +11130,13 @@ function canSwipeCalendarTarget(target){
   return !target.closest('.cpevs-panel, .cpn-btn, .cph, button');
 }
 
+
 function isAdaptiveCalendarPanelScroll(){
-  return document.documentElement.classList.contains('embedded-phone') || document.documentElement.classList.contains('embedded-tablet');
+  const html = document.documentElement;
+  return html.classList.contains('phone-app')
+      || html.classList.contains('tablet-app')
+      || html.classList.contains('embedded-phone')
+      || html.classList.contains('embedded-tablet');
 }
 
 let calendarPanelTouchProxy = null;
@@ -11209,7 +11203,6 @@ calOverlay.addEventListener('touchend', e => {
   calTouchStartX = null;
   calTouchStartY = null;
   if(Math.abs(dy) >= TOUCH_MODE_SWIPE_THRESHOLD &amp;&amp; Math.abs(dy) > Math.abs(dx) * TOUCH_GESTURE_DIRECTION_RATIO){
-    moveModeBySteps(dy < 0 ? 1 : -1, touch.clientX, 280);
     return;
   }
   if(Math.abs(dx) < 50) return;
@@ -11227,7 +11220,7 @@ if(cpePanel && cpeList){
 
   cpePanel.addEventListener('touchstart', e => {
     if(!isAdaptiveCalendarPanelScroll()) return;
-    if(e.target.closest('.cpe-list, .cpe-ev, .cpn-btn, button')) return;
+    if(e.target.closest('.cpn-btn, button')) return;
     if(!e.touches[0]) return;
     startCalendarPanelTouchProxy(e.touches[0]);
     e.stopPropagation();
@@ -11253,6 +11246,7 @@ if(cpePanel && cpeList){
     stopCalendarPanelTouchProxy();
   }, {passive:true});
 }
+
 
 /* ──────── HEADER + ZOOM BUTTONS ──────── */
 function updateHud(){
@@ -11647,9 +11641,21 @@ let modeScrollAccum = 0;
 let modeScrollLastAt = 0;
 let modeScrollLastTriggerAt = 0;
 
+
 function moveModeBySteps(stepDelta, clientX, duration = 430){
+
+  if(
+    document.documentElement.classList.contains('embedded-phone') ||
+    document.documentElement.classList.contains('embedded-tablet')
+  ){
+    return false;
+  }
+
   const currentSequenceIndex = getMode() === 'calendar' ? 1 : 0;
-  const targetSequenceIndex = Math.max(0, Math.min(MODE_SWITCH_LEVELS.length - 1, currentSequenceIndex + stepDelta));
+  const targetSequenceIndex = Math.max(
+    0,
+    Math.min(MODE_SWITCH_LEVELS.length - 1, currentSequenceIndex + stepDelta)
+  );
   if(targetSequenceIndex === currentSequenceIndex) return false;
 
   const stageRect = stage.getBoundingClientRect();
@@ -11871,11 +11877,7 @@ stage.addEventListener('pointermove', e=>{
     dragDistance = Math.max(dragDistance, Math.hypot(dx, dy));
     const absX = Math.abs(dx);
     const absY = Math.abs(dy);
-    if(absY >= TOUCH_MODE_SWIPE_THRESHOLD &amp;&amp; absY > absX * TOUCH_GESTURE_DIRECTION_RATIO){
-      moveModeBySteps(dy < 0 ? 1 : -1, e.clientX, 280);
-      stopStageDrag(e.pointerId);
-      return;
-    }
+
     if(mode === 'year'){
       if(absX >= TOUCH_MODE_SWIPE_THRESHOLD &amp;&amp; absX > absY * TOUCH_GESTURE_DIRECTION_RATIO){
         suppressTimelineEventClicksUntil = performance.now() + 120;
@@ -12255,6 +12257,10 @@ function syncEmbeddedAppMode(){
   }
   document.documentElement.classList.toggle('embedded-phone',phone);
   document.documentElement.classList.toggle('embedded-tablet',tablet);
+  try{
+    const pw=window.parent||window;
+    document.documentElement.classList.toggle('embedded-portrait',pw.innerHeight>pw.innerWidth);
+  }catch(e){}
   return {phone,tablet};
 }
 window.syncEmbeddedAppMode = syncEmbeddedAppMode;
@@ -12948,8 +12954,8 @@ sessionStorage.setItem(ONBOARD_KEY, '1');
       .ov-ev-gallery {
         font-family: var(--mono); font-size: 0.55rem; letter-spacing: .04em; text-transform: uppercase;
         flex-shrink: 0; justify-self: end;
-        background: var(--b); color: var(--w);
-        border: none; border-radius: 6px; padding: 4px 8px;
+        background: var(--g3); color: var(--w);
+        border: #515154; border-radius: 6px; padding: 4px 8px;
         cursor: pointer; white-space: nowrap;
         transition: background .15s var(--ease);
       }
@@ -13213,21 +13219,36 @@ sessionStorage.setItem(ONBOARD_KEY, '1');
       /* ── Custom Field Filter ──────────────────────────── */
       .yb-filter { position: relative; flex-shrink: 0; }
       .yb-filter-btn {
-        display: inline-flex; align-items: center; gap: 7px;
+        width:148px;
+        display: inline-flex; align-items: center; gap: 10px;
         border: .5px solid var(--g4); border-radius: 980px;
-        padding: 5px 10px 5px 9px;
-        font-family: var(--mono); font-size: 0.62rem; font-weight: 400;
+        padding: 6px 14px 6px 10px;
+        font-family: var(--sans); font-size: 0.7rem; font-weight: 500; justify-content:flex-start;
         color: var(--b); background: var(--w); cursor: pointer;
         transition: border-color .2s var(--ease), background .2s var(--ease);
         white-space: nowrap;
       }
+
+
+      
       .yb-filter-btn:hover { border-color: var(--g3); background: var(--g6); }
       .yb-filter-btn.open { border-color: var(--b); background: var(--g6); }
-      .yf-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--g4); flex-shrink: 0; transition: background .2s var(--ease); }
+      .yf-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--g4); flex-shrink: 0; transition: background .2s var(--ease); }
       .yf-label { letter-spacing: -.01em; }
-      .yf-chevron { flex-shrink: 0; color: var(--g3); transition: transform .25s var(--ease-spring); }
+      .yf-chevron{
+        margin-left:auto;
+        width:11px;
+        height:11px;
+        display:block;
+        flex-shrink:0;
+        color:var(--g);
+        border:none;
+        transform:none;
+        transition:transform .25s var(--ease-spring);
+      }
       .yb-filter-btn.open .yf-chevron { transform: rotate(180deg); }
       .yf-dropdown {
+        width:148px;
         position: absolute; top: calc(100% + 6px); right: 0;
         background: var(--w); border: .5px solid var(--g4);
         border-radius: 14px; padding: 5px;
@@ -13285,7 +13306,7 @@ sessionStorage.setItem(ONBOARD_KEY, '1');
         <button class=&amp;quot;yb-filter-btn&amp;quot; id=&amp;quot;yb-filter-btn&amp;quot; aria-haspopup=&amp;quot;listbox&amp;quot;>
           <span class=&amp;quot;yf-dot&amp;quot; id=&amp;quot;yf-dot&amp;quot;></span>
           <span class=&amp;quot;yf-label&amp;quot; id=&amp;quot;yf-label&amp;quot;>All fields</span>
-          <svg class=&amp;quot;yf-chevron&amp;quot; width=&amp;quot;9&amp;quot; height=&amp;quot;9&amp;quot; viewBox=&amp;quot;0 0 9 9&amp;quot; fill=&amp;quot;none&amp;quot;><path d=&amp;quot;M1.5 3L4.5 6L7.5 3&amp;quot; stroke=&amp;quot;currentColor&amp;quot; stroke-width=&amp;quot;1.5&amp;quot; stroke-linecap=&amp;quot;round&amp;quot; stroke-linejoin=&amp;quot;round&amp;quot;/></svg>
+          <svg class=&amp;quot;yf-chevron&amp;quot; width=&amp;quot;9&amp;quot; height=&amp;quot;9&amp;quot; viewBox=&amp;quot;0 0 9 9&amp;quot; fill=&amp;quot;none&amp;quot;><path d=&amp;quot;M1.5 3L4.5 6L7.5 3&amp;quot; stroke=&amp;quot;currentColor&amp;quot; stroke-width=&amp;quot;1.3&amp;quot; stroke-linecap=&amp;quot;round&amp;quot; stroke-linejoin=&amp;quot;round&amp;quot;/></svg>
         </button>
         <div class=&amp;quot;yf-dropdown&amp;quot; id=&amp;quot;yf-dropdown&amp;quot; role=&amp;quot;listbox&amp;quot;></div>
       </div>
@@ -13917,6 +13938,8 @@ sessionStorage.setItem(ONBOARD_KEY, '1');
           const n = years.length;
           lbl.style.left = (n > 1 ? i / (n - 1) * 100 : 50) + '%';
           lbl.style.top  = '2px';
+          lbl.style.cursor = 'pointer';
+          lbl.onclick = () => { S.dir = i > S.yIdx ? 1 : -1; S.yIdx = i; S.activeDocIdx = null; update(); };
           labels.appendChild(lbl);
         });
       }
@@ -14891,6 +14914,7 @@ sessionStorage.setItem(ONBOARD_KEY, '1');
             <div class="chat-node-rail" id="chat-page-rail" aria-label="Chat timeline"></div>
             <div class="chat-thread chat-page-thread" id="chat-page-thread"></div>
           </div>
+          <div class="chat-loading-hint" id="chat-page-loading-hint" aria-live="polite"></div>
           <form class="chat-compose chat-page-compose" id="chat-page-form">
             <label class="chat-compose-field" for="chat-page-input">
               <textarea class="chat-input" id="chat-page-input" rows="1" placeholder="Type a question"></textarea>
@@ -22221,6 +22245,8 @@ html.embedded-tablet .pop-card{
 html.embedded-tablet .pop-hero{
   height:110px!important;
 }
+/* ── tablet portrait: hide view/events counter ── */
+html.embedded-tablet.embedded-portrait .hdr-r{display:none!important;}
 `;
 
     /* ── Chat highlight CSS injected into both iframes ── */
@@ -22454,6 +22480,33 @@ html.embedded-phone .event-card.card-dense .card-desc{
   mask-image:none!important;
   -webkit-mask-image:none!important;
 }
+/* ── phone/tablet: hide "or use ←→" hint ── */
+html.embedded-phone .drag-hint-line2{display:none!important;}
+html.embedded-tablet .drag-hint-line2{display:none!important;}
+/* ── phone: year-bar buttons vertically centred ── */
+html.embedded-phone .year-bar{
+  height:auto!important;
+  padding-top:12px!important;
+  padding-bottom:12px!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+}
+/* ── phone: inside-map calendar cpe-list scrollbar ── */
+html.embedded-phone .cpe-list{
+  scrollbar-width:thin!important;
+  scrollbar-color:rgba(29,29,31,.22) transparent!important;
+}
+html.embedded-phone .cpe-list::-webkit-scrollbar{width:4px!important;}
+html.embedded-phone .cpe-list::-webkit-scrollbar-track{background:transparent!important;margin:6px 0!important;}
+html.embedded-phone .cpe-list::-webkit-scrollbar-thumb{background:rgba(29,29,31,.22)!important;border-radius:99px!important;}
+/* ── phone: FIELD bar — hide category legend tags ── */
+html.embedded-phone .cat-legend{display:none!important;}
+/* ── phone: equal-width filter + toggle buttons, icon pinned right ── */
+html.embedded-phone .yb-right{flex:1!important;}
+html.embedded-phone .toggle-btn{width:100%!important;}
+html.embedded-phone #toggle-label{flex:1!important;text-align:left!important;}
+/* ── phone: year labels clickable cursor ── */
+html.embedded-phone .yr-lbl{cursor:pointer!important;}
 `;
 
     try{
@@ -22529,7 +22582,14 @@ html.embedded-phone .event-card.card-dense .card-desc{
     document.documentElement.classList.toggle('phone-app', phoneEnabled);
     document.documentElement.classList.toggle('tablet-app', tabletEnabled);
     document.documentElement.classList.toggle('map-density-compact', compactMap);
-    document.documentElement.style.setProperty('--app-vh', `${window.innerHeight * 0.01}px`);
+    /* Don't shrink the layout when the keyboard opens for a chat input on phone.
+       The chat system repositions itself via visualViewport; the shell must stay put. */
+    const ae = document.activeElement;
+    const chatInputFocused = phoneEnabled && ae &&
+      (ae.id === 'chat-widget-input' || ae.id === 'chat-page-input');
+    if(!chatInputFocused){
+      document.documentElement.style.setProperty('--app-vh', `${window.innerHeight * 0.01}px`);
+    }
     if(phoneEnabled && document.body.classList.contains('on-timeline') && typeof window.showPhaseView === 'function'){
       window.showPhaseView();
     }
@@ -22972,6 +23032,15 @@ html.embedded-phone .event-card.card-dense .card-desc{
 .chat-empty-copy{font-size:13px;line-height:1.75;color:var(--g3)}
 .chat-empty-copy strong{font-weight:600;color:var(--b)}
 html.phone-app #chat-panel .chat-widget-thread.chat-has-draft .chat-empty{display:none}
+html.phone-app.chat-compose-active #chat-panel .chat-empty{display:none!important;}
+
+/* ── Loading hint (seconds counter + close nudge) ── */
+.chat-loading-hint{
+  display:none;font-size:11px;color:var(--g3);
+  padding:3px 14px 5px;text-align:center;
+  animation:fadeIn .3s ease;
+}
+.chat-loading-hint.visible{display:block;}
 
 /* ── Compose area — no shadow ── */
 .chat-compose{
@@ -23382,6 +23451,7 @@ html.tablet-app #page-cal .cpe-list{
   touch-action:pan-y!important;
   padding-bottom:8px!important;
 }
+
 </style>
 <button id="chat-fab" type="button" aria-label="Open chat" title="Open chat"></button>
 <div id="chat-panel" aria-hidden="true">
@@ -23398,6 +23468,7 @@ html.tablet-app #page-cal .cpe-list{
     <div class="chat-node-rail" id="chat-widget-rail" aria-label="Chat timeline"></div>
     <div class="chat-thread chat-widget-thread" id="chat-widget-thread"></div>
   </div>
+  <div class="chat-loading-hint" id="chat-widget-loading-hint" aria-live="polite"></div>
   <form class="chat-compose chat-widget-compose" id="chat-widget-form">
     <label class="chat-compose-field" for="chat-widget-input">
       <textarea class="chat-input" id="chat-widget-input" rows="1" placeholder="Type a question"></textarea>
@@ -23445,8 +23516,29 @@ html.tablet-app #page-cal .cpe-list{
     pageInput:document.getElementById('chat-page-input'),
     widgetSend:document.getElementById('chat-widget-send'),
     pageSend:document.getElementById('chat-page-send'),
-    sourceReturnBtn:document.getElementById('chat-source-return-btn')
+    sourceReturnBtn:document.getElementById('chat-source-return-btn'),
+    widgetLoadingHint:document.getElementById('chat-widget-loading-hint'),
+    pageLoadingHint:document.getElementById('chat-page-loading-hint')
   };
+
+  let _loadingTimer=null, _loadingTimerSecs=0;
+  function startLoadingTimer(){
+    _loadingTimerSecs=0;
+    clearInterval(_loadingTimer);
+    _loadingTimer=setInterval(()=>{
+      _loadingTimerSecs++;
+      const msg=_loadingTimerSecs+'s · You can close this window and come back later';
+      [els.widgetLoadingHint,els.pageLoadingHint].forEach(el=>{
+        if(el){el.textContent=msg;el.classList.add('visible');}
+      });
+    },1000);
+  }
+  function stopLoadingTimer(){
+    clearInterval(_loadingTimer);_loadingTimer=null;
+    [els.widgetLoadingHint,els.pageLoadingHint].forEach(el=>{
+      if(el){el.textContent='';el.classList.remove('visible');}
+    });
+  }
 
 
   function keepChatLastVisible(){
@@ -25924,6 +26016,7 @@ html.tablet-app #page-cal .cpe-list{
     if(!question||state.requestInFlight) return;
     clearChatActiveTurn(true);
     state.requestInFlight=true;
+    startLoadingTimer();
     const pendingWeakSuggestion=state.pendingWeakSuggestion;
     const pendingExternalSuggestion=state.pendingExternalSuggestion;
     if(pendingWeakSuggestion&&!isAffirmativeReply(question)&&!isNegativeReply(question)){
@@ -26108,6 +26201,7 @@ html.tablet-app #page-cal .cpe-list{
       });
     }finally{
       state.requestInFlight=false;
+      stopLoadingTimer();
       saveTurns();
       renderChatViews();
     }
@@ -27033,6 +27127,71 @@ overflow-y:auto;
 }
 
 
+
+/* ===== FINAL PHONE CALENDAR EVENTS SCROLL FIX ===== */
+
+html.phone-app #page-cal{
+  height:100%;
+  overflow:hidden!important;
+}
+
+html.phone-app #page-cal .cpbody{
+  height:calc(100svh - 52px - 76px);
+  min-height:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+  padding:0 16px calc(16px + env(safe-area-inset-bottom))!important;
+  gap:12px!important;
+}
+
+html.phone-app #page-cal .cpgrid-panel{
+  flex:0 0 auto!important;
+  max-height:46svh!important;
+  overflow:hidden!important;
+}
+
+html.phone-app #page-cal .cpevs-panel{
+  width:100%!important;
+  flex:1 1 auto!important;
+  min-height:0!important;
+  height:auto!important;
+  max-height:none!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+  border-radius:18px!important;
+  -webkit-overflow-scrolling:touch!important;
+}
+
+html.phone-app #page-cal .cpe-head{
+  flex:0 0 auto!important;
+  padding:12px 16px 10px!important;
+}
+
+html.phone-app #page-cal .cpe-list{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  height:auto!important;
+  max-height:none!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  -webkit-overflow-scrolling:touch!important;
+  touch-action:pan-y!important;
+  overscroll-behavior-y:contain!important;
+  padding-bottom:24px!important;
+}
+
+html.phone-app #page-cal .cpe-ev{
+  touch-action:pan-y!important;
+}
+
+
+
+
+
+
+
 </style>
 
 <script>
@@ -27478,7 +27637,7 @@ overflow-y:auto;
     const tile=_lightboxItems[_lightboxIdx];
     if(!tile) return;
 
-    _applyTileToFrame(tile, false, 0);
+    _applyTileToFrame(tile, true, 1);
 
     /* Wire action buttons */
     const galleryId=tile.dataset.galleryId||'';
