@@ -1,5 +1,6 @@
 ﻿NAME
-	EVENT
+EVENT
+
 	inside-001.jpg
 	LKAB Begins Industrial Mining (1900)
 	inside-002.jpg

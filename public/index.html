@@ -592,7 +592,7 @@ a{text-decoration:none;color:inherit}
 
 /* FULL CALENDAR */
 #page-cal{display:flex;flex-direction:column;background:var(--w);overflow:hidden}
-.cph{padding:28px 40px 16px;display:flex;align-items:flex-end;justify-content:space-between;flex-shrink:0;border-bottom:none}
+.cph{padding:28px 40px 16px;display:flex;align-items:flex-end;justify-content:space-between;flex-shrink:0;border-bottom:none;position:relative}
 .cph-left{}
 .cph-title{font-family:var(--serif);font-size:clamp(34px,4.5vw,56px);letter-spacing:-.04em;font-weight:400;line-height:1}
 .cph-sub{font-size:12px;color:var(--g3);margin-top:6px;letter-spacing:-.005em;line-height:1.5;font-family:var(--sans)}
@@ -601,6 +601,16 @@ a{text-decoration:none;color:inherit}
 .cpn-btn:hover:not(:disabled){border-color:var(--b);background:var(--g6)}
 .cpn-btn:disabled{opacity:.25;cursor:default;pointer-events:none;border-color:var(--g4);}
 .cpn-yr{font-size:13px;font-weight:500;min-width:90px;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:var(--g3)}
+.cph-right,.cph-title,.cpn-btn,.cpn-yr{transition:none!important;animation:none!important;transform:none!important;}
+@media (min-width:901px){
+  .cph-right{
+    position:absolute;
+    left:var(--main-nav-center-x,50vw);
+    top:50%;
+    transform:translate(-50%,-50%)!important;
+    padding-bottom:0;
+  }
+}
 .cp-back{background:#4a6f8a;color:#fff;padding:6px 16px;border-radius:980px;font-size:12px;font-weight:500;cursor:pointer;letter-spacing:-.01em;border:1px solid #4a6f8a;box-shadow:0 2px 8px rgba(74,111,138,.18);transition:background .2s ease,box-shadow .2s ease,transform .18s cubic-bezier(.22,1,.36,1)}
 .cp-back:hover{background:#344f63;border-color:#344f63;box-shadow:0 4px 14px rgba(74,111,138,.28)}
 .cp-back:active{transform:scale(1.06)}
@@ -775,6 +785,7 @@ a{text-decoration:none;color:inherit}
 .tlp-vbtn.on .tlp-vbtn-icon{opacity:1}
 .tlp-vbtn-icon-strips{display:flex;flex-direction:column;gap:2px;width:12px}
 .tlp-vbtn-icon-strip{height:2px;background:currentColor;border-radius:1px;opacity:.7}
+.tlp-controls,.tlp-view-toggle,.tlp-vbtn,.tlp-vbtn-icon{transition:none!important;animation:none!important;transform:none!important;}
 
 /* Detailed horizontal scroll timeline — combined text+photo */
 .dtl-body{flex:1;overflow-x:auto;overflow-y:hidden;padding:0;scrollbar-width:thin;scrollbar-color:var(--g4) transparent;position:relative}
@@ -8280,7 +8291,7 @@ button{border:none;background:none;cursor:pointer;font-family:inherit;color:inhe
 .hdr-center{
   display:flex;flex-direction:row;align-items:center;justify-self:center;gap:8px;width:max-content;
   transform:translateX(var(--parent-nav-offset,0px));
-  transition:transform .3s cubic-bezier(.22,1,.36,1);
+  transition:none;
 }
 .hdr-page-label{
   font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
@@ -8306,18 +8317,19 @@ button{border:none;background:none;cursor:pointer;font-family:inherit;color:inhe
 /* ── Parent tab row: Inside Map / Outside Map — independent pills ── */
 .map-tabs{
   display:flex;align-items:center;gap:6px;
+  transition:none;animation:none;transform:none;
 }
 .map-tab{
   font-size:11px;font-weight:600;padding:8px 16px;border-radius:999px;
   color:var(--b);letter-spacing:-.01em;
   border:1.5px solid var(--g4);
   background:var(--w);
-  transition:background .22s cubic-bezier(.22,1,.36,1),color .22s cubic-bezier(.22,1,.36,1),border-color .22s cubic-bezier(.22,1,.36,1),transform .18s cubic-bezier(.22,1,.36,1);
+  transition:none;
   font-family:var(--sans);white-space:nowrap;cursor:pointer;
   box-shadow:none;
 }
 .map-tab:hover:not(.on){background:var(--g6);border-color:var(--b);}
-.map-tab:active{transform:scale(1.06);}
+.map-tab:active{transform:none;}
 .map-tab.on{
   background:var(--b);color:#fff;
   border-color:var(--b);
@@ -9717,6 +9729,23 @@ const viewCountEl = document.getElementById('view-count');
 const zoomBtns = document.querySelectorAll('.zoom-btn');
 const hint = document.getElementById('stage-hint');
 
+function updateCpeScrollIndicator(){
+  if(!cpeList || !cpePanel) return;
+  const maxScroll = Math.max(0, cpeList.scrollHeight - cpeList.clientHeight);
+  const visible = maxScroll > 1;
+  const panelRect = cpePanel.getBoundingClientRect();
+  const listRect = cpeList.getBoundingClientRect();
+  const top = Math.max(0, Math.round(listRect.top - panelRect.top));
+  const trackH = Math.max(0, Math.round(cpeList.clientHeight));
+  const thumbH = visible ? Math.max(32, Math.round((cpeList.clientHeight / Math.max(cpeList.scrollHeight, 1)) * trackH)) : 0;
+  const thumbY = visible ? Math.round((cpeList.scrollTop / maxScroll) * Math.max(0, trackH - thumbH)) : 0;
+  cpePanel.style.setProperty('--cpe-scroll-visible', visible ? '1' : '0');
+  cpePanel.style.setProperty('--cpe-scroll-top', top + 'px');
+  cpePanel.style.setProperty('--cpe-scroll-track-h', trackH + 'px');
+  cpePanel.style.setProperty('--cpe-scroll-thumb-h', thumbH + 'px');
+  cpePanel.style.setProperty('--cpe-scroll-thumb-y', thumbY + 'px');
+}
+
 function getOutsideHudState(){
   try{
     const outsideFrame = document.getElementById('outside-frame');
@@ -11005,7 +11034,11 @@ function renderCalPage(dir){
 
   if(dir) animateStaggerIn(Array.from(cells), {axis:'x', distance:dir === 'left' ? 18 : -18, step:10, duration:220});
 
-  if(!cpSel || cpSel < start || cpSel > end) renderCpeList(rangeEvents, null);
+  if(!cpSel || cpSel < start || cpSel > end){
+    const showAllPhoneEvents = document.documentElement.classList.contains('embedded-phone')
+      || document.documentElement.classList.contains('phone-app');
+    renderCpeList(showAllPhoneEvents ? EVS : rangeEvents, null);
+  }
   else renderCpeList(EVS.filter(e => e.year === cpSel), cpSel);
   updateCpNav();
 
@@ -11031,11 +11064,16 @@ function renderCalPage(dir){
 
 function renderCpeList(evs, sel){
   const sorted = [...evs].sort((a,b) => a.year - b.year || a.month - b.month || a.day - b.day || a.id - b.id);
-  cpeYr.textContent = sel || 'All events this period';
+  const showAllPhoneEvents = !sel && (
+    document.documentElement.classList.contains('embedded-phone')
+    || document.documentElement.classList.contains('phone-app')
+  );
+  cpeYr.textContent = sel || (showAllPhoneEvents ? 'All events' : 'All events this period');
   cpeCount.textContent = sorted.length ? `${sorted.length} event${sorted.length !== 1 ? 's' : ''}` : sel ? 'No archived events' : '';
 
   if(!sorted.length){
     cpeList.innerHTML = '<div class=&quot;cpe-empty&quot;>No events recorded<br>for this year.</div>';
+    requestAnimationFrame(updateCpeScrollIndicator);
     return;
   }
 
@@ -11075,6 +11113,9 @@ function renderCpeList(evs, sel){
   });
 
   animateStaggerIn(cpeList.querySelectorAll('.cpe-ev'), {axis:'y', distance:10, step:20, duration:220});
+  cpeList.scrollTop = 0;
+  requestAnimationFrame(updateCpeScrollIndicator);
+  setTimeout(updateCpeScrollIndicator, 260);
 }
 
 function syncCalendarListActiveState(){
@@ -11151,6 +11192,8 @@ cpeList.addEventListener('wheel', e => {
     e.stopPropagation();
   }
 }, {passive: true});
+cpeList.addEventListener('scroll', updateCpeScrollIndicator, {passive:true});
+window.addEventListener('resize', () => requestAnimationFrame(updateCpeScrollIndicator), {passive:true});
 
 let calendarPanelHoverLocked = false;
 if(cpePanel){
@@ -11173,9 +11216,9 @@ function canSwipeCalendarTarget(target){
 
 function isAdaptiveCalendarPanelScroll(){
   const html = document.documentElement;
-  return html.classList.contains('phone-app')
+  return html.classList.contains('embedded-phone')
+      || html.classList.contains('phone-app')
       || html.classList.contains('tablet-app')
-      || html.classList.contains('embedded-phone')
       || html.classList.contains('embedded-tablet');
 }
 
@@ -11194,6 +11237,7 @@ function updateCalendarPanelTouchProxy(touch){
   if(!calendarPanelTouchProxy || !touch || !cpeList) return false;
   const dy = touch.clientY - calendarPanelTouchProxy.startY;
   cpeList.scrollTop = calendarPanelTouchProxy.startScrollTop - dy;
+  updateCpeScrollIndicator();
   if(Math.abs(dy) > 4) calendarPanelTouchProxy.moved = true;
   return calendarPanelTouchProxy.moved;
 }
@@ -12322,7 +12366,7 @@ function syncTimelineHeaderMetaVisibility(){
   return changed;
 }
 
-function alignHeaderCenterToParentTabs(pass=0){
+function alignHeaderCenterToParentTabs(){
   const setParentOffset=(value)=>{
     const next=Number.isFinite(value)?value:0;
     document.documentElement.style.setProperty('--parent-nav-offset',next.toFixed(2)+'px');
@@ -12338,10 +12382,10 @@ function alignHeaderCenterToParentTabs(pass=0){
     const center=document.querySelector('.hdr-center');
     if(!hdr||!center){
       setParentOffset(0);
+      syncTimelineHeaderMetaVisibility();
       return;
     }
     const hdrRect=hdr.getBoundingClientRect();
-    const centerWidth=center.offsetWidth||0;
     const parentCenter=typeof window.parent?.getKirunaMainNavTabsCenterX==='function'
       ? window.parent.getKirunaMainNavTabsCenterX()
       : null;
@@ -12350,17 +12394,11 @@ function alignHeaderCenterToParentTabs(pass=0){
       ? parentCenter-frameRect.left
       : hdrRect.left+(hdrRect.width/2);
     const localCenter=hdrRect.left+(hdrRect.width/2);
-    const rawOffset=desiredCenter-localCenter;
-    const maxOffset=Math.max(0,((hdrRect.width-centerWidth)/2)-24);
-    const boundedOffset=Math.max(-maxOffset,Math.min(maxOffset,rawOffset));
-    setParentOffset(boundedOffset);
+    setParentOffset(desiredCenter-localCenter);
   }catch(e){
     setParentOffset(0);
   }
-  const metaChanged=syncTimelineHeaderMetaVisibility();
-  if(metaChanged&&pass<1){
-    requestAnimationFrame(()=>alignHeaderCenterToParentTabs(pass+1));
-  }
+  syncTimelineHeaderMetaVisibility();
 }
 window.alignHeaderCenterToParentTabs = alignHeaderCenterToParentTabs;
 window.syncTimelineAdaptiveUi = function(){
@@ -13006,6 +13044,27 @@ sessionStorage.setItem(ONBOARD_KEY, '1');
         transition: background .15s var(--ease);
       }
       .ov-ev-gallery:hover { background: #424245; }
+      @media (max-width: 1240px) {
+        html:not(.embedded-phone):not(.embedded-tablet) .ov-event-row {
+          grid-template-columns: 112px minmax(148px,188px) minmax(0,1fr);
+          overflow: hidden;
+        }
+        html:not(.embedded-phone):not(.embedded-tablet) .ov-ev-actor,
+        html:not(.embedded-phone):not(.embedded-tablet) .ov-ev-link,
+        html:not(.embedded-phone):not(.embedded-tablet) .ov-ev-gallery {
+          display: none !important;
+        }
+      }
+      @media (max-width: 1040px) {
+        html:not(.embedded-phone):not(.embedded-tablet) .overview-panel {
+          padding-left: 34px;
+          padding-right: 34px;
+        }
+        html:not(.embedded-phone):not(.embedded-tablet) .ov-event-row {
+          grid-template-columns: 98px minmax(128px,170px) minmax(0,1fr);
+          gap: 12px;
+        }
+      }
       .ov-ev-field-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; transition: transform .2s var(--ease-spring); }
 
       /* Persistent active state — stays until year or event changes */
@@ -13073,6 +13132,7 @@ sessionStorage.setItem(ONBOARD_KEY, '1');
       }
       .cards-vp::-webkit-scrollbar { display: none; }
       .cards-vp.dragging { cursor: grabbing; }
+      .cards-vp.gallery-arrival-prep { visibility: hidden; }
 
       @keyframes enterRight { from { opacity: 0; transform: translateX(28px) scale(0.97); } to { opacity: 1; transform: translateX(0) scale(1); } }
       @keyframes enterLeft  { from { opacity: 0; transform: translateX(-28px) scale(0.97); } to { opacity: 1; transform: translateX(0) scale(1); } }
@@ -13546,6 +13606,8 @@ sessionStorage.setItem(ONBOARD_KEY, '1');
       filter:&amp;quot;All&amp;quot;, yIdx:0, dir:1, view:&amp;quot;expanded&amp;quot;,
       activeDocIdx: null, ovField: null,
       backLink: null, pendingCardFocus: null, pendingCardFocusBack: null, pendingOverviewRestore: null,
+      pendingGalleryArrival: null,
+      suppressCardEntranceOnce: false,
       prevView: null
     };
 
@@ -13889,7 +13951,7 @@ sessionStorage.setItem(ONBOARD_KEY, '1');
         S.pendingCardFocus = null;
         if (card) {
           requestAnimationFrame(() => {
-            centerOutsideDocCard(docIdx);
+            centerOutsideDocCard(docIdx, S.pendingGalleryArrival === docIdx ? &amp;quot;auto&amp;quot; : &amp;quot;smooth&amp;quot;);
           });
         }
       }
@@ -13912,6 +13974,39 @@ sessionStorage.setItem(ONBOARD_KEY, '1');
     function scheduleOutsideDocCardCenter(docIdx) {
       [0, 120, 360, 760].forEach((delay, index) => {
         setTimeout(() => centerOutsideDocCard(docIdx, index === 0 ? &amp;quot;auto&amp;quot; : &amp;quot;smooth&amp;quot;), delay);
+      });
+    }
+
+    function scheduleOutsideGalleryArrivalFlip(docIdx) {
+      const targetIdx = Number(docIdx);
+      let completed = false;
+      const reveal = () =&gt; {
+        if (completed) return true;
+        const vp = document.getElementById(&amp;quot;cards-vp&amp;quot;);
+        const card = vp ? vp.querySelector(`[data-doc-idx=&amp;quot;${targetIdx}&amp;quot;]`) : null;
+        if (!card) return false;
+        completed = true;
+        vp.querySelectorAll(&amp;quot;.event-card.flipped&amp;quot;).forEach(el =&gt; {
+          if (el !== card) el.classList.remove(&amp;quot;flipped&amp;quot;);
+        });
+        card.classList.add(&amp;quot;is-active&amp;quot;, &amp;quot;flipped&amp;quot;);
+        centerOutsideDocCard(targetIdx, &amp;quot;auto&amp;quot;);
+        setTimeout(() =&gt; {
+          const currentVp = document.getElementById(&amp;quot;cards-vp&amp;quot;);
+          const currentCard = currentVp ? currentVp.querySelector(`[data-doc-idx=&amp;quot;${targetIdx}&amp;quot;]`) : card;
+          if (currentCard) {
+            currentCard.classList.remove(&amp;quot;flipped&amp;quot;);
+            currentCard.classList.add(&amp;quot;is-active&amp;quot;);
+          }
+          S.activeDocIdx = targetIdx;
+          if (S.pendingGalleryArrival === targetIdx) S.pendingGalleryArrival = null;
+        }, 760);
+        return true;
+      };
+      [120, 320, 620, 920].forEach(delay =&gt; {
+        setTimeout(() =&gt; {
+          reveal();
+        }, delay);
       });
     }
 
@@ -14110,7 +14205,7 @@ sessionStorage.setItem(ONBOARD_KEY, '1');
     function renderCards(docs, dir) {
       const vp = document.getElementById(&amp;quot;cards-vp&amp;quot;);
       // If no existing cards, inject immediately
-      if (!vp.children.length || dir === 0 || dir === &amp;quot;fromEvents&amp;quot;) {
+      if (S.suppressCardEntranceOnce || !vp.children.length || dir === 0 || dir === &amp;quot;fromEvents&amp;quot;) {
         _injectCards(vp, docs, dir);
         return;
       }
@@ -14147,6 +14242,8 @@ sessionStorage.setItem(ONBOARD_KEY, '1');
     }
 
     function _injectCards(vp, docs, dir) {
+      const suppressEntrance = !!S.suppressCardEntranceOnce;
+      vp.classList.toggle(&amp;quot;gallery-arrival-prep&amp;quot;, suppressEntrance);
       vp.innerHTML = &amp;quot;&amp;quot;;
       vp.scrollLeft = 0;
       const anim = dir === &amp;quot;fromEvents&amp;quot; ? &amp;quot;enterSlideIn&amp;quot; : dir > 0 ? &amp;quot;enterRight&amp;quot; : dir < 0 ? &amp;quot;enterLeft&amp;quot; : &amp;quot;enterFade&amp;quot;;
@@ -14159,10 +14256,16 @@ sessionStorage.setItem(ONBOARD_KEY, '1');
 
       docs.forEach((doc, i) => {
         const card = document.createElement(&amp;quot;div&amp;quot;);
-        card.className = &amp;quot;event-card&amp;quot; + (S.activeDocIdx === doc.idx ? &amp;quot; is-active&amp;quot; : &amp;quot;&amp;quot;);
+        card.className = &amp;quot;event-card&amp;quot; + (S.activeDocIdx === doc.idx ? &amp;quot; is-active&amp;quot; : &amp;quot;&amp;quot;) + (S.pendingGalleryArrival === doc.idx ? &amp;quot; flipped&amp;quot; : &amp;quot;&amp;quot;);
         card.dataset.docIdx = doc.idx;
         const staggerDelay = dir === &amp;quot;fromEvents&amp;quot; ? Math.min(i, 10) * 0.055 : Math.min(i, 8) * 0.025;
-        card.style.animation = `${anim} .38s var(--ease-spring) ${staggerDelay}s both`;
+        if (suppressEntrance) {
+          card.style.animation = &amp;quot;none&amp;quot;;
+          card.style.opacity = &amp;quot;1&amp;quot;;
+          card.style.transform = &amp;quot;none&amp;quot;;
+        } else {
+          card.style.animation = `${anim} .38s var(--ease-spring) ${staggerDelay}s both`;
+        }
 
         const fm = FIELD_META[doc.field];
         card.innerHTML = `
@@ -14225,6 +14328,12 @@ sessionStorage.setItem(ONBOARD_KEY, '1');
           fitRenderedCardDensity(vp);
           applyCardFocus();
           checkCardViewportStates();
+          if (suppressEntrance) {
+            requestAnimationFrame(() =&gt; {
+              vp.classList.remove(&amp;quot;gallery-arrival-prep&amp;quot;);
+              S.suppressCardEntranceOnce = false;
+            });
+          }
         });
       });
     }
@@ -14437,10 +14546,12 @@ sessionStorage.setItem(ONBOARD_KEY, '1');
       S.yIdx = targetYearIdx;
       S.activeDocIdx = target.idx;
       S.pendingCardFocus = target.idx;
+      S.pendingGalleryArrival = target.idx;
+      S.suppressCardEntranceOnce = true;
 
       setView(&amp;quot;expanded&amp;quot;);
       update();
-      scheduleOutsideDocCardCenter(target.idx);
+      scheduleOutsideGalleryArrivalFlip(target.idx);
 
       return true;
     };
@@ -15651,8 +15762,12 @@ function animateTimelinePanelSwap(panel){
 /* ── Back symbols shared by navigation pills ── */
 const _BACK_ARROW_SVG = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M8.5 2.5L4 7L8.5 11.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const _CHAT_RETURN_SYMBOL = '<span class="back-geom-symbol" aria-hidden="true">↩</span>';
+function _usesTouchBackUi(){
+  return document.documentElement.classList.contains('phone-app')
+    || document.documentElement.classList.contains('tablet-app');
+}
 function _setBackLabel(btn, label, opts){
-  const symbol = opts?.chatReturn ? _CHAT_RETURN_SYMBOL : _BACK_ARROW_SVG;
+  const symbol = opts?.chatReturn && !_usesTouchBackUi() ? _CHAT_RETURN_SYMBOL : _BACK_ARROW_SVG;
   btn.innerHTML = symbol + '<span style="vertical-align:middle">' + label + '</span>';
 }
 
@@ -15866,6 +15981,7 @@ function showPage(p,fromPage){
   }
 
   if(p==='chat'){
+    if(typeof window.acknowledgeChatFabNotice==='function') window.acknowledgeChatFabNotice();
     if(fromPage&&fromPage!=='chat'){
       _chatOriginPage=fromPage;
     } else if(!fromPage){
@@ -17114,6 +17230,13 @@ function triggerCalDayInteraction(cell){
 
 function _calAnimLabel(el, newText, dir){
   if(!el){ return; }
+  if(el.id === 'cph-title' || el.id === 'cpn-label'){
+    el.style.transition = 'none';
+    el.style.opacity = '1';
+    el.style.transform = 'none';
+    el.textContent = newText;
+    return;
+  }
   if(!dir || el.textContent === newText){
     el.textContent = newText;
     return;
@@ -17378,9 +17501,26 @@ function updateResponsiveCollisionHides(){
 
   const backBtn=document.getElementById('map-back-btn');
   const eraPanel=document.getElementById('era-panel');
+  const eraFilter=document.getElementById('era-filter-btns');
   const backRect=getVisibleRect(backBtn);
   const eraRect=getVisibleRect(eraPanel);
-  const hideFilterUi=!!(backRect&&eraRect&&rectsOverlap(backRect,eraRect,5));
+  const isTouchAppMode=document.documentElement.classList.contains('phone-app')||
+    document.documentElement.classList.contains('tablet-app');
+  const eraPanelStyles=eraPanel?getComputedStyle(eraPanel):null;
+  const eraFilterStyles=eraFilter?getComputedStyle(eraFilter):null;
+  const hideDeformedDesktopFilter=!!(
+    !isTouchAppMode &&
+      eraPanel &&
+      eraRect &&
+      (
+        eraPanel.scrollWidth>eraPanel.clientWidth+2 ||
+        eraRect.left<0 ||
+        eraRect.right>window.innerWidth ||
+        eraPanelStyles?.display==='flex' ||
+      eraFilterStyles?.flexDirection==='row'
+    )
+  );
+  const hideFilterUi=!!((backRect&&eraRect&&rectsOverlap(backRect,eraRect,5))||hideDeformedDesktopFilter);
 
   const sidebar=document.getElementById('sidebar');
   const sidebarTabs=sidebar?.querySelector('.sb-tabs');
@@ -17666,12 +17806,14 @@ function updateNavTabsCentering(){
   if(html.classList.contains('phone-app')||html.classList.contains('tablet-app')){
     navTabsEl.style.removeProperty('--nav-tabs-left');
     navTabsEl.style.removeProperty('--nav-tabs-max-width');
+    syncMainNavCenterVar();
     requestAnimationFrame(()=>_alignMapTabsCenter());
     return;
   }
   if(!isSearchEventsVisible()||!navLogoEl){
     navTabsEl.style.removeProperty('--nav-tabs-left');
     navTabsEl.style.removeProperty('--nav-tabs-max-width');
+    syncMainNavCenterVar();
     requestAnimationFrame(()=>_alignMapTabsCenter());
     return;
   }
@@ -17682,12 +17824,14 @@ function updateNavTabsCentering(){
   if(gapWidth<=180){
     navTabsEl.style.removeProperty('--nav-tabs-left');
     navTabsEl.style.removeProperty('--nav-tabs-max-width');
+    syncMainNavCenterVar();
     requestAnimationFrame(()=>_alignMapTabsCenter());
     return;
   }
   const center=((logoRect.right+searchRect.left)/2)-navRect.left;
   navTabsEl.style.setProperty('--nav-tabs-left',center.toFixed(2)+'px');
   navTabsEl.style.setProperty('--nav-tabs-max-width',Math.max(220,gapWidth-18).toFixed(2)+'px');
+  syncMainNavCenterVar();
   requestAnimationFrame(()=>_alignMapTabsCenter());
 }
 function getMainNavTabsCenterX(){
@@ -17695,6 +17839,9 @@ function getMainNavTabsCenterX(){
   const rect=navTabsEl.getBoundingClientRect();
   if(!rect.width) return window.innerWidth/2;
   return rect.left+(rect.width/2);
+}
+function syncMainNavCenterVar(){
+  document.documentElement.style.setProperty('--main-nav-center-x',getMainNavTabsCenterX().toFixed(2)+'px');
 }
 window.getKirunaMainNavTabsCenterX=getMainNavTabsCenterX;
 const NAV_SECONDARY_HIDE_EPSILON=6;
@@ -18200,6 +18347,7 @@ function alignTlpControls(){
 
 function _alignMapTabsCenter(){
   try{
+    syncMainNavCenterVar();
     const navTabsCenterX = getMainNavTabsCenterX();
     const frame = document.getElementById('timeline2-frame');
     const frameRect = frame?.getBoundingClientRect();
@@ -18213,14 +18361,10 @@ function _alignMapTabsCenter(){
       tlDoc.documentElement.style.setProperty('--parent-nav-offset', '0px');
       return;
     }
-
     const hdrRect = hdr.getBoundingClientRect();
     const hdrCenterX = (frameRect?.left||0) + hdrRect.left + hdrRect.width / 2;
-
-    /* Compute required offset and apply via CSS variable */
     const offset = navTabsCenterX - hdrCenterX;
     hdrCenter.style.setProperty('--parent-nav-offset', offset + 'px');
-    /* Also set on :root for any other consumers */
     tlDoc.documentElement.style.setProperty('--parent-nav-offset', offset + 'px');
     frame?.contentWindow?.alignHeaderCenterToParentTabs?.();
   }catch(e){}
@@ -21901,7 +22045,7 @@ function initDiscourse(){
     </div>
   </div>
 </div>
-<button id="chat-source-return-btn" type="button" hidden aria-label="Back to chat" title="Back to chat"><span class="back-geom-symbol" aria-hidden="true">↩</span></button>
+<button id="chat-source-return-btn" type="button" hidden aria-label="Back to chat" title="Back to chat"><span class="chat-source-return-desktop back-geom-symbol" aria-hidden="true">↩</span><svg class="chat-source-return-touch" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0" aria-hidden="true"><path d="M8.5 2.5L4 7L8.5 11.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
 <script>
 (function(){
   function isPhoneAppMode(){
@@ -22259,14 +22403,16 @@ html.embedded-phone .cpbody{
   display:flex!important;
   flex-direction:column!important;
   gap:10px!important;
+  height:calc(100svh - 52px)!important;
+  min-height:0!important;
   padding:10px 12px calc(24px + env(safe-area-inset-bottom))!important;
-  overflow:auto!important;
+  overflow:hidden!important;
 }
 html.embedded-phone .cpgrid-panel,
 html.embedded-phone .cpevs-panel{
   width:100%!important;
   border:none!important;
-  border-radius:22px!important;
+  border-radius:0!important;
   background:rgba(248,248,250,.96)!important;
   box-shadow:0 12px 28px rgba(15,23,42,.08)!important;
   min-height:0!important;
@@ -22278,9 +22424,42 @@ html.embedded-phone .cpgrid-panel{
 }
 html.embedded-phone .cpevs-panel{
   order:2!important;
-  flex:none!important;
+  flex:1 1 auto!important;
   height:auto!important;
-  max-height:min(42vh,300px)!important;
+  max-height:none!important;
+  min-height:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+  touch-action:pan-y!important;
+  position:relative!important;
+}
+html.embedded-phone .cpevs-panel::before{
+  content:''!important;
+  position:absolute!important;
+  right:3px!important;
+  top:var(--cpe-scroll-top,58px)!important;
+  width:5px!important;
+  height:var(--cpe-scroll-track-h,0px)!important;
+  border-radius:999px!important;
+  background:rgba(29,29,31,.08)!important;
+  opacity:var(--cpe-scroll-visible,0)!important;
+  pointer-events:none!important;
+  z-index:5!important;
+}
+html.embedded-phone .cpevs-panel::after{
+  content:''!important;
+  position:absolute!important;
+  right:3px!important;
+  top:var(--cpe-scroll-top,58px)!important;
+  width:5px!important;
+  height:var(--cpe-scroll-thumb-h,36px)!important;
+  border-radius:999px!important;
+  background:rgba(29,29,31,.48)!important;
+  transform:translateY(var(--cpe-scroll-thumb-y,0px))!important;
+  opacity:var(--cpe-scroll-visible,0)!important;
+  pointer-events:none!important;
+  z-index:6!important;
 }
 html.embedded-phone .cp-day{
   padding:8px 5px 4px!important;
@@ -22311,8 +22490,31 @@ html.embedded-phone .cpe-count{
   font-size:10px!important;
 }
 html.embedded-phone .cpe-list{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  height:100%!important;
+  max-height:100%!important;
   overflow-y:auto!important;
-  padding-bottom:8px!important;
+  overflow-x:hidden!important;
+  padding-bottom:12px!important;
+  scrollbar-width:thin!important;
+  scrollbar-color:rgba(29,29,31,.28) transparent!important;
+  -webkit-overflow-scrolling:touch!important;
+  overscroll-behavior-y:contain!important;
+  touch-action:pan-y!important;
+}
+html.embedded-phone .cpe-list::-webkit-scrollbar{
+  display:block!important;
+  width:4px!important;
+  height:4px!important;
+}
+html.embedded-phone .cpe-list::-webkit-scrollbar-track{
+  background:transparent!important;
+  margin:6px 0!important;
+}
+html.embedded-phone .cpe-list::-webkit-scrollbar-thumb{
+  background:rgba(29,29,31,.28)!important;
+  border-radius:99px!important;
 }
 html.embedded-phone .cpe-ev{
   padding:10px 14px!important;
@@ -22335,7 +22537,11 @@ html.embedded-phone .cpe-ev-meta{
 html.embedded-phone .cpe-ev-desc{
   font-size:9.8px!important;
   line-height:1.44!important;
-  -webkit-line-clamp:4!important;
+  display:block!important;
+  -webkit-line-clamp:unset!important;
+  -webkit-box-orient:initial!important;
+  overflow:visible!important;
+  white-space:normal!important;
 }
 html.embedded-phone .cpe-ev.cpe-compact{
   padding-top:9px!important;
@@ -22363,7 +22569,11 @@ html.embedded-phone .cpe-ev.cpe-dense .cpe-ev-meta{
 html.embedded-phone .cpe-ev.cpe-dense .cpe-ev-desc{
   font-size:8.8px!important;
   line-height:1.32!important;
-  -webkit-line-clamp:5!important;
+  display:block!important;
+  -webkit-line-clamp:unset!important;
+  -webkit-box-orient:initial!important;
+  overflow:visible!important;
+  white-space:normal!important;
 }
 html.embedded-tablet #hdr{
   padding:0 16px!important;
@@ -22759,14 +22969,11 @@ html.embedded-phone .year-bar{
   align-items:center!important;
   justify-content:space-between!important;
 }
-/* ── phone: inside-map calendar cpe-list scrollbar ── */
-html.embedded-phone .cpe-list{
-  scrollbar-width:thin!important;
-  scrollbar-color:rgba(29,29,31,.22) transparent!important;
-}
-html.embedded-phone .cpe-list::-webkit-scrollbar{width:4px!important;}
+/* ── phone: inside-map calendar list scrolls within the events panel ── */
+html.embedded-phone .cpe-list{scrollbar-width:thin!important;scrollbar-color:rgba(29,29,31,.28) transparent!important;}
+html.embedded-phone .cpe-list::-webkit-scrollbar{display:block!important;width:4px!important;height:4px!important;}
 html.embedded-phone .cpe-list::-webkit-scrollbar-track{background:transparent!important;margin:6px 0!important;}
-html.embedded-phone .cpe-list::-webkit-scrollbar-thumb{background:rgba(29,29,31,.22)!important;border-radius:99px!important;}
+html.embedded-phone .cpe-list::-webkit-scrollbar-thumb{background:rgba(29,29,31,.28)!important;border-radius:99px!important;}
 /* ── phone: FIELD bar — hide category legend tags ── */
 html.embedded-phone .cat-legend{display:none!important;}
 /* ── phone: equal-width filter + toggle buttons, icon pinned right ── */
@@ -22988,7 +23195,7 @@ html.embedded-phone .yr-lbl{cursor:pointer!important;}
   transition:opacity .28s .04s cubic-bezier(.22,1,.36,1), transform .35s .04s cubic-bezier(.22,1,.36,1);
 }
 .chat-page-lead{
-  font-size:1.08rem;font-weight:300;line-height:1.85;color:var(--g3);max-width:72ch;
+  font-family:"Source Serif 4","Georgia",serif;font-size:1.08rem;font-weight:300;line-height:1.85;color:#484850;max-width:680px;
   transition:opacity .26s .08s cubic-bezier(.22,1,.36,1), transform .32s .08s cubic-bezier(.22,1,.36,1);
 }
 .chat-lead-highlight{
@@ -23130,6 +23337,10 @@ html.embedded-phone .yr-lbl{cursor:pointer!important;}
 .chat-node-rail::-webkit-scrollbar{display:none}
 .chat-node-rail::before{
   content:'';position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--g5);transform:translateX(-50%);z-index:0;
+}
+#chat-widget-rail::before,
+#chat-page-rail::before{
+  bottom:var(--chat-rail-bottom-cut,0px);
 }
 .chat-node-btn{
   position:absolute;left:50%;z-index:2;width:10px;height:10px;padding:0;border-radius:50%;border:1.5px solid var(--g4);background:#fff;
@@ -23322,6 +23533,10 @@ html.phone-app .chat-page-thread.chat-empty-thread{
 }
 html.phone-app #chat-panel .chat-widget-thread.chat-has-draft .chat-empty{display:none}
 html.phone-app.chat-compose-active #chat-panel .chat-empty{display:none!important;}
+html.phone-app #chat-panel.chat-empty-overlap-hidden .chat-widget-thread .chat-empty,
+html.tablet-app #chat-panel.chat-empty-overlap-hidden .chat-widget-thread .chat-empty{
+  display:none!important;
+}
 
 /* ── Loading hint (seconds counter + close nudge) ── */
 .chat-loading-hint{
@@ -23439,6 +23654,43 @@ html.phone-app.chat-compose-active #chat-panel .chat-empty{display:none!importan
   100%{transform:scale(1)}
 }
 #chat-fab.dragging{cursor:grabbing;animation:none;transform:scale(1.08)}
+.chat-fab-status{
+  position:absolute;
+  right:-1px;
+  top:-1px;
+  width:9px;
+  height:9px;
+  border-radius:999px;
+  opacity:0;
+  transform:scale(.72);
+  pointer-events:none;
+  border:1.5px solid #fff;
+  box-shadow:0 0 0 1px rgba(29,29,31,.08);
+  transition:opacity .18s ease,transform .22s cubic-bezier(.22,1,.36,1),background .18s ease;
+  z-index:2;
+}
+#chat-fab.fab-status-thinking .chat-fab-status{
+  opacity:1;
+  transform:scale(1);
+  background:#ffd60a;
+  background-color:#ffd60a!important;
+  box-shadow:0 0 0 1px rgba(29,29,31,.08),0 0 0 5px rgba(255,214,10,.36),0 0 18px rgba(255,214,10,.9);
+}
+#chat-fab.fab-status-success .chat-fab-status{
+  opacity:1;
+  transform:scale(1);
+  background:#30d158;
+}
+#chat-fab.fab-status-unread .chat-fab-status{
+  opacity:1;
+  transform:scale(1);
+  background:#ff3b30;
+  animation:chatFabStatusBreath 1.15s ease-in-out infinite;
+}
+@keyframes chatFabStatusBreath{
+  0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,59,48,.42),0 0 0 1px rgba(29,29,31,.08)}
+  50%{transform:scale(1.18);box-shadow:0 0 0 7px rgba(255,59,48,0),0 0 0 1px rgba(29,29,31,.08)}
+}
 body.on-chat #chat-fab,
 body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
 body.on-gallery #chat-source-return-btn,
@@ -23757,7 +24009,7 @@ html.tablet-app #page-cal .cpe-list{
 }
 
 </style>
-<button id="chat-fab" type="button" aria-label="Open chat" title="Open chat"></button>
+<button id="chat-fab" type="button" aria-label="Open chat" title="Open chat"><span class="chat-fab-status" aria-hidden="true"></span></button>
 <div id="chat-panel" aria-hidden="true">
   <div class="chat-panel-head">
     <div class="chat-panel-title-wrap">
@@ -23804,6 +24056,7 @@ html.tablet-app #page-cal .cpe-list{
   };
   let chatSourceReturnState=null;
   let chatActiveTurnTimer=null;
+  let chatFabStatusTimer=null;
 
   const els={
     fab:document.getElementById('chat-fab'),
@@ -23824,6 +24077,43 @@ html.tablet-app #page-cal .cpe-list{
     widgetLoadingHint:document.getElementById('chat-widget-loading-hint'),
     pageLoadingHint:document.getElementById('chat-page-loading-hint')
   };
+
+  function isChatOpenedForNotice(){
+    return state.panelOpen || document.body.classList.contains('on-chat');
+  }
+
+  function setChatFabStatus(mode){
+    if(!els.fab) return;
+    els.fab.classList.remove('fab-status-thinking','fab-status-success','fab-status-unread');
+    if(mode) els.fab.classList.add('fab-status-'+mode);
+  }
+
+  function clearChatFabStatusTimer(){
+    clearTimeout(chatFabStatusTimer);
+    chatFabStatusTimer=null;
+  }
+
+  function markChatThinking(){
+    clearChatFabStatusTimer();
+    setChatFabStatus('thinking');
+  }
+
+  function markChatResponseReady(){
+    clearChatFabStatusTimer();
+    setChatFabStatus('success');
+    chatFabStatusTimer=setTimeout(()=>{
+      chatFabStatusTimer=null;
+      if(state.requestInFlight) return;
+      setChatFabStatus(isChatOpenedForNotice()?null:'unread');
+    },1000);
+  }
+
+  function acknowledgeChatFabNotice(){
+    if(state.requestInFlight) return;
+    clearChatFabStatusTimer();
+    setChatFabStatus(null);
+  }
+  window.acknowledgeChatFabNotice=acknowledgeChatFabNotice;
 
   let _loadingTimer=null, _loadingTimerSecs=0;
   function startLoadingTimer(){
@@ -25756,6 +26046,7 @@ html.tablet-app #page-cal .cpe-list{
     els.panel.style.height=panelHeight+'px';
     els.panel.style.left=left+'px';
     els.panel.style.top=top+'px';
+    scheduleChatEmptyOverlapState();
   }
 
   let panelCloseAnimTimer=null;
@@ -25799,6 +26090,7 @@ html.tablet-app #page-cal .cpe-list{
   function openPanel(){
     clearPanelClosingState();
     state.panelOpen=true;
+    acknowledgeChatFabNotice();
     syncChatComposeViewportVars(false);
     positionPanel();
     preparePanelOpenAnimation();
@@ -25819,6 +26111,7 @@ html.tablet-app #page-cal .cpe-list{
     exitChatComposeMode();
     els.panel.classList.remove('open');
     els.fab.classList.remove('open');
+    els.panel.classList.remove('chat-empty-overlap-hidden');
     els.panel.setAttribute('aria-hidden','true');
     if(!shouldAnimate) clearPanelClosingState();
     syncChatViewportLayout({scroll:false});
@@ -25842,6 +26135,69 @@ html.tablet-app #page-cal .cpe-list{
     if(!els.widgetThread) return;
     const hasDraft=!!normalizeSearchText(els.widgetInput?.value||'');
     els.widgetThread.classList.toggle('chat-has-draft',hasDraft);
+  }
+
+  function rectsOverlap(a,b,pad){
+    const gap=pad||0;
+    if(!a||!b||!a.width||!a.height||!b.width||!b.height) return false;
+    return a.left < b.right + gap &&
+      a.right > b.left - gap &&
+      a.top < b.bottom + gap &&
+      a.bottom > b.top - gap;
+  }
+
+  function updateChatRailClipState(rail,form){
+    if(!rail||!form){
+      return;
+    }
+    const railRect=rail.getBoundingClientRect();
+    const formRect=form.getBoundingClientRect();
+    if(!railRect.width||!railRect.height||!formRect.width||!formRect.height){
+      rail.style.removeProperty('--chat-rail-bottom-cut');
+      return;
+    }
+    const overlap=Math.max(0,railRect.bottom-formRect.top);
+    if(overlap>0){
+      rail.style.setProperty('--chat-rail-bottom-cut',Math.ceil(overlap+1)+'px');
+    }else{
+      rail.style.removeProperty('--chat-rail-bottom-cut');
+    }
+  }
+
+  function updateChatEmptyOverlapState(){
+    if(!els.panel||!els.widgetThread) return;
+    const adaptive=document.documentElement.classList.contains('phone-app')||
+      document.documentElement.classList.contains('tablet-app');
+    if(!adaptive||!state.panelOpen){
+      els.panel.classList.remove('chat-empty-overlap-hidden');
+      return;
+    }
+
+    els.panel.classList.remove('chat-empty-overlap-hidden');
+    if(!threadHasOnlyEmptyState(els.widgetThread)){
+      return;
+    }
+
+    const card=els.widgetThread.querySelector('.chat-empty-card');
+    if(!card){
+      return;
+    }
+
+    const cardRect=card.getBoundingClientRect();
+    const railRect=els.widgetRail?.getBoundingClientRect();
+    const formRect=els.widgetForm?.getBoundingClientRect();
+    const shouldHide=rectsOverlap(cardRect,railRect,10)||rectsOverlap(cardRect,formRect,10);
+    els.panel.classList.toggle('chat-empty-overlap-hidden',shouldHide);
+  }
+
+  function scheduleChatEmptyOverlapState(){
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        updateChatRailClipState(els.widgetRail,els.widgetForm);
+        updateChatRailClipState(els.pageRail,els.pageForm);
+        updateChatEmptyOverlapState();
+      });
+    });
   }
 
   function threadHasOnlyEmptyState(thread){
@@ -26376,6 +26732,7 @@ html.tablet-app #page-cal .cpe-list{
       button.setAttribute('title', state.requestInFlight?'Sending':'Send');
     });
     [els.widgetInput,els.pageInput].forEach(textarea=>normalizeTextareaHeight(textarea));
+    scheduleChatEmptyOverlapState();
   }
 
   async function submitQuestion(rawQuestion){
@@ -26383,6 +26740,7 @@ html.tablet-app #page-cal .cpe-list{
     if(!question||state.requestInFlight) return;
     clearChatActiveTurn(true);
     state.requestInFlight=true;
+    markChatThinking();
     startLoadingTimer();
     const pendingWeakSuggestion=state.pendingWeakSuggestion;
     const pendingExternalSuggestion=state.pendingExternalSuggestion;
@@ -26569,6 +26927,7 @@ html.tablet-app #page-cal .cpe-list{
     }finally{
       state.requestInFlight=false;
       stopLoadingTimer();
+      markChatResponseReady();
       saveTurns();
       renderChatViews();
     }
@@ -26728,6 +27087,7 @@ html.tablet-app #page-cal .cpe-list{
     },80);
   });
   els.panelOpenPage.addEventListener('click',()=>{
+    acknowledgeChatFabNotice();
     closePanel();
     const currentPage=getCurrentPageName();
     const originPage=currentPage!=='chat'?currentPage:'home';
@@ -27538,8 +27898,9 @@ html.phone-app #page-cal .cpevs-panel{
   display:flex!important;
   flex-direction:column!important;
   overflow:hidden!important;
-  border-radius:18px!important;
+  border-radius:0!important;
   -webkit-overflow-scrolling:touch!important;
+  touch-action:pan-y!important;
 }
 
 html.phone-app #page-cal .cpe-head{
@@ -27550,18 +27911,489 @@ html.phone-app #page-cal .cpe-head{
 html.phone-app #page-cal .cpe-list{
   flex:1 1 auto!important;
   min-height:0!important;
-  height:auto!important;
-  max-height:none!important;
+  height:100%!important;
+  max-height:100%!important;
   overflow-y:auto!important;
   overflow-x:hidden!important;
+  scrollbar-width:thin!important;
+  scrollbar-color:rgba(29,29,31,.28) transparent!important;
   -webkit-overflow-scrolling:touch!important;
   touch-action:pan-y!important;
   overscroll-behavior-y:contain!important;
   padding-bottom:24px!important;
 }
 
+html.phone-app #page-cal .cpe-list::-webkit-scrollbar{
+  display:block!important;
+  width:4px!important;
+  height:4px!important;
+}
+
+html.phone-app #page-cal .cpe-list::-webkit-scrollbar-track{
+  background:transparent!important;
+  margin:6px 0!important;
+}
+
+html.phone-app #page-cal .cpe-list::-webkit-scrollbar-thumb{
+  background:rgba(29,29,31,.28)!important;
+  border-radius:99px!important;
+}
+
+html.phone-app #page-cal .cpe-ev-title,
+html.phone-app #page-cal .cpe-ev-desc{
+  display:block!important;
+  -webkit-line-clamp:unset!important;
+  -webkit-box-orient:initial!important;
+  overflow:visible!important;
+  white-space:normal!important;
+}
+
 html.phone-app #page-cal .cpe-ev{
   touch-action:pan-y!important;
+}
+
+/* FINAL MOBILE REQUESTED REFINEMENTS */
+html.phone-app body:has(#page-home:not(.off)),
+html.phone-app body:has(#page-home:not(.off)) #content,
+html.phone-app #page-home,
+html.phone-app #page-home .hero-outer,
+html.phone-app #page-home .hero-inner,
+html.phone-app #page-home .stats-wrapper,
+html.phone-app #page-home .stats-inner,
+html.phone-app #page-home .stat-cell,
+html.phone-app #page-home .htl-section-outer,
+html.phone-app #page-home .cards-section-outer,
+html.phone-app #page-home .section-inner{
+  background:#fff!important;
+  background-image:none!important;
+}
+
+html.phone-app #nav,
+html.phone-app .nav-tabs{
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+
+html.phone-app #nav{
+  width:100%!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  height:auto!important;
+  min-height:unset!important;
+  display:flex!important;
+  align-items:flex-start!important;
+  flex-wrap:wrap!important;
+  gap:12px!important;
+  padding-top:max(10px,env(safe-area-inset-top))!important;
+  padding-bottom:12px!important;
+  padding-left:18px!important;
+  padding-right:18px!important;
+  border:none!important;
+  border-bottom:1px solid rgba(255,255,255,.64)!important;
+  border-radius:0!important;
+  background:#fff!important;
+  background-color:#fff!important;
+  box-shadow:none!important;
+}
+
+html.phone-app .logo{
+  width:100%!important;
+  margin:0!important;
+  font-size:22px!important;
+  font-weight:500!important;
+  letter-spacing:-.03em!important;
+}
+
+html.phone-app .nav-r{
+  display:none!important;
+}
+
+html.phone-app .nav-tabs{
+  min-width:0!important;
+  width:100%!important;
+  max-width:none!important;
+  flex:1 1 100%!important;
+  display:grid!important;
+  grid-template-columns:repeat(6,minmax(0,1fr))!important;
+  justify-content:stretch!important;
+  gap:4px!important;
+  padding:4px!important;
+  margin:0!important;
+  transform:none!important;
+  background:#fff!important;
+  background-color:#fff!important;
+  border:1px solid rgba(255,255,255,.54)!important;
+  box-shadow:none!important;
+  border-radius:18px!important;
+  overflow:visible!important;
+}
+
+html.phone-app .ntab{
+  height:36px!important;
+  padding:0 6px!important;
+  border-radius:0!important;
+  justify-content:center!important;
+  text-align:center!important;
+  font-size:11px!important;
+  font-weight:600!important;
+  color:#636366!important;
+  position:relative!important;
+  overflow:visible!important;
+}
+
+html.phone-app .ntab::after{
+  content:''!important;
+  display:block!important;
+  position:absolute!important;
+  left:50%!important;
+  right:50%!important;
+  bottom:0!important;
+  height:2px!important;
+  border-radius:1px!important;
+  background:#111827!important;
+  transition:left .3s cubic-bezier(.4,0,.2,1),right .3s cubic-bezier(.4,0,.2,1)!important;
+}
+
+html.phone-app .ntab.on{
+  background:transparent!important;
+  color:#111827!important;
+  box-shadow:none!important;
+}
+
+html.phone-app .ntab.on::after{
+  left:10px!important;
+  right:10px!important;
+}
+
+html.phone-app #page-cal .cpgrid-panel{
+  border-radius:0!important;
+}
+
+html.phone-app #page-cal .cpevs-panel{
+  border-radius:0!important;
+}
+
+html.phone-app #chat-panel{
+  left:50%!important;
+  top:50%!important;
+  width:85vw!important;
+  max-width:85vw!important;
+  height:85dvh!important;
+  max-height:85dvh!important;
+  border-radius:20px!important;
+  transform:translate(-50%,-50%) scale(.08)!important;
+  transform-origin:center center!important;
+}
+
+html.phone-app #chat-panel .chat-link-btn{
+  border:1px solid rgba(29,29,31,.22)!important;
+  border-radius:999px!important;
+  background:#fff!important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.62)!important;
+}
+
+html.phone-app #chat-panel.open{
+  transform:translate(-50%,-50%) scale(1)!important;
+}
+
+html.phone-app #chat-panel.closing{
+  transform:translate(-50%,-50%) scale(.08)!important;
+  transform-origin:center center!important;
+}
+
+html.phone-app.chat-compose-expanding #chat-panel,
+html.phone-app.chat-compose-active:not(.chat-compose-collapsing) #chat-panel{
+  left:50%!important;
+  top:50%!important;
+  width:85vw!important;
+  max-width:85vw!important;
+  height:85dvh!important;
+  max-height:85dvh!important;
+  border:1.5px solid var(--chat-panel-border)!important;
+  border-radius:20px!important;
+  box-shadow:0 28px 38px -22px rgba(0,0,0,.48),0 12px 20px -18px rgba(0,0,0,.34)!important;
+  transform:translate(-50%,-50%) scale(1)!important;
+}
+
+html.phone-app.chat-compose-active #chat-panel.open{
+  transform:translate(-50%,-50%) scale(1)!important;
+}
+
+html.phone-app #chat-panel{
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+
+/* FINAL STRICT FIXES — phone calendar scroll, white nav, tablet chat */
+html.phone-app #nav,
+html.tablet-app #nav,
+html.phone-app .nav-tabs,
+html.tablet-app .nav-tabs{
+  background:#fff!important;
+  background-color:#fff!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+
+html.phone-app #page-cal .cpevs-panel,
+html.embedded-phone .cpevs-panel{
+  min-height:0!important;
+  overflow:hidden!important;
+  touch-action:pan-y!important;
+}
+
+html.phone-app #page-cal .cpe-list,
+html.embedded-phone .cpe-list{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  height:100%!important;
+  max-height:100%!important;
+  overflow-y:scroll!important;
+  overflow-x:hidden!important;
+  -webkit-overflow-scrolling:touch!important;
+  overscroll-behavior-y:contain!important;
+  touch-action:pan-y!important;
+  scrollbar-width:thin!important;
+  scrollbar-color:rgba(29,29,31,.34) transparent!important;
+}
+
+html.phone-app #page-cal .cpe-list::-webkit-scrollbar,
+html.embedded-phone .cpe-list::-webkit-scrollbar{
+  display:block!important;
+  width:5px!important;
+  height:5px!important;
+}
+
+html.phone-app #page-cal .cpe-list::-webkit-scrollbar-thumb,
+html.embedded-phone .cpe-list::-webkit-scrollbar-thumb{
+  background:rgba(29,29,31,.34)!important;
+  border-radius:99px!important;
+}
+
+/* FINAL DEVICE-SPECIFIC RESTORES */
+html.tablet-app #nav{
+  width:100%!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  justify-items:center!important;
+  align-items:center!important;
+  padding:max(10px,env(safe-area-inset-top)) 18px 12px!important;
+  border:none!important;
+  border-radius:0!important;
+  background:#fff!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+
+html.tablet-app .logo,
+html.tablet-app .nav-r{
+  display:none!important;
+}
+
+html.tablet-app .nav-tabs{
+  position:static!important;
+  left:auto!important;
+  top:auto!important;
+  transform:none!important;
+  display:grid!important;
+  grid-template-columns:repeat(6,minmax(0,1fr))!important;
+  width:min(100%,calc(100vw - 36px))!important;
+  max-width:none!important;
+  height:auto!important;
+  gap:4px!important;
+  padding:4px!important;
+  margin:0 auto!important;
+  border-radius:18px!important;
+  border:1px solid rgba(255,255,255,.54)!important;
+  background:rgba(118,118,128,.12)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.58)!important;
+  overflow:visible!important;
+}
+
+html.tablet-app .ntab{
+  height:42px!important;
+  padding:0 12px!important;
+  border-radius:14px!important;
+  justify-content:center!important;
+  text-align:center!important;
+  font-size:13px!important;
+  font-weight:600!important;
+  color:#636366!important;
+}
+
+html.tablet-app .ntab::after{
+  display:none!important;
+}
+
+html.tablet-app .ntab.on{
+  background:rgba(255,255,255,.96)!important;
+  color:#111827!important;
+  box-shadow:0 6px 18px rgba(15,23,42,.08)!important;
+}
+
+html.phone-app #page-chat,
+html.phone-app #page-chat .chat-page-shell,
+html.phone-app #page-chat .chat-page-board{
+  background:#fff!important;
+}
+
+html.phone-app .ntab::after{
+  transition:left .3s cubic-bezier(.4,0,.2,1),right .3s cubic-bezier(.4,0,.2,1),opacity .12s ease!important;
+}
+
+html.phone-app .ntab:not(.on)::after{
+  display:block!important;
+  left:50%!important;
+  right:50%!important;
+  opacity:0!important;
+}
+
+html.phone-app #page-cal .cpe-list,
+html.embedded-phone .cpe-list{
+  scrollbar-gutter:stable!important;
+  padding-right:8px!important;
+}
+
+html.phone-app #page-cal .cpe-list::-webkit-scrollbar-track,
+html.embedded-phone .cpe-list::-webkit-scrollbar-track{
+  display:block!important;
+  background:transparent!important;
+}
+
+html.phone-app #page-cal .cpe-list::-webkit-scrollbar-thumb,
+html.embedded-phone .cpe-list::-webkit-scrollbar-thumb{
+  display:block!important;
+  background:rgba(29,29,31,.34)!important;
+}
+
+/* FINAL PHONE REQUESTED REFINEMENTS — stats bottom line + full-height event list */
+html.phone-app #page-home .stats-inner{
+  border-bottom:none!important;
+}
+
+html.phone-app #page-home .stats-wrapper{
+  border-bottom:1px solid rgba(15,23,42,.08)!important;
+}
+
+html.phone-app #page-home .stat-cell:nth-last-child(-n+3){
+  border-bottom:none!important;
+}
+
+html.phone-app #page-cal{
+  height:100%!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+
+html.phone-app #page-cal .cph{
+  flex:0 0 auto!important;
+}
+
+html.phone-app #page-cal .cpbody{
+  flex:1 1 auto!important;
+  height:auto!important;
+  min-height:0!important;
+  padding:0 16px 0!important;
+  gap:12px!important;
+}
+
+html.phone-app #page-cal .cpgrid-panel{
+  width:100%!important;
+  flex:0 0 auto!important;
+  max-height:46svh!important;
+}
+
+html.phone-app #page-cal .cpevs-panel,
+html.embedded-phone .cpevs-panel{
+  flex:1 1 0!important;
+  min-height:0!important;
+  height:auto!important;
+  max-height:none!important;
+  position:relative!important;
+}
+
+html.phone-app #page-cal .cpe-list,
+html.embedded-phone .cpe-list{
+  flex:1 1 0!important;
+  min-height:0!important;
+  height:auto!important;
+  max-height:none!important;
+  box-sizing:border-box!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  -webkit-overflow-scrolling:touch!important;
+  overscroll-behavior-y:contain!important;
+  touch-action:pan-y!important;
+  padding-bottom:0!important;
+}
+
+html.phone-app #page-cal .cpevs-panel::before,
+html.embedded-phone .cpevs-panel::before{
+  content:''!important;
+  position:absolute!important;
+  right:0!important;
+  top:var(--cpe-scroll-top,58px)!important;
+  width:5px!important;
+  height:var(--cpe-scroll-track-h,0px)!important;
+  border-radius:999px!important;
+  background:rgba(29,29,31,.08)!important;
+  opacity:var(--cpe-scroll-visible,0)!important;
+  pointer-events:none!important;
+  z-index:5!important;
+}
+
+html.phone-app #page-cal .cpevs-panel::after,
+html.embedded-phone .cpevs-panel::after{
+  content:''!important;
+  position:absolute!important;
+  right:0!important;
+  top:var(--cpe-scroll-top,58px)!important;
+  width:5px!important;
+  height:var(--cpe-scroll-thumb-h,36px)!important;
+  border-radius:999px!important;
+  background:rgba(29,29,31,.48)!important;
+  transform:translateY(var(--cpe-scroll-thumb-y,0px))!important;
+  opacity:var(--cpe-scroll-visible,0)!important;
+  pointer-events:none!important;
+  z-index:6!important;
+}
+
+#chat-source-return-btn .chat-source-return-touch{
+  display:none!important;
+}
+
+html.phone-app #chat-source-return-btn .chat-source-return-desktop,
+html.tablet-app #chat-source-return-btn .chat-source-return-desktop{
+  display:none!important;
+}
+
+html.phone-app #chat-source-return-btn .chat-source-return-touch,
+html.tablet-app #chat-source-return-btn .chat-source-return-touch{
+  display:block!important;
+}
+
+html.phone-app #page-discourse .dc-ptab,
+html.tablet-app #page-discourse .dc-ptab{
+  border-bottom-color:transparent!important;
+}
+
+html.phone-app #page-discourse .dc-ptab .dc-ptab-icon,
+html.tablet-app #page-discourse .dc-ptab .dc-ptab-icon{
+  display:flex!important;
+}
+
+html.phone-app #page-discourse .dc-nav-indicator,
+html.tablet-app #page-discourse .dc-nav-indicator{
+  display:block!important;
+  opacity:1!important;
+  height:2.5px!important;
+  background:var(--dp)!important;
+  transition:left .32s cubic-bezier(.4,0,.2,1),width .32s cubic-bezier(.4,0,.2,1)!important;
 }
 
 
