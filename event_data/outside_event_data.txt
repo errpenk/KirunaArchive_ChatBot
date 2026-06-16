@@ -1,0 +1,315 @@
+﻿NAME
+	EVENT
+	YEAR
+	outside-001.jpg
+	Deformation Forecast
+	2004
+	outside-002.jpg
+	Mail to Kiruna Kommun
+	2004
+	outside-003.jpg
+	Agreement on City Relocation
+	2004
+	outside-004.jpg
+	Vision 2099
+	2004
+	outside-005.jpg
+	Sketch Proposal Alternatives for Expansion
+	2005
+	outside-006.jpg
+	Cultural Heritage in Motion
+	2005
+	outside-007.jpg
+	Report New Kiruna — The Northwestern Alternative
+	2005
+	outside-008.jpg
+	The New Kiruna Northwest Alternative
+	2006
+	outside-009.jpg
+	Railway Investigation, Kiruna New Railway
+	2006
+	outside-010.jpg
+	Comprehensive Development Plan for the Central Area of Kiruna
+	2006
+	outside-011.jpg
+	Environmental Impact Assessment for the Detailed Master Plan
+	2006
+	outside-012.jpg
+	Survey: What is your impression of Kiruna?
+	2007
+	outside-013.jpg
+	Comprehensive Plan for Kiruna C
+	2007
+	outside-014.jpg
+	Final Report: Kiruna New Railway Investigation
+	2007
+	outside-015.jpg
+	Compilation of Responses to the Survey
+	2007
+	outside-016.jpg
+	What is Kiruna Worth? Kiruna Cultural Valuation Analysis
+	2008
+	outside-017.jpg
+	Renewal of National Interest
+	2009
+	outside-018.jpg
+	Detail Plan for Bolagsområdet Gruvstadspark
+	2010
+	outside-019.jpg
+	Expression of Interest
+	2011
+	outside-020.jpg
+	Agreement: GP1-Atvalet
+	2011
+	outside-021.jpg
+	Agreement of the Municipal Board on City Relocation
+	2011
+	outside-022.jpg
+	Agreement on Temporary Railway Relocation
+	2012
+	outside-023.jpg
+	Temporary Railway Relocation
+	2012
+	outside-024.jpg
+	A New City Centre for Kiruna — Invite to an Architecture Competition
+	2012
+	outside-025.jpg
+	First Delivery
+	2012
+	outside-026.jpg
+	Architecture Competition Brief
+	2012
+	outside-027.jpg
+	Preliminary Study on Railway Relocation
+	2012
+	outside-028.jpg
+	Railway Decommissioning
+	2012
+	outside-029.jpg
+	Kiruna Forever
+	2012
+	outside-030.jpg
+	Rejection of Declassification of Kiruna Town Hall
+	2012
+	outside-031.jpg
+	Preliminary Study Kiruna Railway Station
+	2013
+	outside-032.jpg
+	Supplementary Agreement on Building Relocation
+	2013
+	outside-033.jpg
+	A New City Centre for Kiruna — Jury Pronouncement
+	2013
+	outside-034.jpg
+	Winning the Case
+	2013
+	outside-035.jpg
+	Invitation to Architecture Competition, New City Hall
+	2013
+	outside-036.jpg
+	First Delivery
+	2013
+	outside-037.jpg
+	Kristallen
+	2013
+	outside-038.jpg
+	Architectural Competition New City Hall — Jury Pronouncement
+	2013
+	outside-039.jpg
+	Supplementary Agreement on Building Relocation
+	2013
+	outside-040.jpg
+	Kiruna 2.0 Vision Report
+	2013
+	outside-041.jpg
+	Development Plan
+	2014
+	outside-042.jpg
+	Detail Plan for Linbanan
+	2014
+	outside-043.jpg
+	Decommissioning of Ulspiran 2 and 4
+	2014
+	outside-044.jpg
+	Analysis of Kiruna's Cultural Heritage Phase 2
+	2014
+	outside-045.jpg
+	Overview Plan for the Central Area of Kiruna 2014
+	2014
+	outside-046.jpg
+	Deformation Forecast
+	2014
+	outside-047.jpg
+	Adjusted Development Plan
+	2015
+	outside-048.jpg
+	Construction of New City Hall Kristallen Begins
+	2015
+	outside-049.jpg
+	Detail Plan for Square and Commercial Street
+	2016
+	outside-050.jpg
+	Detail Plan: Gruvstadspark 2, Etapp 1
+	2016
+	outside-051.jpg
+	Level 1365 Reaches Full Exploitation
+	2016
+	outside-052.jpg
+	Building Relocation Plan for Structures Affected by Level 1365
+	2017
+	outside-053.jpg
+	Moving of B5 Hjalmar Lundbohmsgården
+	2017
+	outside-054.jpg
+	First Relocation Stage Completed
+	2017
+	outside-055.jpg
+	Decommissioning of Ulspiran 6 and 8
+	2017
+	outside-056.jpg
+	Preliminary Study Mining Town Park, Phase 2
+	2017
+	outside-057.jpg
+	Town Hall Closes
+	2018
+	outside-058.jpg
+	Detailed Plan for Gruvstadspark 2, Stage 2
+	2018
+	outside-059.jpg
+	New City Hall Completed
+	2018
+	outside-060.jpg
+	Management of Cultural Buildings for Relocation due to Level 1365, Version 3
+	2018
+	outside-061.jpg
+	Detail Plan for Retail Park and Centre
+	2019
+	outside-062.jpg
+	Deformation Forecast
+	2019
+	outside-063.jpg
+	Construction of Scandic Hotel Begins
+	2019
+	outside-064.jpg
+	Construction of Aurora Center Begins
+	2019
+	outside-065.jpg
+	Detail Plan for Gruvstadspark 2, Etapp 2, Del av Centrum
+	2019
+	outside-066.jpg
+	Study on the Relocation of the Church of Kiruna
+	2019
+	outside-067.jpg
+	Construction of Block 1 Begins
+	2019
+	outside-068.jpg
+	Agreement on Heritage Buildings to Move
+	2019
+	outside-069.jpg
+	Town Hall Demolition
+	2019
+	outside-070.jpg
+	Construction of Blocks 7, 8 & 9 Begins
+	2019
+	outside-071.jpg
+	Proposal for Detailed Plan for Part of Tuolluvaara 1
+	2019
+	outside-072.jpg
+	Detailed Plan for the Knowledge Hub
+	2019
+	outside-073.jpg
+	Heritage Buildings Second Moving Phase Begins
+	2019
+	outside-074.jpg
+	First Set of Housing Buildings Completed
+	2020
+	outside-075.jpg
+	Railway Plan
+	2020
+	outside-076.jpg
+	Demolition Documentation, Kiruna City Hall
+	2020
+	outside-077.jpg
+	Detail Plan for Gruvstadspark 2, Etapp 4
+	2020
+	outside-078.jpg
+	Construction of Swimming Pool Starts
+	2021
+	outside-079.jpg
+	Construction of Hjalmar Lundbohm School Starts
+	2021
+	outside-080.jpg
+	Construction of Police Station Starts
+	2021
+	outside-081.jpg
+	Detail Plan for Gruvstadspark 2, Etapp 5, Kyrkan 11 m fl
+	2021
+	outside-082.jpg
+	Landscape Analysis — Old Kiruna Church Site
+	2021
+	outside-083.jpg
+	Detail Plan for Gruvstadspark 3, Etapp 1, Hovmästaren 1 f
+	2021
+	outside-084.jpg
+	Comprehensive Assessment of Line Studies
+	2021
+	outside-085.jpg
+	Inauguration of Scandic Hotel
+	2022
+	outside-086.jpg
+	Inauguration of Aurora Center
+	2022
+	outside-087.jpg
+	Block 1 Inauguration
+	2022
+	outside-088.jpg
+	Construction of Blocks 7, 8 & 9 Completed
+	2022
+	outside-089.jpg
+	Agreement of the Municipal Board on Hospital Relocation
+	2022
+	outside-090.jpg
+	Inauguration of New City Centre
+	2022
+	outside-091.jpg
+	Detail Plan Tuolluvaara 1:1 — Western Green Finger
+	2022
+	outside-092.jpg
+	New Railway Line Studies
+	2022
+	outside-093.jpg
+	Detail Plan Tuolluvaara 1:1 — Northeast of Vinterleden
+	2022
+	outside-094.jpg
+	Detail Plan for Gruvstadspark 3, Etapp 2
+	2022
+	outside-095.jpg
+	Second Set of Housing Buildings Completed
+	2023
+	outside-096.jpg
+	Third Set of Housing Buildings Completed
+	2023
+	outside-097.jpg
+	Police Station Completed
+	2023
+	outside-098.jpg
+	Detailed Planning Proposal for City Park
+	2023
+	outside-099.jpg
+	Inauguration of Hjalmar Lundbohm School
+	2023
+	outside-100.jpg
+	Agreement on Hospital Relocation
+	2024
+	outside-101.jpg
+	Detailed Plan for Volume Trade and the Centre, Change
+	2024
+	outside-102.jpg
+	Kiruna Church Closes
+	2024
+	outside-103.jpg
+	Relocation of Kiruna Church and its Bell Tower
+	2025
+	outside-104.jpg
+	Deformation Forecast
+	2025

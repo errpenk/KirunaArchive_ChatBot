@@ -1,0 +1,70 @@
+﻿NAME
+	EVENT
+	inside-001.jpg
+	LKAB Begins Industrial Mining (1900)
+	inside-002.jpg
+	Malmbanan Railway Completed (1902)
+	inside-003.jpg
+	Garden City Master Plan (1910)
+	inside-004.jpg
+	Peak Wartime Ore Production (1943)
+	inside-005.jpg
+	City Hall Inaugurated (1958)
+	inside-006.jpg
+	Underground Mine Exceeds 1,000m (1969)
+	inside-007.jpg
+	Esrange Space Centre (1984)
+	inside-008.jpg
+	City Relocation Decision (2004)
+	inside-009.jpg
+	Old City Hall Demolished (2012)
+	inside-010.jpg
+	Kristallen City Hall Opens (2018)
+	inside-011.jpg
+	Old Town Subsidence Milestone (2023)
+	inside-012.jpg
+	New Kiruna Target Completion (2035)
+	inside-100.jpg
+	Compilation of Responses to the Survey (2007)
+	inside-101.jpg
+	Detail Plan Bolagsomradet Gruvstadspark (2010)
+	inside-102.jpg
+	Development Plan (2014)
+	inside-103.jpg
+	Deformation Forecast (2014)
+	inside-104.jpg
+	Construction of Scandic Hotel Begins (2019)
+	inside-105.jpg
+	Town Hall Demolition (2019)
+	inside-106.jpg
+	Construction of Aurora Center Begins (2019)
+	inside-107.jpg
+	Construction of Block 1 Begins (2019)
+	inside-108.jpg
+	Detail Plan Square and Commercial Street (2016)
+	inside-109.jpg
+	Gruvstadspark 2 Etapp 5 Kyrkan (2021)
+	inside-110.jpg
+	Demolition Documentation City Hall (2020)
+	inside-111.jpg
+	Deformation Forecast (2019)
+	inside-112.jpg
+	Detailed Plan Gruvstadspark 2 Etapp 3 (2018)
+	inside-113.jpg
+	Vision 2099 (2004)
+	inside-114.jpg
+	Adjusted Development Plan (2015)
+	inside-115.jpg
+	Detailed Overview Plan Central Area (2014)
+	inside-116.jpg
+	Detailed Plan LINBANAN 1 (2014)
+	inside-117.jpg
+	Mail to Kiruna Kommun (2004)
+	inside-118.jpg
+	Construction of New City Hall Begins (2015)
+	inside-119.jpg
+	Detail Plan Square and Commercial Street (2016)
+	inside-120.jpg
+	Detail Plan Bolagsomradet Gruvstadspark 18b (2010)
+	inside-121.jpg
+	Kiruna Church Closes (2024)
