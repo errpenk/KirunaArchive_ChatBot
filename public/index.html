@@ -98,6 +98,14 @@ a{text-decoration:none;color:inherit}
   pointer-events:none;
   transition:opacity .48s cubic-bezier(.22,1,.36,1);
 }
+#mobile-intro-inner{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:22px;
+  transform:translateY(4vh);
+}
 #mobile-intro video{
   width:min(40vw,360px);
   max-width:40vw;
@@ -109,6 +117,26 @@ a{text-decoration:none;color:inherit}
   transform:translateY(10px) scale(.985);
   transition:opacity .5s cubic-bezier(.22,1,.36,1),transform .58s cubic-bezier(.22,1,.36,1);
 }
+#mobile-intro-progress{
+  width:min(34vw,220px);
+  min-width:104px;
+  height:4px;
+  border-radius:999px;
+  background:rgba(29,29,31,.16);
+  overflow:hidden;
+  opacity:0;
+  transform:translateY(6px);
+  transition:opacity .46s cubic-bezier(.22,1,.36,1),transform .5s cubic-bezier(.22,1,.36,1);
+}
+#mobile-intro-progress-fill{
+  display:block;
+  width:100%;
+  height:100%;
+  border-radius:inherit;
+  background:#1d1d1f;
+  transform:scaleX(0);
+  transform-origin:left center;
+}
 body.kiruna-intro-pending #shell,
 body.kiruna-intro-active #shell{
   opacity:0;
@@ -117,7 +145,7 @@ body.kiruna-intro-active #shell{
 body.kiruna-intro-revealing #shell{
   opacity:1;
   transform:translateY(0) scale(1);
-  transition:opacity 1.05s cubic-bezier(.22,1,.36,1),transform 1.12s cubic-bezier(.22,1,.36,1);
+  transition:opacity .58s cubic-bezier(.22,1,.36,1),transform .64s cubic-bezier(.22,1,.36,1);
 }
 body.kiruna-intro-active #mobile-intro,
 body.kiruna-intro-exiting #mobile-intro{
@@ -129,15 +157,23 @@ body.kiruna-intro-active #mobile-intro video{
   opacity:1;
   transform:translateY(0) scale(1);
 }
+body.kiruna-intro-active #mobile-intro-progress{
+  opacity:1;
+  transform:translateY(0);
+}
 body.kiruna-intro-exiting #mobile-intro{
   opacity:0;
   pointer-events:none;
-  transition:opacity .9s cubic-bezier(.22,1,.36,1);
+  transition:opacity .42s cubic-bezier(.22,1,.36,1);
 }
 body.kiruna-intro-exiting #mobile-intro video{
   opacity:0;
   transform:translateY(-10px) scale(.985);
-  transition:opacity .78s cubic-bezier(.22,1,.36,1),transform .86s cubic-bezier(.22,1,.36,1);
+  transition:opacity .38s cubic-bezier(.22,1,.36,1),transform .44s cubic-bezier(.22,1,.36,1);
+}
+body.kiruna-intro-exiting #mobile-intro-progress{
+  opacity:0;
+  transform:translateY(-6px);
 }
 .page{
   position:absolute;inset:0;overflow:hidden;
@@ -8089,7 +8125,7 @@ html.tablet-app .chat-page-scroll-shell{
 <body>
 <script>
 (function(){
-  var key='kiruna-mobile-intro-seen-v4';
+  var key='kiruna-mobile-intro-seen-v5';
   var seen=false;
   try{seen=localStorage.getItem(key)==='1';}catch(e){}
   if(!seen){
@@ -8098,11 +8134,14 @@ html.tablet-app .chat-page-scroll-shell{
 })();
 </script>
 <div id="mobile-intro" aria-hidden="true">
-  <video id="mobile-intro-video" src="videos/kiruna-mobile-intro.mov" muted playsinline preload="auto"></video>
+  <div id="mobile-intro-inner">
+    <video id="mobile-intro-video" src="videos/kiruna-mobile-intro.mov" muted playsinline preload="auto"></video>
+    <div id="mobile-intro-progress" aria-hidden="true"><span id="mobile-intro-progress-fill"></span></div>
+  </div>
 </div>
 <script>
 (function(){
-  var key='kiruna-mobile-intro-seen-v4';
+  var key='kiruna-mobile-intro-seen-v5';
   var seen=false;
   try{seen=localStorage.getItem(key)==='1';}catch(e){}
   if(seen) return;
@@ -8111,19 +8150,62 @@ html.tablet-app .chat-page-scroll-shell{
   if(!body || !video) return;
   window.__kirunaIntroEarlyStarted=true;
   window.__kirunaIntroEarlyStartedAt=Date.now();
+  window.__kirunaIntroTargetSeconds=1.55;
   body.classList.remove('kiruna-intro-pending');
   body.classList.add('kiruna-intro-active');
+  window.__kirunaIntroSetPlaybackRate=function(){
+    var video=document.getElementById('mobile-intro-video');
+    if(!video) return;
+    var duration=Number.isFinite(video.duration) && video.duration > 0 ? video.duration : 0;
+    var target=window.__kirunaIntroTargetSeconds || 1.55;
+    if(duration > target){
+      video.playbackRate=Math.min(4, Math.max(1, duration / target));
+    }else{
+      video.playbackRate=1;
+    }
+  };
+  window.__kirunaIntroUpdateProgress=function(){
+    var fill=document.getElementById('mobile-intro-progress-fill');
+    var video=document.getElementById('mobile-intro-video');
+    if(!fill || !video) return;
+    var duration=Number.isFinite(video.duration) && video.duration > 0 ? video.duration : 0;
+    var elapsed=(Date.now()-(window.__kirunaIntroEarlyStartedAt||Date.now()))/1000;
+    var ratio=duration ? video.currentTime/duration : Math.min(1, elapsed/7);
+    ratio=Math.max(0, Math.min(1, ratio));
+    fill.style.transform='scaleX('+ratio.toFixed(4)+')';
+  };
+  window.__kirunaIntroProgressFrame=function(){
+    window.__kirunaIntroUpdateProgress?.();
+    var video=document.getElementById('mobile-intro-video');
+    if(video && !video.paused && !video.ended && !window.__kirunaIntroEarlyDone){
+      window.__kirunaIntroProgressRaf=requestAnimationFrame(window.__kirunaIntroProgressFrame);
+    }
+  };
   var markDone=function(type){
+    window.__kirunaIntroUpdateProgress?.();
     window.__kirunaIntroEarlyDone=true;
     window.__kirunaIntroEarlyDoneType=type;
     try{window.dispatchEvent(new CustomEvent('kiruna-intro-early-done',{detail:{type:type}}));}catch(e){}
   };
   video.addEventListener('ended',function(){markDone('ended');},{once:true});
   video.addEventListener('error',function(){markDone('error');},{once:true});
+  video.addEventListener('loadedmetadata',function(){window.__kirunaIntroSetPlaybackRate?.();},{once:true});
   try{
     video.load();
     video.currentTime=0;
+    window.__kirunaIntroSetPlaybackRate?.();
     var playPromise=video.play();
+    if(playPromise && typeof playPromise.catch==='function'){
+      playPromise.then(function(){
+        cancelAnimationFrame(window.__kirunaIntroProgressRaf);
+        window.__kirunaIntroProgressRaf=requestAnimationFrame(window.__kirunaIntroProgressFrame);
+      }).catch(function(){
+        window.__kirunaIntroEarlyPlayBlocked=true;
+      });
+    }else{
+      cancelAnimationFrame(window.__kirunaIntroProgressRaf);
+      window.__kirunaIntroProgressRaf=requestAnimationFrame(window.__kirunaIntroProgressFrame);
+    }
     if(playPromise && typeof playPromise.catch==='function'){
       playPromise.catch(function(){
         window.__kirunaIntroEarlyPlayBlocked=true;
@@ -9892,6 +9974,20 @@ function clearCpeFullscreenAnimationState(){
   cpePanel.style.removeProperty('visibility');
 }
 
+function setCpeFullscreenButtonHitArea(expanded){
+  if(!cpeFullscreenBtn) return;
+  const props = ['width','height','flex-basis','margin-top','margin-right','font-size','overflow'];
+  props.forEach(prop => cpeFullscreenBtn.style.removeProperty(prop));
+  if(!expanded) return;
+  cpeFullscreenBtn.style.setProperty('width', '52px', 'important');
+  cpeFullscreenBtn.style.setProperty('height', '52px', 'important');
+  cpeFullscreenBtn.style.setProperty('flex-basis', '52px', 'important');
+  cpeFullscreenBtn.style.setProperty('margin-top', '-8px', 'important');
+  cpeFullscreenBtn.style.setProperty('margin-right', '-4px', 'important');
+  cpeFullscreenBtn.style.setProperty('font-size', '24px', 'important');
+  cpeFullscreenBtn.style.setProperty('overflow', 'visible', 'important');
+}
+
 function setCpeFullscreen(open){
   if(!cpePanel) return;
   const next = !!open;
@@ -9908,6 +10004,7 @@ function setCpeFullscreen(open){
     cpePanel.classList.remove('cpe-fullscreen-closing');
     cpePanel.classList.add('cpe-fullscreen');
     cpePanel.classList.remove('cpe-fullscreen-visible');
+    setCpeFullscreenButtonHitArea(true);
     clearCpeFullscreenAnimationState();
     void cpePanel.offsetHeight;
     cpePanel.style.setProperty('will-change', 'transform, opacity', 'important');
@@ -9944,6 +10041,7 @@ function setCpeFullscreen(open){
     cpePanel._cpeFullscreenTimer = setTimeout(() => {
       cpePanel.classList.remove('cpe-fullscreen', 'cpe-fullscreen-closing');
       document.documentElement.classList.remove('cpe-fullscreen-open');
+      setCpeFullscreenButtonHitArea(false);
       clearCpeFullscreenAnimationState();
       updateCpeFullscreenAvailability();
       updateCpeScrollIndicator();
@@ -23523,6 +23621,21 @@ html.embedded-phone .cpevs-panel.cpe-fullscreen.cpe-fullscreen-closing{opacity:0
 .cpevs-panel.cpe-fullscreen-capable .cpe-fullscreen-btn{
   display:inline-flex!important;
 }
+.cpevs-panel.cpe-fullscreen .cpe-fullscreen-btn{
+  width:52px!important;
+  height:52px!important;
+  flex:0 0 52px!important;
+  margin-top:-8px!important;
+  margin-right:-4px!important;
+  font-size:24px!important;
+  overflow:visible!important;
+}
+.cpevs-panel.cpe-fullscreen .cpe-fullscreen-btn::before{
+  content:''!important;
+  position:absolute!important;
+  inset:-12px!important;
+  border-radius:999px!important;
+}
 /* ── phone: FIELD bar — hide category legend tags ── */
 html.embedded-phone .cat-legend{display:none!important;}
 /* ── phone: equal-width filter + toggle buttons, icon pinned right ── */
@@ -29450,6 +29563,25 @@ html.embedded-phone:not(.embedded-tablet) .cpevs-panel.cpe-fullscreen .cpe-fulls
   display:inline-flex!important;
 }
 
+#page-cal .cpevs-panel.cpe-fullscreen .cpe-fullscreen-btn,
+.cpevs-panel.cpe-fullscreen .cpe-fullscreen-btn{
+  width:52px!important;
+  height:52px!important;
+  flex:0 0 52px!important;
+  margin-top:-8px!important;
+  margin-right:-4px!important;
+  font-size:24px!important;
+  overflow:visible!important;
+}
+
+#page-cal .cpevs-panel.cpe-fullscreen .cpe-fullscreen-btn::before,
+.cpevs-panel.cpe-fullscreen .cpe-fullscreen-btn::before{
+  content:''!important;
+  position:absolute!important;
+  inset:-12px!important;
+  border-radius:999px!important;
+}
+
 html.phone-app #content,
 html.phone-app #nav{
   transition:filter .32s cubic-bezier(.22,1,.36,1), transform .32s cubic-bezier(.22,1,.36,1)!important;
@@ -30601,9 +30733,9 @@ html.tablet-app #page-discourse .dc-nav-indicator{
 </script>
 <script>
 (function(){
-  const INTRO_KEY='kiruna-mobile-intro-seen-v4';
-  const INTRO_MIN_MS=900;
-  const INTRO_EXIT_MS=980;
+  const INTRO_KEY='kiruna-mobile-intro-seen-v5';
+  const INTRO_MIN_MS=320;
+  const INTRO_EXIT_MS=300;
 
   function isAdaptiveEntryDevice(){
     return true;
@@ -30625,6 +30757,9 @@ html.tablet-app #page-discourse .dc-nav-indicator{
     const body=document.body;
     if(body.dataset.introFinishing==='1') return;
     body.dataset.introFinishing='1';
+    window.__kirunaIntroUpdateProgress?.();
+    const fill=document.getElementById('mobile-intro-progress-fill');
+    if(fill) fill.style.transform='scaleX(1)';
     markIntroSeen();
     body.classList.remove('kiruna-intro-active','kiruna-intro-pending');
     body.classList.add('kiruna-intro-exiting');
@@ -30637,7 +30772,8 @@ html.tablet-app #page-discourse .dc-nav-indicator{
     setTimeout(()=>{
       body.classList.remove('kiruna-intro-revealing');
       delete body.dataset.introFinishing;
-    }, INTRO_EXIT_MS + 520);
+      cancelAnimationFrame(window.__kirunaIntroProgressRaf);
+    }, INTRO_EXIT_MS + 260);
   }
 
   function startIntro(){
@@ -30656,6 +30792,8 @@ html.tablet-app #page-discourse .dc-nav-indicator{
       try{video.load();}catch(e){}
       video.currentTime=0;
     }
+    window.__kirunaIntroTargetSeconds=1.55;
+    window.__kirunaIntroSetPlaybackRate?.();
 
     const startedAt=earlyStarted && window.__kirunaIntroEarlyStartedAt ? window.__kirunaIntroEarlyStartedAt : Date.now();
     const finishAfterMinimum=()=>{
@@ -30663,7 +30801,7 @@ html.tablet-app #page-discourse .dc-nav-indicator{
       setTimeout(finishIntro, Math.max(0, INTRO_MIN_MS-elapsed));
     };
 
-    let fallbackTimer=setTimeout(finishAfterMinimum, 7000);
+    let fallbackTimer=setTimeout(finishAfterMinimum, 1900);
     const handleVideoDone=()=>{
       clearTimeout(fallbackTimer);
       finishAfterMinimum();
@@ -30679,21 +30817,29 @@ html.tablet-app #page-discourse .dc-nav-indicator{
     if(!earlyStarted){
       const playPromise=video.play();
       if(playPromise && typeof playPromise.catch==='function'){
+        playPromise.then(()=>{
+          cancelAnimationFrame(window.__kirunaIntroProgressRaf);
+          window.__kirunaIntroProgressRaf=requestAnimationFrame(window.__kirunaIntroProgressFrame);
+        }).catch(()=>{});
         playPromise.catch(()=>{
           clearTimeout(fallbackTimer);
-          fallbackTimer=setTimeout(finishAfterMinimum, 1400);
+          fallbackTimer=setTimeout(finishAfterMinimum, 900);
         });
       }
     }else if(window.__kirunaIntroEarlyPlayBlocked){
       clearTimeout(fallbackTimer);
-      fallbackTimer=setTimeout(finishAfterMinimum, 1400);
+      fallbackTimer=setTimeout(finishAfterMinimum, 900);
     }else if(video.paused && !window.__kirunaIntroEarlyDone){
       const playPromise=video.play();
       if(playPromise && typeof playPromise.catch==='function'){
+        playPromise.then(()=>{
+          cancelAnimationFrame(window.__kirunaIntroProgressRaf);
+          window.__kirunaIntroProgressRaf=requestAnimationFrame(window.__kirunaIntroProgressFrame);
+        }).catch(()=>{});
         playPromise.catch(()=>{
           window.__kirunaIntroEarlyPlayBlocked=true;
           clearTimeout(fallbackTimer);
-          fallbackTimer=setTimeout(finishAfterMinimum, 1400);
+          fallbackTimer=setTimeout(finishAfterMinimum, 900);
         });
       }
     }
