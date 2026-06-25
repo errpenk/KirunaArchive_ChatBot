@@ -8150,14 +8150,14 @@ html.tablet-app .chat-page-scroll-shell{
   if(!body || !video) return;
   window.__kirunaIntroEarlyStarted=true;
   window.__kirunaIntroEarlyStartedAt=Date.now();
-  window.__kirunaIntroTargetSeconds=1.55;
+  window.__kirunaIntroTargetSeconds=2.0;
   body.classList.remove('kiruna-intro-pending');
   body.classList.add('kiruna-intro-active');
   window.__kirunaIntroSetPlaybackRate=function(){
     var video=document.getElementById('mobile-intro-video');
     if(!video) return;
     var duration=Number.isFinite(video.duration) && video.duration > 0 ? video.duration : 0;
-    var target=window.__kirunaIntroTargetSeconds || 1.55;
+    var target=window.__kirunaIntroTargetSeconds || 2.0;
     if(duration > target){
       video.playbackRate=Math.min(4, Math.max(1, duration / target));
     }else{
@@ -8192,7 +8192,7 @@ html.tablet-app .chat-page-scroll-shell{
   video.addEventListener('loadedmetadata',function(){window.__kirunaIntroSetPlaybackRate?.();},{once:true});
   try{
     video.load();
-    video.currentTime=0;
+    video.currentTime=0.04;
     window.__kirunaIntroSetPlaybackRate?.();
     var playPromise=video.play();
     if(playPromise && typeof playPromise.catch==='function'){
@@ -9979,12 +9979,12 @@ function setCpeFullscreenButtonHitArea(expanded){
   const props = ['width','height','flex-basis','margin-top','margin-right','font-size','overflow'];
   props.forEach(prop => cpeFullscreenBtn.style.removeProperty(prop));
   if(!expanded) return;
-  cpeFullscreenBtn.style.setProperty('width', '52px', 'important');
-  cpeFullscreenBtn.style.setProperty('height', '52px', 'important');
-  cpeFullscreenBtn.style.setProperty('flex-basis', '52px', 'important');
-  cpeFullscreenBtn.style.setProperty('margin-top', '-8px', 'important');
-  cpeFullscreenBtn.style.setProperty('margin-right', '-4px', 'important');
-  cpeFullscreenBtn.style.setProperty('font-size', '24px', 'important');
+  cpeFullscreenBtn.style.setProperty('width', '36px', 'important');
+  cpeFullscreenBtn.style.setProperty('height', '36px', 'important');
+  cpeFullscreenBtn.style.setProperty('flex-basis', '36px', 'important');
+  cpeFullscreenBtn.style.setProperty('margin-top', '-2px', 'important');
+  cpeFullscreenBtn.style.setProperty('margin-right', '0', 'important');
+  cpeFullscreenBtn.style.setProperty('font-size', '18px', 'important');
   cpeFullscreenBtn.style.setProperty('overflow', 'visible', 'important');
 }
 
@@ -23622,12 +23622,12 @@ html.embedded-phone .cpevs-panel.cpe-fullscreen.cpe-fullscreen-closing{opacity:0
   display:inline-flex!important;
 }
 .cpevs-panel.cpe-fullscreen .cpe-fullscreen-btn{
-  width:52px!important;
-  height:52px!important;
-  flex:0 0 52px!important;
-  margin-top:-8px!important;
-  margin-right:-4px!important;
-  font-size:24px!important;
+  width:36px!important;
+  height:36px!important;
+  flex:0 0 36px!important;
+  margin-top:-2px!important;
+  margin-right:0!important;
+  font-size:18px!important;
   overflow:visible!important;
 }
 .cpevs-panel.cpe-fullscreen .cpe-fullscreen-btn::before{
@@ -29565,12 +29565,12 @@ html.embedded-phone:not(.embedded-tablet) .cpevs-panel.cpe-fullscreen .cpe-fulls
 
 #page-cal .cpevs-panel.cpe-fullscreen .cpe-fullscreen-btn,
 .cpevs-panel.cpe-fullscreen .cpe-fullscreen-btn{
-  width:52px!important;
-  height:52px!important;
-  flex:0 0 52px!important;
-  margin-top:-8px!important;
-  margin-right:-4px!important;
-  font-size:24px!important;
+  width:36px!important;
+  height:36px!important;
+  flex:0 0 36px!important;
+  margin-top:-2px!important;
+  margin-right:0!important;
+  font-size:18px!important;
   overflow:visible!important;
 }
 
@@ -30790,9 +30790,9 @@ html.tablet-app #page-discourse .dc-nav-indicator{
     body.classList.add('kiruna-intro-active');
     if(!earlyStarted){
       try{video.load();}catch(e){}
-      video.currentTime=0;
+      video.currentTime=0.04;
     }
-    window.__kirunaIntroTargetSeconds=1.55;
+    window.__kirunaIntroTargetSeconds=2.0;
     window.__kirunaIntroSetPlaybackRate?.();
 
     const startedAt=earlyStarted && window.__kirunaIntroEarlyStartedAt ? window.__kirunaIntroEarlyStartedAt : Date.now();
@@ -30801,7 +30801,7 @@ html.tablet-app #page-discourse .dc-nav-indicator{
       setTimeout(finishIntro, Math.max(0, INTRO_MIN_MS-elapsed));
     };
 
-    let fallbackTimer=setTimeout(finishAfterMinimum, 1900);
+    let fallbackTimer=setTimeout(finishAfterMinimum, 2100);
     const handleVideoDone=()=>{
       clearTimeout(fallbackTimer);
       finishAfterMinimum();
