@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kiruna Intro Preview</title>
+<style>
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    min-height:100vh;
+    display:grid;
+    place-items:center;
+    background:#fff;
+    color:#000;
+    font-family:Arial,Helvetica,sans-serif;
+  }
+  .stage{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:42px;
+  }
+  .kiruna-logo{
+    display:inline-flex;
+    align-items:center;
+    gap:clamp(12px,3vw,34px);
+    color:#000;
+    transform-origin:center;
+  }
+  .kiruna-mark{
+    display:block;
+    width:clamp(88px,28vw,280px);
+    height:auto;
+    flex:0 0 auto;
+    overflow:visible;
+  }
+  .kiruna-title{
+    color:#000;
+    font-family:Arial,Helvetica,sans-serif;
+    font-size:clamp(26px,7vw,80px);
+    font-weight:400;
+    line-height:1;
+    letter-spacing:0;
+    white-space:nowrap;
+    opacity:0;
+  }
+  .kiruna-title [data-line]{
+    display:block;
+    overflow:hidden;
+    color:#000;
+  }
+  .progress{
+    width:260px;
+    height:4px;
+    border-radius:999px;
+    background:rgba(0,0,0,.14);
+    overflow:hidden;
+  }
+  #progress-fill{
+    display:block;
+    width:100%;
+    height:100%;
+    border-radius:inherit;
+    background:#000;
+    transform:scaleX(0);
+    transform-origin:left center;
+  }
+  .controls{
+    position:fixed;
+    left:24px;
+    bottom:24px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    color:#777;
+    font-size:13px;
+  }
+  button{
+    height:36px;
+    border:1px solid #d8d8d8;
+    border-radius:999px;
+    padding:0 16px;
+    background:#fff;
+    color:#000;
+    font:inherit;
+    cursor:pointer;
+  }
+  button:hover{border-color:#000}
+  @media (prefers-reduced-motion:reduce){
+    #kiruna-mark-path{
+      fill-opacity:1;
+      stroke-opacity:0;
+    }
+    .kiruna-title{
+      opacity:1;
+      clip-path:none!important;
+    }
+  }
+</style>
+</head>
+<body>
+  <main class="stage" aria-label="Kiruna intro animation preview">
+    <div id="kiruna-logo" class="kiruna-logo" aria-label="Kiruna Archive">
+      <svg
+        class="kiruna-mark"
+        viewBox="0 0 280 151"
+        width="280"
+        height="151"
+        aria-hidden="true"
+      >
+        <path
+          id="kiruna-mark-path"
+          d="M27 132 L109 15 L150 15 L69 132 Z M158 43 L180 16 L259 132 L217 132 Z M116 132 L145 90 L174 132 Z"
+          fill="#000"
+          fill-opacity="0"
+          stroke="#000"
+          stroke-width="8"
+          stroke-linejoin="round"
+          stroke-linecap="round"
+        />
+      </svg>
+
+      <div id="kiruna-title" class="kiruna-title">Kiruna Archive</div>
+    </div>
+    <div class="progress" aria-hidden="true"><span id="progress-fill"></span></div>
+  </main>
+
+  <div class="controls">
+    <button id="replay" type="button">Replay</button>
+    <span id="status">Ready</span>
+  </div>
+
+<script type="module">
+import { animate, svg, utils } from './vendor/anime.esm.min.js';
+
+const logo = document.querySelector('#kiruna-logo');
+const markPath = document.querySelector('#kiruna-mark-path');
+const title = document.querySelector('#kiruna-title');
+const fill = document.querySelector('#progress-fill');
+const replay = document.querySelector('#replay');
+const status = document.querySelector('#status');
+const totalMs = 1830;
+let progressRaf = 0;
+let doneTimer = 0;
+let startedAt = 0;
+
+function setProgress(){
+  const elapsed = Date.now() - startedAt;
+  const ratio = Math.max(0, Math.min(1, elapsed / totalMs));
+  fill.style.transform = `scaleX(${ratio.toFixed(4)})`;
+  if(ratio < 1){
+    progressRaf = requestAnimationFrame(setProgress);
+  }
+}
+
+function resetIntro(){
+  cancelAnimationFrame(progressRaf);
+  clearTimeout(doneTimer);
+  utils.remove([logo, markPath, title, fill]);
+  title.replaceChildren(document.createTextNode('Kiruna Archive'));
+  logo.style.opacity = '0';
+  logo.style.transform = 'translateY(10px) scale(.985)';
+  markPath.style.fillOpacity = '0';
+  markPath.style.strokeOpacity = '1';
+  markPath.style.strokeWidth = '8';
+  title.style.opacity = '0';
+  title.style.clipPath = 'inset(0 100% 0 0)';
+  fill.style.transform = 'scaleX(0)';
+}
+
+function playIntro(){
+  resetIntro();
+  const [drawable] = svg.createDrawable(markPath);
+
+  startedAt = Date.now();
+  status.textContent = 'Playing';
+  setProgress();
+
+  animate(logo, {
+    opacity:[0,1],
+    translateY:[10,0],
+    scale:[.985,1],
+    duration:520,
+    ease:'outCubic'
+  });
+
+  animate(drawable, {
+    draw:['0 0','0 1'],
+    duration:1200,
+    ease:'inOutQuad'
+  });
+
+  animate(markPath, {
+    fillOpacity:[0,1],
+    duration:700,
+    delay:820,
+    ease:'inOutQuad'
+  });
+
+  animate(markPath, {
+    strokeOpacity:[1,0],
+    strokeWidth:[8,2],
+    duration:780,
+    delay:1050,
+    ease:'outQuad'
+  });
+
+  animate(title, {
+    opacity:[0,1],
+    clipPath:['inset(0 100% 0 0)','inset(0 0% 0 0)'],
+    duration:760,
+    delay:1070,
+    ease:'outQuad'
+  });
+
+  doneTimer = setTimeout(() => {
+    fill.style.transform = 'scaleX(1)';
+    status.textContent = 'Done';
+  }, totalMs);
+}
+
+replay.addEventListener('click', playIntro);
+playIntro();
+</script>
+</body>
+</html>
