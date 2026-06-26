@@ -106,16 +106,34 @@ a{text-decoration:none;color:inherit}
   gap:22px;
   transform:translateY(4vh);
 }
-#mobile-intro video{
+#mobile-intro-video-frame{
   width:min(40vw,360px);
   max-width:40vw;
   max-height:40vh;
-  height:auto;
-  display:block;
-  object-fit:contain;
+  aspect-ratio:16/9;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  background:#fff;
   opacity:0;
   transform:translateY(10px) scale(.985);
   transition:opacity .5s cubic-bezier(.22,1,.36,1),transform .58s cubic-bezier(.22,1,.36,1);
+}
+#mobile-intro video{
+  width:104%;
+  height:104%;
+  max-width:none;
+  max-height:none;
+  display:block;
+  object-fit:cover;
+  background:#fff;
+  opacity:0;
+  transform:scale(1.02);
+  transition:opacity .18s ease;
+}
+body.kiruna-intro-video-ready #mobile-intro video{
+  opacity:1;
 }
 #mobile-intro-progress{
   width:min(34vw,220px);
@@ -153,7 +171,7 @@ body.kiruna-intro-exiting #mobile-intro{
   opacity:1;
   pointer-events:auto;
 }
-body.kiruna-intro-active #mobile-intro video{
+body.kiruna-intro-active #mobile-intro-video-frame{
   opacity:1;
   transform:translateY(0) scale(1);
 }
@@ -166,7 +184,7 @@ body.kiruna-intro-exiting #mobile-intro{
   pointer-events:none;
   transition:opacity .42s cubic-bezier(.22,1,.36,1);
 }
-body.kiruna-intro-exiting #mobile-intro video{
+body.kiruna-intro-exiting #mobile-intro-video-frame{
   opacity:0;
   transform:translateY(-10px) scale(.985);
   transition:opacity .38s cubic-bezier(.22,1,.36,1),transform .44s cubic-bezier(.22,1,.36,1);
@@ -8125,7 +8143,7 @@ html.tablet-app .chat-page-scroll-shell{
 <body>
 <script>
 (function(){
-  var key='kiruna-mobile-intro-seen-v5';
+  var key='kiruna-mobile-intro-seen-v6';
   var seen=false;
   try{seen=localStorage.getItem(key)==='1';}catch(e){}
   if(!seen){
@@ -8135,13 +8153,15 @@ html.tablet-app .chat-page-scroll-shell{
 </script>
 <div id="mobile-intro" aria-hidden="true">
   <div id="mobile-intro-inner">
-    <video id="mobile-intro-video" src="videos/kiruna-mobile-intro.mov#t=0.04" muted playsinline webkit-playsinline preload="auto"></video>
+    <div id="mobile-intro-video-frame" aria-hidden="true">
+      <video id="mobile-intro-video" src="videos/kiruna-mobile-intro.mov" muted playsinline webkit-playsinline autoplay preload="auto"></video>
+    </div>
     <div id="mobile-intro-progress" aria-hidden="true"><span id="mobile-intro-progress-fill"></span></div>
   </div>
 </div>
 <script>
 (function(){
-  var key='kiruna-mobile-intro-seen-v5';
+  var key='kiruna-mobile-intro-seen-v6';
   var seen=false;
   try{seen=localStorage.getItem(key)==='1';}catch(e){}
   if(seen) return;
@@ -8166,7 +8186,7 @@ html.tablet-app .chat-page-scroll-shell{
     if(!video || video.dataset.introSeeked==='1') return;
     if(video.readyState < 1) return;
     try{
-      video.currentTime=0.04;
+      video.currentTime=0;
       video.dataset.introSeeked='1';
     }catch(e){}
   };
@@ -8192,6 +8212,47 @@ html.tablet-app .chat-page-scroll-shell{
       window.__kirunaIntroProgressRaf=requestAnimationFrame(window.__kirunaIntroProgressFrame);
     }
   };
+  window.__kirunaIntroStartProgressLoop=function(){
+    cancelAnimationFrame(window.__kirunaIntroProgressRaf);
+    window.__kirunaIntroProgressRaf=requestAnimationFrame(window.__kirunaIntroProgressFrame);
+  };
+  window.__kirunaIntroSchedulePlayRetry=function(){
+    if(window.__kirunaIntroEarlyDone) return;
+    var attempts=window.__kirunaIntroPlayAttempts||0;
+    if(attempts>=14) return;
+    window.__kirunaIntroPlayAttempts=attempts+1;
+    clearTimeout(window.__kirunaIntroRetryTimer);
+    window.__kirunaIntroRetryTimer=setTimeout(function(){
+      window.__kirunaIntroTryPlay?.();
+    }, attempts<4 ? 180 : 320);
+  };
+  window.__kirunaIntroTryPlay=function(){
+    var video=document.getElementById('mobile-intro-video');
+    if(!video || window.__kirunaIntroEarlyDone) return;
+    window.__kirunaPrepareIntroVideo?.();
+    window.__kirunaSeekIntroStart?.();
+    window.__kirunaIntroEarlyPlayBlocked=false;
+    var playPromise;
+    try{
+      playPromise=video.play();
+    }catch(e){
+      window.__kirunaIntroEarlyPlayBlocked=true;
+      window.__kirunaIntroSchedulePlayRetry?.();
+      return;
+    }
+    if(playPromise && typeof playPromise.then==='function'){
+      playPromise.then(function(){
+        document.body.classList.add('kiruna-intro-video-ready');
+        window.__kirunaIntroStartProgressLoop?.();
+      }).catch(function(){
+        window.__kirunaIntroEarlyPlayBlocked=true;
+        window.__kirunaIntroSchedulePlayRetry?.();
+      });
+    }else{
+      document.body.classList.add('kiruna-intro-video-ready');
+      window.__kirunaIntroStartProgressLoop?.();
+    }
+  };
   var markDone=function(type){
     window.__kirunaIntroUpdateProgress?.();
     window.__kirunaIntroEarlyDone=true;
@@ -8201,29 +8262,16 @@ html.tablet-app .chat-page-scroll-shell{
   video.addEventListener('ended',function(){markDone('ended');},{once:true});
   video.addEventListener('error',function(){markDone('error');},{once:true});
   video.addEventListener('loadedmetadata',function(){window.__kirunaSeekIntroStart?.();},{once:true});
+  video.addEventListener('loadeddata',function(){document.body.classList.add('kiruna-intro-video-ready'); window.__kirunaIntroTryPlay?.();},{once:true});
+  video.addEventListener('canplay',function(){document.body.classList.add('kiruna-intro-video-ready'); window.__kirunaIntroTryPlay?.();},{once:true});
   try{
     video.load();
     window.__kirunaPrepareIntroVideo();
     window.__kirunaSeekIntroStart();
-    var playPromise=video.play();
-    if(playPromise && typeof playPromise.catch==='function'){
-      playPromise.then(function(){
-        cancelAnimationFrame(window.__kirunaIntroProgressRaf);
-        window.__kirunaIntroProgressRaf=requestAnimationFrame(window.__kirunaIntroProgressFrame);
-      }).catch(function(){
-        window.__kirunaIntroEarlyPlayBlocked=true;
-      });
-    }else{
-      cancelAnimationFrame(window.__kirunaIntroProgressRaf);
-      window.__kirunaIntroProgressRaf=requestAnimationFrame(window.__kirunaIntroProgressFrame);
-    }
-    if(playPromise && typeof playPromise.catch==='function'){
-      playPromise.catch(function(){
-        window.__kirunaIntroEarlyPlayBlocked=true;
-      });
-    }
+    window.__kirunaIntroTryPlay();
   }catch(e){
     window.__kirunaIntroEarlyPlayBlocked=true;
+    window.__kirunaIntroSchedulePlayRetry?.();
   }
 })();
 </script>
@@ -30744,7 +30792,7 @@ html.tablet-app #page-discourse .dc-nav-indicator{
 </script>
 <script>
 (function(){
-  const INTRO_KEY='kiruna-mobile-intro-seen-v5';
+  const INTRO_KEY='kiruna-mobile-intro-seen-v6';
   const INTRO_MIN_MS=320;
   const INTRO_EXIT_MS=300;
 
@@ -30761,7 +30809,7 @@ html.tablet-app #page-discourse .dc-nav-indicator{
   }
 
   function clearIntroClasses(){
-    document.body.classList.remove('kiruna-intro-pending','kiruna-intro-active','kiruna-intro-exiting','kiruna-intro-revealing');
+    document.body.classList.remove('kiruna-intro-pending','kiruna-intro-active','kiruna-intro-exiting','kiruna-intro-revealing','kiruna-intro-video-ready');
   }
 
   function finishIntro(){
@@ -30782,6 +30830,7 @@ html.tablet-app #page-discourse .dc-nav-indicator{
     }, INTRO_EXIT_MS);
     setTimeout(()=>{
       body.classList.remove('kiruna-intro-revealing');
+      body.classList.remove('kiruna-intro-video-ready');
       delete body.dataset.introFinishing;
       cancelAnimationFrame(window.__kirunaIntroProgressRaf);
     }, INTRO_EXIT_MS + 260);
@@ -30836,33 +30885,13 @@ html.tablet-app #page-discourse .dc-nav-indicator{
     }
 
     if(!earlyStarted){
-      const playPromise=video.play();
-      if(playPromise && typeof playPromise.catch==='function'){
-        playPromise.then(()=>{
-          cancelAnimationFrame(window.__kirunaIntroProgressRaf);
-          window.__kirunaIntroProgressRaf=requestAnimationFrame(window.__kirunaIntroProgressFrame);
-        }).catch(()=>{});
-        playPromise.catch(()=>{
-          clearTimeout(fallbackTimer);
-          fallbackTimer=setTimeout(finishAfterMinimum, getFallbackMs());
-        });
-      }
+      window.__kirunaIntroTryPlay?.();
     }else if(window.__kirunaIntroEarlyPlayBlocked){
+      window.__kirunaIntroTryPlay?.();
       clearTimeout(fallbackTimer);
       fallbackTimer=setTimeout(finishAfterMinimum, getFallbackMs());
     }else if(video.paused && !window.__kirunaIntroEarlyDone){
-      const playPromise=video.play();
-      if(playPromise && typeof playPromise.catch==='function'){
-        playPromise.then(()=>{
-          cancelAnimationFrame(window.__kirunaIntroProgressRaf);
-          window.__kirunaIntroProgressRaf=requestAnimationFrame(window.__kirunaIntroProgressFrame);
-        }).catch(()=>{});
-        playPromise.catch(()=>{
-          window.__kirunaIntroEarlyPlayBlocked=true;
-          clearTimeout(fallbackTimer);
-          fallbackTimer=setTimeout(finishAfterMinimum, getFallbackMs());
-        });
-      }
+      window.__kirunaIntroTryPlay?.();
     }
   }
 
