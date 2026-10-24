@@ -14,7 +14,7 @@ Minimal Railway-ready version of the Kiruna Archive with a real chat backend.
 
 - `public/index.html` contains the main page markup and intro scripts.
 - `public/timeline.html` and `public/outside-map.html` contain the timeline and Outside views.
-- `public/css/` and `public/js/` contain each page's styles and scripts, loaded in the original order.
+- `public/css/` and `public/js/` contain each page's styles and scripts. Main-page CSS is loaded in cascade order: base, archive, responsive, report, discourse, compare, app mode, and adaptive overrides.
 - `public/js/outside-data.js` supplies the same document data to the main search and Outside view.
 
 ## Local run
