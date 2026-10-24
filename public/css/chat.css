@@ -234,14 +234,15 @@
   transform:translateY(-50%);font:600 10px var(--chat-mono);text-align:left;
 }
 #chat-page-rail .chat-node-btn::before{
-  content:'';display:block;flex:none;width:16px;height:2px;background:#aeb9c2;
+  content:'';display:block;flex:none;box-sizing:border-box;
+  width:16px;height:16px;border:2px solid #c9ced4;border-radius:50%;background:#fff;
 }
 #chat-page-rail .chat-node-btn:hover,
 #chat-page-rail .chat-node-btn.active{
   color:#284e6b!important;background:transparent!important;transform:translateY(-50%);box-shadow:none!important;
 }
 #chat-page-rail .chat-node-btn:hover::before,
-#chat-page-rail .chat-node-btn.active::before{background:#284e6b;width:20px}
+#chat-page-rail .chat-node-btn.active::before{border-color:#284e6b}
 #chat-page-rail .chat-node-btn:focus-visible{outline:2px solid #284e6b;outline-offset:1px}
 
 /* ── Chat turn: natural appear, no flash/pulse ── */
@@ -811,10 +812,9 @@ html.phone-app:not(.chat-compose-active):not(.chat-compose-expanding) #page-chat
   .chat-source-rail-number{font-size:8px}
   .chat-source-rail-text{font-size:9px}
   #chat-page-rail{width:28px}
+  #chat-page-rail::before{left:5px}
   #chat-page-rail .chat-node-btn{width:28px;gap:3px;font-size:8px}
-  #chat-page-rail .chat-node-btn::before{width:8px}
-  #chat-page-rail .chat-node-btn:hover::before,
-  #chat-page-rail .chat-node-btn.active::before{width:10px}
+  #chat-page-rail .chat-node-btn::before{width:10px;height:10px;border-width:1.5px}
   .chat-page-thread{padding-right:0}
 }
 @media(max-height:650px){
