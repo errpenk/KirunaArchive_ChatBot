@@ -6,7 +6,7 @@ Minimal Railway-ready version of the Kiruna Archive with a real chat backend.
 
 - Serves the archive frontend from `public/index.html`
 - Adds `POST /api/chat`
-- Retrieves local archive context from the page itself
+- Retrieves local archive context from the main page, timeline, and shared Outside data
 - Uses Volcengine Ark Responses API for live web-backed answers
 - Falls back to local archive-only answers when `ARK_API_KEY` or the Ark model setting is missing
 
@@ -75,7 +75,7 @@ https://your-api.up.railway.app
 ```
 
 2. In Netlify, connect the same GitHub repo.
-3. Netlify will read [netlify.toml](/Users/mac/Downloads/map/netlify.toml); you do not need a custom publish directory or build command in the UI unless you want to override it.
+3. Netlify will read `netlify.toml` and run the redirect preparation command during the build.
 4. In Netlify environment variables, add:
    - `NETLIFY_RAILWAY_API_ORIGIN`
      Example: `https://your-api.up.railway.app`

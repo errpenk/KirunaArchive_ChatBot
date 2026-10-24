@@ -103,10 +103,8 @@
   transform:scale(1.04);
   z-index:3;
 }
-.gallery-tile-bg{
-  position:absolute;inset:0;
-  /* Mac Photos-style subtle gradient on grey block */
-}
+.gallery-tile-bg{position:absolute;inset:0;}
+.gallery-tile-image{width:100%;height:100%;object-fit:cover;display:block;}
 .gallery-tile-label{
   position:absolute;inset:0;display:flex;flex-direction:column;
   justify-content:flex-end;padding:12px;
@@ -379,27 +377,6 @@
 }
 .glb-close:hover{background:rgba(28,28,30,.76);border-color:rgba(255,255,255,.28);}
 .glb-close:active{transform:scale(.93);}
-.glb-full-btn.contrast-on-dark,
-.glb-close.contrast-on-dark,
-.gif-close.contrast-on-dark{
-  background:rgba(255,255,255,.58);
-  border-color:rgba(255,255,255,.36);
-  color:#1c1c1e;
-}
-.glb-full-btn.contrast-on-light,
-.glb-close.contrast-on-light,
-.gif-close.contrast-on-light{
-  background:rgba(28,28,30,.48);
-  border-color:rgba(0,0,0,.18);
-  color:rgba(255,255,255,.92);
-}
-.glb-full-btn.contrast-on-dark:hover,
-.glb-close.contrast-on-dark:hover,
-.gif-close.contrast-on-dark:hover{background:rgba(255,255,255,.86);}
-.glb-full-btn.contrast-on-light:hover,
-.glb-close.contrast-on-light:hover,
-.gif-close.contrast-on-light:hover{background:rgba(28,28,30,.8);}
-
 /* Nav arrows — fixed to viewport edges and viewport vertical center */
 .glb-nav{
   position:fixed;z-index:9010;

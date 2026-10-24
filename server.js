@@ -6,11 +6,14 @@ import * as cheerio from "cheerio";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import vm from "node:vm";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PUBLIC_DIR = path.join(__dirname, "public");
 const INDEX_FILE = path.join(PUBLIC_DIR, "index.html");
+const TIMELINE_FILE = path.join(PUBLIC_DIR, "timeline.html");
+const OUTSIDE_DATA_FILE = path.join(PUBLIC_DIR, "js", "outside-data.js");
 
 const PORT = Number(process.env.PORT || 3000);
 const RAW_ARK_API_KEY = String(process.env.ARK_API_KEY || "");
@@ -146,24 +149,6 @@ const SWEDEN_CONTEXT_REGEX = /\b(sweden|swedish|sverige|swiden|sami|sapmi)\b/i;
 
 function normalizeWhitespace(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
-}
-
-function decodeHtmlEntities(value, passes = 2) {
-  let decoded = String(value || "");
-  const maxPasses = Math.max(1, Number(passes) || 2);
-  for (let index = 0; index < maxPasses; index += 1) {
-    const next = decoded
-      .replace(/&amp;/g, "&")
-      .replace(/&quot;/g, '"')
-      .replace(/&#34;/g, '"')
-      .replace(/&apos;/g, "'")
-      .replace(/&#39;/g, "'")
-      .replace(/&lt;/g, "<")
-      .replace(/&gt;/g, ">");
-    if (next === decoded) break;
-    decoded = next;
-  }
-  return decoded;
 }
 
 function canonicalizeToken(token) {
@@ -573,21 +558,7 @@ function buildTimelineFrameEntries($) {
   return entries;
 }
 
-function buildTimelineOutsideEntries(srcdoc) {
-  const decoded = decodeHtmlEntities(srcdoc, 3);
-  const rawMatch = decoded.match(/const RAW = \[([\s\S]*?)\];\s*const FIELD_META = \{/);
-  if (!rawMatch) return [];
-  const fieldMatch = decoded.match(/const FIELD_META = \{([\s\S]*?)\};\s*const FIELDS =/);
-
-  let rawDocs = [];
-  let fieldMeta = {};
-  try {
-    rawDocs = Function(`"use strict"; return ([${rawMatch[1]}]);`)();
-    fieldMeta = fieldMatch ? Function(`"use strict"; return ({${fieldMatch[1]}});`)() : {};
-  } catch {
-    return [];
-  }
-
+function buildTimelineOutsideEntries({ RAW: rawDocs, FIELD_META: fieldMeta }) {
   const monthMap = {
     january: 1,
     february: 2,
@@ -608,8 +579,7 @@ function buildTimelineOutsideEntries(srcdoc) {
     return Number(parts.length === 2 ? parts[1] : parts[0]) || null;
   };
 
-  return Array.isArray(rawDocs)
-    ? rawDocs
+  return rawDocs
         .map((row, index) => {
           const rawDate = normalizeWhitespace(row?.[0] || "");
           const title = normalizeWhitespace(row?.[1] || "");
@@ -633,9 +603,9 @@ function buildTimelineOutsideEntries(srcdoc) {
             fieldColor: fieldMeta?.[field]?.color || "#86868b"
           };
         })
-        .filter(Boolean)
-    : [];
+        .filter(Boolean);
 }
+
 
 function chunkArchiveEntries(entries) {
   const chunks = [];
@@ -690,16 +660,22 @@ function chunkArchiveEntries(entries) {
 }
 
 async function loadArchiveChunks() {
-  const html = await fs.readFile(INDEX_FILE, "utf8");
-  const $ = cheerio.load(html);
-  const entries = buildArchiveEntries($);
-  try {
-    const timelineHtml = $("#timeline2-frame").attr("srcdoc") || "";
-    if (!timelineHtml) throw new Error("Timeline srcdoc missing.");
-    const timeline$ = cheerio.load(timelineHtml);
-    entries.push(...buildTimelineFrameEntries(timeline$));
-    entries.push(...buildTimelineOutsideEntries(timelineHtml));
-  } catch {}
+  const [html, timelineHtml, outsideDataScript] = await Promise.all([
+    fs.readFile(INDEX_FILE, "utf8"),
+    fs.readFile(TIMELINE_FILE, "utf8"),
+    fs.readFile(OUTSIDE_DATA_FILE, "utf8")
+  ]);
+  const context = { window: {} };
+  vm.runInNewContext(outsideDataScript, context, { filename: OUTSIDE_DATA_FILE, timeout: 1000 });
+  const outsideData = context.window.KirunaOutsideData;
+  if (!Array.isArray(outsideData?.RAW) || !outsideData.FIELD_META) {
+    throw new Error("Outside archive data missing.");
+  }
+  const entries = [
+    ...buildArchiveEntries(cheerio.load(html)),
+    ...buildTimelineFrameEntries(cheerio.load(timelineHtml)),
+    ...buildTimelineOutsideEntries(outsideData)
+  ];
   return chunkArchiveEntries(entries);
 }
 

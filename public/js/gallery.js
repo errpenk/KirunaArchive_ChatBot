@@ -37,118 +37,14 @@
       imgUrl:ev.imgUrl||galleryImageUrl('inside',ev.id),
     }));
 
-    /* Outside Map — 104 documents, hardcoded to guarantee availability */
-    const outside=[
-  {id:"outside-1",docIdx:1,source:"outside",year:2004,title:"Deformation Forecast",meta:"2004 · Mining"},
-  {id:"outside-2",docIdx:2,source:"outside",year:2004,title:"Mail to Kiruna Kommun",meta:"March 2004 · Governance"},
-  {id:"outside-3",docIdx:3,source:"outside",year:2004,title:"Agreement on City Relocation",meta:"December 2004 · Governance"},
-  {id:"outside-4",docIdx:4,source:"outside",year:2004,title:"Vision 2099",meta:"2004 · Urban Planning"},
-  {id:"outside-5",docIdx:5,source:"outside",year:2005,title:"Sketch Proposal Alternatives for Expansion",meta:"June 2005 · Urban Planning"},
-  {id:"outside-6",docIdx:6,source:"outside",year:2005,title:"Cultural Heritage in Motion",meta:"2005 · Heritage"},
-  {id:"outside-7",docIdx:7,source:"outside",year:2005,title:"Report New Kiruna — The Northwestern Alternative",meta:"2005 · Urban Planning"},
-  {id:"outside-8",docIdx:8,source:"outside",year:2006,title:"The New Kiruna Northwest Alternative",meta:"March 2006 · Urban Planning"},
-  {id:"outside-9",docIdx:9,source:"outside",year:2006,title:"Railway Investigation, Kiruna New Railway",meta:"April 2006 · Infrastructure"},
-  {id:"outside-10",docIdx:10,source:"outside",year:2006,title:"Comprehensive Development Plan for the Central Area of Kiruna",meta:"August 2006 · Urban Planning"},
-  {id:"outside-11",docIdx:11,source:"outside",year:2006,title:"Environmental Impact Assessment for the Detailed Master Plan for Kiruna Town Centre",meta:"December 2006 · Environmental"},
-  {id:"outside-12",docIdx:12,source:"outside",year:2007,title:"Survey: What is your impression of Kiruna?",meta:"2007 · Governance"},
-  {id:"outside-13",docIdx:13,source:"outside",year:2007,title:"Comprehensive Plan for Kiruna C",meta:"January 2007 · Urban Planning"},
-  {id:"outside-14",docIdx:14,source:"outside",year:2007,title:"Final Report: Kiruna New Railway Investigation",meta:"March 2007 · Infrastructure"},
-  {id:"outside-15",docIdx:15,source:"outside",year:2008,title:"Compilation of Responses to the Survey",meta:"2008 · Governance"},
-  {id:"outside-16",docIdx:16,source:"outside",year:2008,title:"What is Kiruna Worth? Kiruna Cultural Valuation Analysis",meta:"February 2008 · Heritage"},
-  {id:"outside-17",docIdx:17,source:"outside",year:2009,title:"Renewal of National Interest",meta:"2009 · Heritage"},
-  {id:"outside-18",docIdx:18,source:"outside",year:2010,title:"Detail Plan for Bolagsområdet Gruvstadspark",meta:"October 2010 · Urban Planning"},
-  {id:"outside-19",docIdx:19,source:"outside",year:2011,title:"Expression of Interest",meta:"2011 · Governance"},
-  {id:"outside-20",docIdx:20,source:"outside",year:2011,title:"Agreement: GP1-Atvalet",meta:"February 2011 · Governance"},
-  {id:"outside-21",docIdx:21,source:"outside",year:2011,title:"Agreement of the Municipal Board on City Relocation",meta:"September 2011 · Relocation"},
-  {id:"outside-22",docIdx:22,source:"outside",year:2012,title:"Agreement on Temporary Railway Relocation",meta:"January 2012 · Infrastructure"},
-  {id:"outside-23",docIdx:23,source:"outside",year:2012,title:"Temporary Railway Relocation",meta:"2012 · Infrastructure"},
-  {id:"outside-24",docIdx:24,source:"outside",year:2012,title:"A New City Centre for Kiruna — Invite to an Architecture Competition",meta:"April 2012 · Urban Planning"},
-  {id:"outside-25",docIdx:25,source:"outside",year:2012,title:"First Delivery",meta:"May 2012 · Urban Planning"},
-  {id:"outside-26",docIdx:26,source:"outside",year:2012,title:"Architecture Competition Brief",meta:"July 2012 · Urban Planning"},
-  {id:"outside-27",docIdx:27,source:"outside",year:2012,title:"Preliminary Study on Railway Relocation",meta:"2012 · Infrastructure"},
-  {id:"outside-28",docIdx:28,source:"outside",year:2012,title:"Railway Decommissioning",meta:"2012 · Infrastructure"},
-  {id:"outside-29",docIdx:29,source:"outside",year:2012,title:"Kiruna Forever",meta:"2012 · Urban Planning"},
-  {id:"outside-30",docIdx:30,source:"outside",year:2012,title:"Rejection of Declassification of Kiruna Town Hall",meta:"2012 · Heritage"},
-  {id:"outside-31",docIdx:31,source:"outside",year:2013,title:"Preliminary Study Kiruna Railway Station",meta:"February 2013 · Infrastructure"},
-  {id:"outside-32",docIdx:32,source:"outside",year:2013,title:"Supplementary Agreement on Building Relocation",meta:"February 2013 · Relocation"},
-  {id:"outside-33",docIdx:33,source:"outside",year:2013,title:"A New City Centre for Kiruna — Jury Pronouncement",meta:"March 2013 · Urban Planning"},
-  {id:"outside-34",docIdx:34,source:"outside",year:2013,title:"Winning the Case",meta:"2013 · Governance"},
-  {id:"outside-35",docIdx:35,source:"outside",year:2013,title:"Invitation to Architecture Competition, New City Hall",meta:"2013 · Urban Planning"},
-  {id:"outside-36",docIdx:36,source:"outside",year:2013,title:"First Delivery",meta:"2013 · Urban Planning"},
-  {id:"outside-37",docIdx:37,source:"outside",year:2013,title:"Kristallen",meta:"2013 · Urban Planning"},
-  {id:"outside-38",docIdx:38,source:"outside",year:2013,title:"Architectural Competition New City Hall — Jury Pronouncement",meta:"2013 · Urban Planning"},
-  {id:"outside-39",docIdx:39,source:"outside",year:2013,title:"Supplementary Agreement on Building Relocation",meta:"November 2013 · Relocation"},
-  {id:"outside-40",docIdx:40,source:"outside",year:2013,title:"Kiruna 2.0 Vision Report",meta:"2013 · Urban Planning"},
-  {id:"outside-41",docIdx:41,source:"outside",year:2014,title:"Development Plan",meta:"March 2014 · Urban Planning"},
-  {id:"outside-42",docIdx:42,source:"outside",year:2014,title:"Detail Plan for Linbanan",meta:"March 2014 · Infrastructure"},
-  {id:"outside-43",docIdx:43,source:"outside",year:2014,title:"Decommissioning of Ulspiran 2 and 4",meta:"March 2014 · Mining"},
-  {id:"outside-44",docIdx:44,source:"outside",year:2014,title:"Analysis of Kiruna's Cultural Heritage Phase 2",meta:"September 2014 · Heritage"},
-  {id:"outside-45",docIdx:45,source:"outside",year:2014,title:"Overview Plan for the Central Area of Kiruna 2014",meta:"October 2014 · Urban Planning"},
-  {id:"outside-46",docIdx:46,source:"outside",year:2014,title:"Deformation Forecast",meta:"December 2014 · Mining"},
-  {id:"outside-47",docIdx:47,source:"outside",year:2015,title:"Adjusted Development Plan",meta:"2015 · Urban Planning"},
-  {id:"outside-48",docIdx:48,source:"outside",year:2015,title:"Construction of New City Hall Kristallen Begins",meta:"2015 · Construction"},
-  {id:"outside-49",docIdx:49,source:"outside",year:2016,title:"Detail Plan for Square and Commercial Street",meta:"July 2016 · Urban Planning"},
-  {id:"outside-50",docIdx:50,source:"outside",year:2016,title:"Detail Plan: Gruvstadspark 2, Etapp 1",meta:"August 2016 · Urban Planning"},
-  {id:"outside-51",docIdx:51,source:"outside",year:2016,title:"Level 1365 Reaches Full Exploitation",meta:"2016 · Mining"},
-  {id:"outside-52",docIdx:52,source:"outside",year:2017,title:"Building Relocation Plan for Structures Affected by Level 1365",meta:"February 2017 · Relocation"},
-  {id:"outside-53",docIdx:53,source:"outside",year:2017,title:"Moving of B5 Hjalmar Lundbohmsgården",meta:"May 2017 · Relocation"},
-  {id:"outside-54",docIdx:54,source:"outside",year:2017,title:"First Relocation Stage Completed",meta:"October 2017 · Relocation"},
-  {id:"outside-55",docIdx:55,source:"outside",year:2017,title:"Decommissioning of Ulspiran 6 and 8",meta:"October 2017 · Mining"},
-  {id:"outside-56",docIdx:56,source:"outside",year:2017,title:"Preliminary Study Mining Town Park, Phase 2",meta:"December 2017 · Urban Planning"},
-  {id:"outside-57",docIdx:57,source:"outside",year:2018,title:"Town Hall Closes",meta:"2018 · Relocation"},
-  {id:"outside-58",docIdx:58,source:"outside",year:2018,title:"Detailed Plan for Gruvstadspark 2, Stage 2",meta:"October 2018 · Urban Planning"},
-  {id:"outside-59",docIdx:59,source:"outside",year:2018,title:"New City Hall Completed",meta:"2018 · Construction"},
-  {id:"outside-60",docIdx:60,source:"outside",year:2018,title:"Management of Cultural Buildings for Relocation due to Level 1365, Version 3",meta:"2018 · Heritage"},
-  {id:"outside-61",docIdx:61,source:"outside",year:2019,title:"Detail Plan for Retail Park and Centre",meta:"March 2019 · Urban Planning"},
-  {id:"outside-62",docIdx:62,source:"outside",year:2019,title:"Deformation Forecast",meta:"April 2019 · Mining"},
-  {id:"outside-63",docIdx:63,source:"outside",year:2019,title:"Construction of Scandic Hotel Begins",meta:"April 2019 · Construction"},
-  {id:"outside-64",docIdx:64,source:"outside",year:2019,title:"Construction of Aurora Center Begins",meta:"May 2019 · Construction"},
-  {id:"outside-65",docIdx:65,source:"outside",year:2019,title:"Detail Plan for Gruvstadspark 2, Etapp 2, Del av Centrum",meta:"June 2019 · Urban Planning"},
-  {id:"outside-66",docIdx:66,source:"outside",year:2019,title:"Study on the Relocation of the Church of Kiruna",meta:"2019 · Heritage"},
-  {id:"outside-67",docIdx:67,source:"outside",year:2019,title:"Construction of Block 1 Begins",meta:"June 2019 · Construction"},
-  {id:"outside-68",docIdx:68,source:"outside",year:2019,title:"Agreement on Heritage Buildings to Move",meta:"June 2019 · Heritage"},
-  {id:"outside-69",docIdx:69,source:"outside",year:2019,title:"Town Hall Demolition",meta:"2019 · Relocation"},
-  {id:"outside-70",docIdx:70,source:"outside",year:2019,title:"Construction of Blocks 7, 8 & 9 Begins",meta:"September 2019 · Construction"},
-  {id:"outside-71",docIdx:71,source:"outside",year:2019,title:"Proposal for Detailed Plan for Part of Tuolluvaara 1",meta:"November 2019 · Urban Planning"},
-  {id:"outside-72",docIdx:72,source:"outside",year:2019,title:"Detailed Plan for the Knowledge Hub",meta:"November 2019 · Urban Planning"},
-  {id:"outside-73",docIdx:73,source:"outside",year:2019,title:"Heritage Buildings Second Moving Phase Begins",meta:"November 2019 · Heritage"},
-  {id:"outside-74",docIdx:74,source:"outside",year:2020,title:"First Set of Housing Buildings Completed",meta:"2020 · Construction"},
-  {id:"outside-75",docIdx:75,source:"outside",year:2020,title:"Railway Plan",meta:"2020 · Infrastructure"},
-  {id:"outside-76",docIdx:76,source:"outside",year:2020,title:"Demolition Documentation, Kiruna City Hall",meta:"November 2020 · Heritage"},
-  {id:"outside-77",docIdx:77,source:"outside",year:2020,title:"Detail Plan for Gruvstadspark 2, Etapp 4",meta:"December 2020 · Urban Planning"},
-  {id:"outside-78",docIdx:78,source:"outside",year:2021,title:"Construction of Swimming Pool Starts",meta:"2021 · Construction"},
-  {id:"outside-79",docIdx:79,source:"outside",year:2021,title:"Construction of Hjalmar Lundbohm School Starts",meta:"2021 · Construction"},
-  {id:"outside-80",docIdx:80,source:"outside",year:2021,title:"Construction of Police Station Starts",meta:"2021 · Construction"},
-  {id:"outside-81",docIdx:81,source:"outside",year:2021,title:"Detail Plan for Gruvstadspark 2, Etapp 5, Kyrkan 11 m fl",meta:"August 2021 · Urban Planning"},
-  {id:"outside-82",docIdx:82,source:"outside",year:2021,title:"Landscape Analysis — Old Kiruna Church Site",meta:"August 2021 · Heritage"},
-  {id:"outside-83",docIdx:83,source:"outside",year:2021,title:"Detail Plan for Gruvstadspark 3, Etapp 1, Hovmästaren 1 f",meta:"August 2021 · Urban Planning"},
-  {id:"outside-84",docIdx:84,source:"outside",year:2021,title:"Comprehensive Assessment of Line Studies",meta:"October 2021 · Infrastructure"},
-  {id:"outside-85",docIdx:85,source:"outside",year:2022,title:"Inauguration of Scandic Hotel",meta:"February 2022 · Construction"},
-  {id:"outside-86",docIdx:86,source:"outside",year:2022,title:"Inauguration of Aurora Center",meta:"May 2022 · Construction"},
-  {id:"outside-87",docIdx:87,source:"outside",year:2022,title:"Block 1 Inauguration",meta:"June 2022 · Construction"},
-  {id:"outside-88",docIdx:88,source:"outside",year:2022,title:"Construction of Blocks 7, 8 & 9 Completed",meta:"September 2022 · Construction"},
-  {id:"outside-89",docIdx:89,source:"outside",year:2022,title:"Agreement of the Municipal Board on Hospital Relocation",meta:"September 2022 · Relocation"},
-  {id:"outside-90",docIdx:90,source:"outside",year:2022,title:"Inauguration of New City Centre",meta:"September 2022 · Construction"},
-  {id:"outside-91",docIdx:91,source:"outside",year:2022,title:"Detail Plan Tuolluvaara 1:1 — Western Green Finger",meta:"November 2022 · Urban Planning"},
-  {id:"outside-92",docIdx:92,source:"outside",year:2022,title:"New Railway Line Studies",meta:"December 2022 · Infrastructure"},
-  {id:"outside-93",docIdx:93,source:"outside",year:2022,title:"Detail Plan Tuolluvaara 1:1 — Northeast of Vinterleden",meta:"December 2022 · Urban Planning"},
-  {id:"outside-94",docIdx:94,source:"outside",year:2022,title:"Detail Plan for Gruvstadspark 3, Etapp 2",meta:"December 2022 · Urban Planning"},
-  {id:"outside-95",docIdx:95,source:"outside",year:2023,title:"Second Set of Housing Buildings Completed",meta:"2023 · Construction"},
-  {id:"outside-96",docIdx:96,source:"outside",year:2023,title:"Third Set of Housing Buildings Completed",meta:"2023 · Construction"},
-  {id:"outside-97",docIdx:97,source:"outside",year:2023,title:"Police Station Completed",meta:"2023 · Construction"},
-  {id:"outside-98",docIdx:98,source:"outside",year:2023,title:"Detailed Planning Proposal for City Park",meta:"October 2023 · Urban Planning"},
-  {id:"outside-99",docIdx:99,source:"outside",year:2023,title:"Inauguration of Hjalmar Lundbohm School",meta:"December 2023 · Construction"},
-  {id:"outside-100",docIdx:100,source:"outside",year:2024,title:"Agreement on Hospital Relocation",meta:"February 2024 · Relocation"},
-  {id:"outside-101",docIdx:101,source:"outside",year:2024,title:"Detailed Plan for Volume Trade and the Centre, Change",meta:"May 2024 · Urban Planning"},
-  {id:"outside-102",docIdx:102,source:"outside",year:2024,title:"Kiruna Church Closes",meta:"June 2024 · Heritage"},
-  {id:"outside-103",docIdx:103,source:"outside",year:2025,title:"Relocation of Kiruna Church and its Bell Tower",meta:"August 2025 · Heritage"},
-  {id:"outside-104",docIdx:104,source:"outside",year:2025,title:"Deformation Forecast",meta:"August 2025 · Mining"}
-];
-
-    /* Sort all by year, then source order */
-    const outsideWithImages=outside.map(doc=>({
-      ...doc,
-      imgUrl:doc.imgUrl||galleryImageUrl('outside',doc.docIdx)
+    const outsideWithImages=window.KirunaOutsideData.RAW.map(([date,title,,field],index)=>({
+      id:'outside-'+(index+1),
+      docIdx:index+1,
+      source:'outside',
+      year:Number(date.match(/\d{4}/)?.[0])||0,
+      title:title.replaceAll('"',''),
+      meta:date+' · '+field,
+      imgUrl:galleryImageUrl('outside',index+1)
     }));
     return [...inside,...outsideWithImages].sort((a,b)=>a.year-b.year||0);
   }
@@ -200,11 +96,14 @@
         bg.className='gallery-tile-bg';
         bg.style.background=tile.dataset.galleryGradient;
         if(item.imgUrl){
-          bg.style.backgroundImage=`url(${item.imgUrl}), ${tile.dataset.galleryGradient}`;
-          bg.style.backgroundSize='cover, cover';
-          bg.style.backgroundPosition='center, center';
+          const img=document.createElement('img');
+          img.className='gallery-tile-image';
+          img.src=item.imgUrl;
+          img.alt='';
+          img.loading='lazy';
+          img.decoding='async';
+          bg.appendChild(img);
         }
-        bg.style.position='absolute';bg.style.inset='0';
 
         const dot=document.createElement('div');
         dot.className='gallery-tile-source-dot';

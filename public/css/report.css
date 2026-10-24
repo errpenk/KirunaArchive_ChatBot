@@ -297,7 +297,6 @@
   #rpt .hero-txt{padding:36px 22px;border-left:none;border-top:1.5px solid var(--border);}
   #rpt h1{font-size:clamp(1.8rem,4.5vw,2.7rem);}
   #rpt .hero-lead{font-size:.98rem;}
-  #rpt .stats{grid-template-columns:repeat(3,1fr);}
   #rpt .scrolly{grid-template-columns:40% 60%;}
   #rpt .scrolly-map{height:calc(100vh - var(--hh));position:sticky;top:var(--hh);}
   #rpt .scrolly-steps{padding-top:36vh;padding-bottom:24vh;}
@@ -314,7 +313,6 @@
   #rpt .hero-txt{padding:26px 16px 20px;}
   #rpt h1{font-size:clamp(1.55rem,7vw,2.1rem);margin-bottom:12px;}
   #rpt .hero-lead{font-size:.93rem;margin-bottom:12px;}
-  #rpt .stats{grid-template-columns:repeat(3,1fr);}
   #rpt .stat{padding:12px 4px;}
   #rpt .stat-n{font-size:1.4rem;}
   #rpt .stat-l{font-size:7.5px;}
@@ -338,7 +336,6 @@
   #rpt .hero-map{height:36vh;}
   #rpt .hero-txt{padding:20px 12px 16px;}
   #rpt h1{font-size:clamp(1.4rem,7.5vw,1.85rem);}
-  #rpt .stats{grid-template-columns:repeat(3,1fr);}
   #rpt .stat{padding:10px 3px;}
   #rpt .stat-n{font-size:1.25rem;}
   #rpt .stat-l{font-size:7px;}
