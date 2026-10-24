@@ -288,6 +288,16 @@ const CC_BAR=Object.fromEntries(Object.entries(CC).map(([key, value])=>[key, mix
 /* Sort all events by year ascending — applies globally to all views/platforms */
 EVS.sort((a,b)=>a.year-b.year);
 
+const tagCounts=new Map();
+EVS.forEach(ev=>ev.tags?.forEach(tag=>tagCounts.set(tag,(tagCounts.get(tag)||0)+1)));
+function relatedMapEvents(ev,visibleEvents){
+  return visibleEvents.filter(other=>other.id!==ev.id).map(other=>{
+    const shared=ev.tags?.filter(tag=>other.tags?.includes(tag)&&tagCounts.get(tag)<=5)||[];
+    shared.sort((a,b)=>tagCounts.get(a)-tagCounts.get(b));
+    return {event:other,topic:shared[0],score:shared.reduce((n,tag)=>n+1/tagCounts.get(tag),0)};
+  }).filter(link=>link.topic).sort((a,b)=>b.score-a.score||Math.abs(a.event.year-ev.year)-Math.abs(b.event.year-ev.year)).slice(0,3);
+}
+
 let activePage='home',activeId=null,eraFilter='all',calYear=2010,cpYear=2010,cpSel=null,calYearFilter=null;
 document.body.classList.add('on-home');
 let leafletMap=null,leafletMarkers={},mapAreaLayers={};
@@ -1499,6 +1509,8 @@ function renderMarkers(){
     const tagsHtml=(ev.tags||[]).map(t=>`<span class="popup-expand-tag">${t}</span>`).join('');
     const stakeholders=ev.stakeholders||((ev.sources||[]).map(s=>s.t.split(/[,.(]/)[0].trim()).filter(Boolean));
     const stakeholdersHtml=stakeholders.length?`<div class="popup-stakeholder-label">Stakeholders</div><div class="popup-stakeholders-row">${stakeholders.map(s=>`<span class="popup-stakeholder-pill">${s}</span>`).join('')}</div>`:'';
+    const related=relatedMapEvents(ev,filtered);
+    const relatedHtml=related.length?`<div class="popup-related"><div class="popup-related-heading">Related by topic</div>${related.map(({event,topic})=>`<button class="popup-related-link" type="button" onclick="event.stopPropagation();window._selectEv(${event.id})"><span>${event.year} · ${event.title}</span><small>${topic} →</small></button>`).join('')}</div>`:'';
     const pid=`ppx-${ev.id}`;
     const popHtml=`
 <div class="popup-inner">
@@ -1506,6 +1518,7 @@ function renderMarkers(){
   <div class="popup-title">${ev.title}</div>
   <div class="popup-cat">${ev.loc||ev.docType||''}</div>
   <div class="popup-short-desc">${shortDesc}</div>
+  ${relatedHtml}
 </div>
 <div class="popup-expand" id="${pid}">
   <div class="popup-expand-inner">

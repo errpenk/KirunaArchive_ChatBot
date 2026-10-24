@@ -98,6 +98,11 @@
 .popup-cat{font-size:11px;color:var(--g3);margin-bottom:6px}
 .popup-short-desc{font-size:11px;color:var(--g2);line-height:1.55;padding-top:6px;border-top:.5px solid var(--g5);transition:max-height .32s ease,opacity .22s ease,padding .22s ease;max-height:120px;overflow:hidden;opacity:1}
 .popup-short-desc.hidden{max-height:0;opacity:0;padding-top:0;border-top:none}
+.popup-related{border-top:.5px solid var(--g5);margin-top:8px;padding-top:8px}
+.popup-related-heading{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g3);margin-bottom:4px}
+.popup-related-link{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;padding:5px 0;border:0;background:none;text-align:left;color:var(--b);font:500 10px/1.4 var(--sans);cursor:pointer}
+.popup-related-link:hover,.popup-related-link:focus-visible{color:var(--accent);text-decoration:underline}
+.popup-related-link small{flex:none;color:var(--g3);font-size:9px}
 .popup-expand{overflow:hidden;max-height:0;transition:max-height .42s cubic-bezier(.4,0,.2,1),opacity .3s ease;opacity:0}
 .popup-expand.open{max-height:600px;opacity:1}
 .popup-expand-inner{padding:0 16px;font-size:11px;color:var(--g2);line-height:1.6}

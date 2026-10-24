@@ -74,7 +74,7 @@
 .chat-page-board{
   min-height:0;display:grid;grid-template-rows:minmax(0,1fr) auto;gap:0;
   position:relative;overflow:hidden;border-radius:28px;
-  border:.5px solid rgba(29,29,31,.1);background:rgba(255,255,255,.96);
+  border:1px solid #000;background:rgba(255,255,255,.96);
   box-shadow:0 14px 38px rgba(29,29,31,.04);
 }
 
