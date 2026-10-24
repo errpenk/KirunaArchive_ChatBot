@@ -20,11 +20,12 @@
 <body>
 <script>
 (function(){
-  document.body.classList.add('kiruna-intro-pending');
+  window.__kirunaIsReload=performance.getEntriesByType('navigation')[0]?.type==='reload';
+  if(!window.__kirunaIsReload) document.body.classList.add('kiruna-intro-pending');
 })();
 </script>
 <div id="mobile-intro" aria-hidden="true">
-  <video id="kiruna-intro-video" autoplay muted playsinline preload="auto" src="./videos/kiruna-mobile-intro.mov"></video>
+  <video id="kiruna-intro-video" muted playsinline preload="auto" src="./videos/kiruna-mobile-intro.mov"></video>
   <div id="mobile-intro-inner">
     <div id="mobile-intro-logo-frame" aria-hidden="true">
       <div id="kiruna-intro-logo" aria-label="Kiruna Archive">
@@ -55,6 +56,7 @@ import { animate, svg, utils } from './vendor/anime.esm.min.js';
   var markPath=document.getElementById('kiruna-mark-path');
   var title=document.getElementById('kiruna-title');
   if(!body || !logo || !markPath || !title) return;
+  if(window.__kirunaIsReload) return;
   var INTRO_TOTAL_MS=1830;
   var motionQuery=window.matchMedia?.('(prefers-reduced-motion: reduce)');
   var reduceMotion=!!motionQuery?.matches;
@@ -468,6 +470,21 @@ import { animate, svg, utils } from './vendor/anime.esm.min.js';
         </div>
       </div>
 
+      <aside class="dc-data-aside" id="dc-data-aside" aria-hidden="true">
+        <div class="dc-data-aside-label">DATA READING</div>
+        <div class="dc-data-aside-note">
+          <h3 id="dc-data-aside-title"></h3>
+          <p id="dc-data-aside-copy"></p>
+        </div>
+      </aside>
+      <aside class="dc-data-aside is-right" id="dc-meta-aside" aria-hidden="true">
+        <div class="dc-data-aside-label">METADATA</div>
+        <div class="dc-data-aside-note">
+          <h3 id="dc-meta-aside-title"></h3>
+          <p id="dc-meta-aside-copy"></p>
+        </div>
+      </aside>
+
       <!-- ══════════════════════════════════
            PANEL 1 — X ORIGINAL POSTS
       ══════════════════════════════════ -->
@@ -872,7 +889,6 @@ import { animate, svg, utils } from './vendor/anime.esm.min.js';
             <div class="chat-page-toolbar"></div>
             <div class="chat-page-eyebrow">CHAT · COMPREHENSIVE SEARCH BOT</div>
             <h1 class="chat-page-title">Chat</h1>
-            <p class="chat-page-lead">Searches the local archive first and answers directly. If nothing is found, it guides you through a yes/no flow to narrow results. Matches link to relevant content, <span class="chat-lead-highlight">highlighted in yellow</span>, with a floating button to quickly return to the conversation.</p>
           </div>
         </div>
         <div class="chat-page-board">
@@ -883,8 +899,9 @@ import { animate, svg, utils } from './vendor/anime.esm.min.js';
             </svg>
           </button>
           <div class="chat-scroll-shell chat-page-scroll-shell">
-            <div class="chat-node-rail" id="chat-page-rail" aria-label="Chat timeline"></div>
+            <nav class="chat-source-rail" id="chat-page-source-rail" aria-label="Archive links in this conversation"></nav>
             <div class="chat-thread chat-page-thread" id="chat-page-thread"></div>
+            <nav class="chat-node-rail" id="chat-page-rail" aria-label="Conversation timeline"></nav>
           </div>
           <div class="chat-loading-hint" id="chat-page-loading-hint" aria-live="polite"></div>
           <form class="chat-compose chat-page-compose" id="chat-page-form">
@@ -1100,6 +1117,17 @@ import { animate, svg, utils } from './vendor/anime.esm.min.js';
 <link rel="stylesheet" href="./css/chat.css" id="chat-ui-styles">
 <link rel="stylesheet" href="./css/mobile-layout.css" id="mobile-layout-fixes">
 <button id="chat-fab" type="button" aria-label="Open chat" title="Open chat"><span class="chat-fab-status" aria-hidden="true"></span></button>
+<aside id="chat-welcome" aria-label="Chat introduction" hidden>
+  <div class="chat-welcome-card">
+    <span class="chat-welcome-wave" aria-hidden="true">👋</span>
+    <p>Hi! Need help exploring Kiruna?</p>
+    <button class="chat-welcome-close" id="chat-welcome-close" type="button" aria-label="Dismiss chat introduction">×</button>
+  </div>
+  <div class="chat-welcome-actions">
+    <button id="chat-welcome-ask" type="button">Ask a question</button>
+    <button id="chat-welcome-explore" type="button">Explore the archive</button>
+  </div>
+</aside>
 <div id="chat-panel" aria-hidden="true">
   <div class="chat-panel-head">
     <div class="chat-panel-title-wrap">
@@ -1137,7 +1165,7 @@ import { animate, svg, utils } from './vendor/anime.esm.min.js';
   }
 
   function hasSeenIntro(){
-    return false;
+    return window.__kirunaIsReload;
   }
 
   function markIntroSeen(){

@@ -280,8 +280,6 @@
   position:sticky;top:0;z-index:90;
   background:rgba(255,255,255,.97);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border-bottom:1px solid var(--db);
-  box-shadow:0 1px 0 var(--db);
   user-select:none;
   -webkit-user-select:none;
   /* Prevent any touch drag from moving the nav */
@@ -341,6 +339,43 @@
   border-radius:2px 2px 0 0;
   pointer-events:none;
   will-change:left,width;
+}
+.dc-data-aside{display:none}
+@media(min-width:1240px){
+  .dc-data-aside{
+    position:absolute;top:0;
+    left:max(16px,calc(50vw - 640px));z-index:40;
+    display:block;width:min(170px,calc((100vw - 860px)/2 - 32px));padding-left:16px;
+    border-left:1px solid #d8e0e6;pointer-events:none;
+    opacity:0;transform:translateY(12px);
+    transition:opacity .3s ease,transform .35s cubic-bezier(.22,1,.36,1);
+  }
+  .dc-data-aside.is-right{
+    left:auto;right:max(16px,calc(50vw - 640px));
+    border-left:0;border-right:1px solid #d8e0e6;
+    padding-left:0;padding-right:16px;
+  }
+  .dc-data-aside.is-visible{opacity:1;transform:translateY(0)}
+  .dc-data-aside-label{
+    margin-bottom:18px;
+    font:700 9px/1.4 var(--mono-d);letter-spacing:.12em;color:var(--dblue);
+  }
+  .dc-data-aside-note{transition:opacity .18s ease,transform .22s ease}
+  .dc-data-aside.is-changing .dc-data-aside-note{opacity:0;transform:translateY(-12px)}
+  .dc-data-aside.is-changing.is-up .dc-data-aside-note{transform:translateY(12px)}
+  .dc-data-aside h3{
+    margin:0 0 10px;font:600 18px/1.2 var(--display);color:var(--dp);
+  }
+  .dc-data-aside p{
+    display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:7;
+    margin:0;font:400 12px/1.65 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
+    color:var(--dp2);
+  }
+}
+html.phone-app #page-discourse .dc-data-aside,
+html.tablet-app #page-discourse .dc-data-aside{display:none!important}
+@media(prefers-reduced-motion:reduce){
+  .dc-data-aside,.dc-data-aside-note{transition:none!important}
 }
 /* ── Platform panels: always rendered, never display:none ── */
 .dc-platform-panel{

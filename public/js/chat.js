@@ -17,7 +17,8 @@
     pendingExternalSuggestion:null,
     fabPos:loadFabPos(),
     drag:null,
-    suppressFabClick:false
+    suppressFabClick:false,
+    welcomeDismissed:false
   };
   let chatSourceReturnState=null;
   let chatActiveTurnTimer=null;
@@ -25,11 +26,13 @@
 
   const els={
     fab:document.getElementById('chat-fab'),
+    welcome:document.getElementById('chat-welcome'),
     panel:document.getElementById('chat-panel'),
     panelClose:document.getElementById('chat-close-btn'),
     panelOpenPage:document.getElementById('chat-open-page-btn'),
     widgetRail:document.getElementById('chat-widget-rail'),
     pageRail:document.getElementById('chat-page-rail'),
+    pageSourceRail:document.getElementById('chat-page-source-rail'),
     widgetThread:document.getElementById('chat-widget-thread'),
     pageThread:document.getElementById('chat-page-thread'),
     widgetForm:document.getElementById('chat-widget-form'),
@@ -211,6 +214,7 @@
   let activeArchiveInlineHighlight=null;
   let activeArchiveInlineHighlightKey='';
   let chatSourceReturnAnchor=null;
+  let activeChatJumpHighlight=null;
   let chatSourceReturnPositionFrame=null;
   let chatSourceReturnRetryTimer=null;
   let outsideDocFlashTimers=[];
@@ -1242,10 +1246,27 @@
     return resolveElementViewportRect(anchorEl);
   }
 
+  function highlightChatJumpElement(el){
+    if(!el||activeChatJumpHighlight===el) return;
+    activeChatJumpHighlight?.classList.remove('chat-jump-highlight');
+    const doc=el.ownerDocument;
+    if(doc!==document&&!doc.getElementById('chat-jump-highlight-style')){
+      const style=doc.createElement('style');
+      style.id='chat-jump-highlight-style';
+      style.textContent='.chat-jump-highlight{background:#fff1a8!important;box-shadow:0 0 0 4px rgba(255,241,168,.55)!important;border-radius:6px!important}'+
+        '.pop-title.chat-jump-highlight + .pop-desc{background:rgba(255,241,168,.55)!important;border-radius:6px!important}';
+      doc.head.appendChild(style);
+    }
+    el.classList.add('chat-jump-highlight');
+    activeChatJumpHighlight=el;
+  }
+
   function clearChatSourceReturnAnchor(){
     clearChatSourceReturnRetry();
     _stopChatReturnTrackingLoop();
     clearOutsideDocFlashTimers();
+    activeChatJumpHighlight?.classList.remove('chat-jump-highlight');
+    activeChatJumpHighlight=null;
     chatSourceReturnAnchor=null;
     chatSourceReturnPositionFrame=null;
     if(!els.sourceReturnBtn) return;
@@ -1268,6 +1289,9 @@
       els.sourceReturnBtn.hidden=true;
       return;
     }
+    if(chatSourceReturnAnchor.persistHighlight&&activeChatJumpHighlight!==anchorEl){
+      highlightChatJumpElement(anchorEl);
+    }
     const anchorPage=anchorEl?.closest('.page');
     if(anchorPage&&anchorPage.classList.contains('off')){
       els.sourceReturnBtn.hidden=true;
@@ -1289,37 +1313,26 @@
     }
     els.sourceReturnBtn.hidden=false;
 
-    // Strictly orthogonal placement: try right → left → above → below
-    // The button is centered on the anchor's vertical/horizontal midpoint.
-    const pad=10;
-    const anchorMidX=rect.left+rect.width/2;
-    const anchorMidY=rect.top+rect.height/2;
-
-    let left, top;
-
-    // Try RIGHT of anchor (vertically centered)
-    const tryRight=rect.right+pad;
-    const tryRightTop=anchorMidY-btnHeight/2;
-    if(tryRight+btnWidth<=vw-pad && tryRightTop>=pad && tryRightTop+btnHeight<=vh-pad){
-      left=tryRight; top=tryRightTop;
-    }
-    // Try LEFT of anchor (vertically centered)
-    else if(rect.left-pad-btnWidth>=pad && anchorMidY-btnHeight/2>=pad && anchorMidY+btnHeight/2<=vh-pad){
-      left=rect.left-pad-btnWidth; top=anchorMidY-btnHeight/2;
-    }
-    // Try ABOVE anchor (horizontally centered)
-    else if(rect.top-pad-btnHeight>=pad && anchorMidX-btnWidth/2>=pad && anchorMidX+btnWidth/2<=vw-pad){
-      left=anchorMidX-btnWidth/2; top=rect.top-pad-btnHeight;
-    }
-    // Try BELOW anchor (horizontally centered)
-    else if(rect.bottom+pad+btnHeight<=vh-pad && anchorMidX-btnWidth/2>=pad && anchorMidX+btnWidth/2<=vw-pad){
-      left=anchorMidX-btnWidth/2; top=rect.bottom+pad;
-    }
-    // Fallback: clamp to right side
-    else{
-      left=Math.min(vw-btnWidth-pad, Math.max(pad, rect.right+pad));
-      top=Math.min(vh-btnHeight-pad, Math.max(pad, anchorMidY-btnHeight/2));
-    }
+    const textBlock=anchorEl.closest('.pop-card,.leaflet-popup-content-wrapper,p,h1,h2,h3,h4,li,blockquote');
+    const context=textBlock&&textBlock!==anchorEl
+      ? resolveElementViewportRect(textBlock)||rect
+      : rect;
+    const pad=12;
+    const minTop=(document.getElementById('nav')?.getBoundingClientRect().bottom||0)+pad;
+    const midY=rect.top+rect.height/2-btnHeight/2;
+    const midX=rect.left+rect.width/2-btnWidth/2;
+    const candidates=[
+      [context.right+pad,midY],
+      [context.left-pad-btnWidth,midY],
+      [midX,context.top-pad-btnHeight],
+      [midX,context.bottom+pad]
+    ];
+    const [left,top]=candidates.find(([x,y])=>
+      x>=pad&&x+btnWidth<=vw-pad&&y>=minTop&&y+btnHeight<=vh-pad
+    )||[
+      clamp(midX,pad,Math.max(pad,vw-btnWidth-pad)),
+      clamp(context.top-pad-btnHeight,minTop,Math.max(minTop,vh-btnHeight-pad))
+    ];
 
     els.sourceReturnBtn.style.left=Math.round(left)+'px';
     els.sourceReturnBtn.style.top=Math.round(top)+'px';
@@ -1370,6 +1383,7 @@
     const tries=Number(attempt||0);
     const popupEl=document.querySelector('#leaflet-map .leaflet-popup-content-wrapper')||document.querySelector('#leaflet-map .leaflet-popup-content');
     if(popupEl){
+      highlightChatJumpElement(popupEl);
       setChatSourceReturnAnchor({
         prefer:'event',
         getElement:()=>document.querySelector('#leaflet-map .leaflet-popup-content-wrapper')||document.querySelector('#leaflet-map .leaflet-popup-content')
@@ -1411,13 +1425,23 @@
     }
   }
 
+  function getTimelineEventHighlight(eventId){
+    const tlDoc=getTimelineFrameWindow()?.document;
+    const popupTitle=tlDoc?.querySelector('#popover.show #pop-title');
+    if(popupTitle) return popupTitle;
+    const anchor=getTimelineEventAnchor(eventId);
+    return anchor?.querySelector('.txt-title,.dtl-card')||anchor;
+  }
+
   function attachChatReturnToTimelineEvent(eventId,attempt){
     const tries=Number(attempt||0);
-    const anchor=getTimelineEventAnchor(eventId);
+    const anchor=getTimelineEventHighlight(eventId);
     if(anchor){
+      highlightChatJumpElement(anchor);
       setChatSourceReturnAnchor({
         prefer:'text',
-        getElement:()=>getTimelineEventAnchor(eventId)
+        persistHighlight:true,
+        getElement:()=>getTimelineEventHighlight(eventId)
       });
       return;
     }
@@ -1429,33 +1453,7 @@
 
   function flashOutsideDocRow(row){
     if(!row) return;
-    const doc=row.ownerDocument;
-    if(doc&&!doc.getElementById('chat-outside-highlight-style')){
-      const style=doc.createElement('style');
-      style.id='chat-outside-highlight-style';
-      style.textContent='' +
-        '.ov-event-row.chat-outside-highlight{' +
-          'background:rgba(255,241,168,.55)!important;' +
-          'outline:2px solid rgba(255,205,64,.95)!important;' +
-          'outline-offset:2px!important;' +
-          'box-shadow:0 0 0 8px rgba(255,241,168,.36)!important;' +
-          'transition:background .26s ease,box-shadow .26s ease,outline-color .26s ease;' +
-        '}' +
-        '.ov-event-row.chat-outside-highlight .ov-ev-title,' +
-        '.ov-event-row.chat-outside-highlight .ov-ev-date,' +
-        '.ov-event-row.chat-outside-highlight .ov-ev-field,' +
-        '.ov-event-row.chat-outside-highlight .ov-ev-actor{' +
-          'background:rgba(255,241,168,.18)!important;' +
-          'border-radius:8px;' +
-        '}';
-      (doc.head||doc.documentElement||doc.body).appendChild(style);
-    }
-    row.classList.add('chat-outside-highlight');
-    clearTimeout(row._chatFlashTimer);
-    row._chatFlashTimer=setTimeout(()=>{
-      if(!row.isConnected) return;
-      row.classList.remove('chat-outside-highlight');
-    },2200);
+    highlightChatJumpElement(row);
   }
 
   function clearOutsideDocFlashTimers(){
@@ -1518,7 +1516,7 @@
   function getArchiveHighlightContainer(target){
     if(!target||!(target instanceof Element)) return target||null;
     return target.closest(
-      '.dc-chart-card,.dc-pill-wrap,.dc-rank-grid,.dc-two-col-chart-table,.dc-three-col-wrap,.dc-cards,.dc-kw-wrap,.dc-col-scroll-wrap,.dc-section,[data-doc-idx],#home-hero,#home-stats,#tl-anchor,#home-documents,#src-section,[id]'
+      '.dc-chart-card,.dc-pill-wrap,.dc-rank-grid,.dc-two-col-chart-table,.dc-three-col-wrap,.dc-cards,.dc-kw-wrap,.dc-col-scroll-wrap,[data-doc-idx]'
     )||target;
   }
 
@@ -1527,7 +1525,7 @@
     const locator=source?.locator||{};
     if(locator.type==='outside-doc') return true;
     if(locator.pageId==='page-discourse'){
-      return Boolean(target.closest('.dc-chart-card,.dc-pill-wrap,.dc-rank-grid,.dc-two-col-chart-table,.dc-three-col-wrap,.dc-cards,.dc-kw-wrap,.dc-col-scroll-wrap,.dc-section'));
+      return target.matches('.dc-chart-card,.dc-pill-wrap,.dc-rank-grid,.dc-two-col-chart-table,.dc-three-col-wrap,.dc-cards,.dc-kw-wrap,.dc-col-scroll-wrap');
     }
     return false;
   }
@@ -1614,7 +1612,7 @@
     clearArchiveInlineHighlight();
     const match=findArchiveTextMatch(target,source);
     if(!match){
-      flashArchiveTarget(target);
+      highlightChatJumpElement(target);
       return target;
     }
     const range=document.createRange();
@@ -1675,9 +1673,7 @@
       prefer:'text',
       getElement:()=>getActiveArchiveAnchorForSource(source)
     });
-    if(options?.flash&&(highlightTarget===resolved||source?.locator?.type!=='text')){
-      flashArchiveTarget(resolved);
-    }
+    if(options?.flash&&source?.locator?.type!=='text') highlightChatJumpElement(resolved);
     return scrollTarget;
   }
 
@@ -1802,11 +1798,17 @@
     if(typeof window.showPage==='function'&&currentPage!==targetPage){
       window.showPage(targetPage);
     }
+    const discoursePanel=targetPage==='discourse'?target?.closest('.dc-platform-panel'):null;
+    const discourseTab=discoursePanel
+      ? document.querySelector('#page-discourse .dc-ptab[data-panel="'+discoursePanel.id.replace('dc-panel-','')+'"]')
+      : null;
+    const switchedPanel=Boolean(discourseTab&&!discourseTab.classList.contains('on'));
+    if(switchedPanel) discourseTab.click();
     const reveal=()=>{
       refreshArchiveTextSource(source,{scroll:true,behavior:'smooth',flash:true});
       scheduleArchiveTextSourceRefresh(source);
     };
-    setTimeout(reveal, currentPage===targetPage?40:180);
+    setTimeout(reveal, switchedPanel?560:(currentPage===targetPage?40:180));
   }
   window.handleChatArchiveSourceJump=function(turnId,sourceIndex){
     const targetTurn=findTurnById(turnId);
@@ -1953,6 +1955,40 @@
     els.fab.style.left=x+'px';
     els.fab.style.top=y+'px';
     if(state.panelOpen) positionPanel();
+    if(els.welcome&&!els.welcome.hidden) positionWelcome();
+  }
+
+  function positionWelcome(){
+    if(!els.welcome||els.welcome.hidden) return;
+    const fab=els.fab.getBoundingClientRect();
+    const width=els.welcome.offsetWidth;
+    const height=els.welcome.offsetHeight;
+    const left=clamp(fab.right-width,12,Math.max(12,window.innerWidth-width-12));
+    const top=fab.top-height-12>=12 ? fab.top-height-12 : fab.bottom+12;
+    els.welcome.style.left=left+'px';
+    els.welcome.style.top=clamp(top,12,Math.max(12,window.innerHeight-height-12))+'px';
+  }
+
+  let welcomePage='';
+  function maybeShowWelcome(){
+    if(state.welcomeDismissed||window.__kirunaIsReload) return;
+    const introVisible=['kiruna-intro-pending','kiruna-intro-active','kiruna-intro-exiting','kiruna-intro-revealing']
+      .some(name=>document.body.classList.contains(name));
+    if(introVisible) return;
+    if(els.welcome.hidden){
+      welcomePage=getCurrentPageName();
+      els.welcome.hidden=false;
+      positionWelcome();
+    }else if(getCurrentPageName()!==welcomePage){
+      dismissWelcome();
+    }
+  }
+  const welcomeObserver=new MutationObserver(maybeShowWelcome);
+
+  function dismissWelcome(){
+    state.welcomeDismissed=true;
+    if(els.welcome) els.welcome.hidden=true;
+    welcomeObserver.disconnect();
   }
 
   function positionPanel(){
@@ -2034,6 +2070,7 @@
   }
 
   function openPanel(){
+    dismissWelcome();
     clearPanelClosingState();
     state.panelOpen=true;
     document.documentElement.classList.add('chat-widget-open');
@@ -2173,7 +2210,27 @@
   function buildTurnMarkers(){
     return state.turns
       .filter(turn=>turn.role==='user')
-      .map(turn=>({id:turn.id}));
+      .map(turn=>({id:turn.id,question:turn.text||''}));
+  }
+
+  function renderPageSourceRail(){
+    const rail=els.pageSourceRail;
+    if(!rail) return;
+    const links=state.turns.flatMap(turn=>
+      turn.role==='assistant'&&!turn.pending&&Array.isArray(turn.sources)
+        ? turn.sources.slice(0,MAX_SOURCE_CARDS).flatMap((source,index)=>
+            source&&!sourceIsExternalResource(source)?[{turnId:turn.id,index,source}]:[])
+        : []
+    );
+    rail.innerHTML='<div class="chat-source-rail-heading">IN THE ARCHIVE <span>'+links.length+'</span></div>'+
+      (links.length
+        ? '<div class="chat-source-rail-list">'+links.map(({turnId,index,source},position)=>
+            '<button class="chat-source-rail-link" type="button" data-turn-id="'+escapeHtml(turnId)+'" data-source-index="'+index+'" title="'+escapeHtml(source.title||'Archive source')+'">'+
+              '<span class="chat-source-rail-number">'+String(position+1).padStart(2,'0')+'</span>'+
+              '<span class="chat-source-rail-text">'+escapeHtml(source.title||'Archive source')+'</span>'+
+            '</button>'
+          ).join('')+'</div>'
+        : '<p class="chat-source-rail-empty">Archive links appear here when a reply finds a match.</p>');
   }
 
   function findTurnEl(thread, turnId){
@@ -2226,11 +2283,16 @@
     rail.querySelectorAll('.chat-node-btn').forEach(btn=>{
       const turn=findTurnEl(thread, btn.getAttribute('data-turn-id'));
       if(!turn) return;
-      const bubble=turn.querySelector('.chat-bubble')||turn;
-      const bubbleRect=bubble.getBoundingClientRect();
       const railHeight=rail.clientHeight||thread.clientHeight||0;
-      const center=(bubbleRect.top+(bubbleRect.height/2))-railRect.top;
-      btn.style.top=clamp(center, 6, Math.max(6, railHeight-6))+'px';
+      let center;
+      if(rail===els.pageRail){
+        center=22+(turn.offsetTop/Math.max(thread.scrollHeight,1))*Math.max(0,railHeight-44);
+      }else{
+        const bubble=turn.querySelector('.chat-bubble')||turn;
+        const bubbleRect=bubble.getBoundingClientRect();
+        center=bubbleRect.top+(bubbleRect.height/2)-railRect.top;
+      }
+      btn.style.top=clamp(center, 12, Math.max(12, railHeight-12))+'px';
     });
     syncRailActive(thread,rail);
   }
@@ -2263,7 +2325,7 @@
       return;
     }
     const markers=buildTurnMarkers();
-    rail.innerHTML=markers.map(marker=>'<button class="chat-node-btn" type="button" data-turn-id="'+escapeHtml(marker.id)+'" aria-label="Jump to question"></button>').join('');
+    rail.innerHTML=markers.map((marker,index)=>'<button class="chat-node-btn" type="button" data-turn-id="'+escapeHtml(marker.id)+'" aria-label="Jump to question '+(index+1)+': '+escapeHtml(marker.question)+'" title="'+escapeHtml(marker.question)+'">'+(rail===els.pageRail?'<span>'+String(index+1).padStart(2,'0')+'</span>':'')+'</button>').join('');
     rail.querySelectorAll('.chat-node-btn').forEach(btn=>{
       btn.addEventListener('click',()=>{
         const turnId=btn.getAttribute('data-turn-id');
@@ -2553,8 +2615,11 @@
     state.pendingExternalSuggestion=nextSuggestion||null;
   }
 
-  function emptyStateMarkup(){
-    return '<div class="chat-empty"><div class="chat-empty-card"><div class="chat-empty-eyebrow">Chat History</div><div class="chat-empty-title">Ask anything</div><div class="chat-empty-copy">Use the floating dot on any page or type here. Questions and replies are temporary and disappear after refresh.</div></div></div>';
+  function emptyStateMarkup(thread){
+    const description=thread===els.pageThread
+      ? 'Searches the local archive first and answers directly. If nothing is found, it guides you through a yes/no flow to narrow results. Matches link to relevant content, <span class="chat-lead-highlight">highlighted in yellow</span>, with a floating button to quickly return to the conversation.'
+      : 'Use the floating dot on any page or type here. Questions and replies are temporary and disappear after refresh.';
+    return '<div class="chat-empty"><div class="chat-empty-card"><div class="chat-empty-eyebrow">Chat History</div><div class="chat-empty-title">Ask anything</div><div class="chat-empty-copy">'+description+'</div></div></div>';
   }
 
   function renderSourceCard(source,turnId,sourceIndex){
@@ -2610,7 +2675,7 @@
       }
       // Show empty state only if not already shown
       if(!thread.querySelector('.chat-empty')){
-        thread.innerHTML=emptyStateMarkup();
+        thread.innerHTML=emptyStateMarkup(thread);
       }
       thread.scrollTop=0;
       return;
@@ -2667,6 +2732,7 @@
     syncWidgetDraftState();
     renderThread(els.widgetThread);
     renderThread(els.pageThread);
+    renderPageSourceRail();
     bindSourceJumpDelegation(els.widgetThread);
     bindSourceJumpDelegation(els.pageThread);
     attachRail(els.widgetRail, els.widgetThread);
@@ -2993,6 +3059,7 @@
       return;
     }
     if(!state.panelOpen){
+      dismissWelcome();
       // Icon changes instantly to circle
       els.fab.classList.add('open');
       // Brief activation bounce
@@ -3013,6 +3080,16 @@
   });
 
   els.panelClose.addEventListener('click',closePanel);
+  document.getElementById('chat-welcome-close')?.addEventListener('click',dismissWelcome);
+  document.getElementById('chat-welcome-ask')?.addEventListener('click',()=>{
+    dismissWelcome();
+    if(getCurrentPageName()==='chat') els.pageInput?.focus();
+    else openPanel();
+  });
+  document.getElementById('chat-welcome-explore')?.addEventListener('click',()=>{
+    dismissWelcome();
+    window.showPage?.('archive',getCurrentPageName());
+  });
   if(els.sourceReturnBtn){
     els.sourceReturnBtn.addEventListener('click',restoreChatSourceView);
   }
@@ -3089,7 +3166,13 @@
 
   bindComposer(els.widgetForm,els.widgetInput);
   bindComposer(els.pageForm,els.pageInput);
+  els.pageSourceRail?.addEventListener('click',event=>{
+    const link=event.target.closest('.chat-source-rail-link');
+    if(link) window.handleChatArchiveSourceJump(link.dataset.turnId,link.dataset.sourceIndex);
+  });
   applyFabPos(state.fabPos||getDefaultFabPos());
+  welcomeObserver.observe(document.body,{attributes:true,attributeFilter:['class']});
+  setTimeout(maybeShowWelcome,500);
   renderChatViews();
   syncChatViewportLayout({scroll:false});
   window.refreshChatUI=()=>{
