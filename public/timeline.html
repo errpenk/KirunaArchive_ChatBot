@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Temporal Zoom - Kiruna Archive Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/timeline.css">
+<link rel="stylesheet" href="./css/timeline-outside-frame.css">
+</head>
+<body>
+
+<div id="shell">
+
+  <!-- HEADER -->
+  <div id="hdr">
+    <div class="hdr-l">
+      <div class="logo">Kiruna <em>Archive</em></div>
+      <div class="proto-tag">Temporal Zoom · Prototype</div>
+    </div>
+    <div class="hdr-center">
+      <div class="hdr-page-label">Timeline</div>
+      <!-- Sub tabs: Overview / Calendar — collapses when Outside Map is active -->
+      <div class="zoom-scale-wrap" id="zoom-scale-wrap">
+        <div class="zoom-scale" id="zoom-scale">
+          <button class="zoom-btn on" data-lvl="0">Overview</button>
+          <button class="zoom-btn" data-lvl="1">Year</button>
+          <button class="zoom-btn" data-lvl="2">Calendar</button>
+        </div>
+              </div>
+      <!-- Parent tabs: Inside Map / Outside Map -->
+      <div class="map-tabs" id="map-tabs">
+        <button class="map-tab on" id="map-tab-inside" data-view="inside">Inside Map</button>
+        <button class="map-tab" id="map-tab-outside" data-view="outside">Outside Map</button>
+      </div>
+    </div>
+    <div class="hdr-r">
+      <span>VIEWING <span class="val" id="view-range">1900–2035</span></span>
+      <span>·</span>
+      <span><span class="val" id="view-count">12</span> events</span>
+    </div>
+  </div>
+
+  <!-- STAGE -->
+  <div id="stage">
+    <div id="stage-hint" aria-hidden="true"></div>
+    <div class="center-line" id="center-line"></div>
+    <div id="canvas"></div>
+      <div id="cal-overlay">
+      <div class="cph">
+        <div class="cph-nav">
+          <button class="cpn-btn" id="cpnav-prev" title="Previous period" aria-label="Previous period">
+            <span class="cpn-icon" aria-hidden="true">‹</span>
+          </button>
+          <div class="cph-center">
+            <div class="cph-title" id="cph-title">1900 – 1934</div>
+          </div>
+          <button class="cpn-btn" id="cpnav-next" title="Next period" aria-label="Next period">
+            <span class="cpn-icon" aria-hidden="true">›</span>
+          </button>
+        </div>
+      </div>
+      <div class="cpbody">
+        <div class="cpgrid-panel">
+          <div class="cpdow-row" id="cpdow"></div>
+          <div id="cal-grid-wrap">
+            <div id="cpdays"></div>
+          </div>
+        </div>
+        <div class="cpevs-panel">
+          <div class="cpe-head">
+            <div class="cpe-head-copy">
+              <div class="cpe-yr" id="cpe-yr">Select a year</div>
+              <div class="cpe-count" id="cpe-count"></div>
+            </div>
+            <button class="cpe-fullscreen-btn" id="cpe-fullscreen-btn" type="button" aria-label="Open all events fullscreen" title="Fullscreen events">
+              <span class="cpe-fullscreen-open" aria-hidden="true">⛶</span>
+              <span class="cpe-fullscreen-close" aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="cpe-list" id="cpe-list"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Stage nav arrows (overview + year) -->
+    <div class="stage-nav left" id="stage-nav-left">
+      <button class="stage-nav-btn" id="stage-nav-btn-left" aria-label="Previous events">‹</button>
+    </div>
+    <div class="stage-nav right" id="stage-nav-right">
+      <button class="stage-nav-btn" id="stage-nav-btn-right" aria-label="Next events">›</button>
+    </div>
+    <!-- Onboarding overlay -->
+    <div id="onboard">
+      <div id="onboard-cursor">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M5 3L19 12L12 13L8 20L5 3Z" fill="#1d1d1f" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div id="onboard-caption">Scroll to zoom through time</div>
+      <button id="onboard-skip">Skip</button>
+    </div>
+  <!-- GESTURE HINT: phone/tablet overview only -->
+  <div id="gesture-hint" aria-hidden="true">
+    <div class="gh-row">
+      <span class="gh-track"><span class="gh-thumb"></span></span>
+      <span class="gh-text">Swipe THERE to explore</span>
+    </div>
+    <div class="gh-row">
+      <span class="gh-pinch"><span class="gh-f gh-fl"></span><span class="gh-f gh-fr"></span></span>
+      <span class="gh-text">Pinch to zoom</span>
+    </div>
+  </div>
+  </div>
+
+  <!-- RIBBON -->
+  <div id="ribbon">
+    <div class="ribbon-label" id="ribbon-label">1900 — 2035</div>
+    <div id="ribbon-track">
+      <div id="ribbon-bg"></div>
+      <div id="ribbon-viewport"></div>
+      <div id="ribbon-hover-year" aria-hidden="true"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- POPOVER -->
+<div id="popover">
+  <div class="pop-card">
+    <div class="pop-close" id="pop-close">✕</div>
+    <div class="pop-hero" id="pop-hero"></div>
+    <div class="pop-yr" id="pop-yr"></div>
+    <div class="pop-title" id="pop-title"></div>
+    <div class="pop-desc" id="pop-desc"></div>
+    <div class="pop-actions">
+      <button class="pop-map-link" id="pop-map-link" type="button">View on Map ↗</button>
+      <button class="pop-gallery-link" id="pop-gallery-link" type="button">View in Gallery</button>
+    </div>
+    <div class="pop-meta">
+      <span id="pop-loc"></span>
+      <span id="pop-cat"></span>
+    </div>
+  </div>
+</div>
+
+<script src="./js/timeline.js"></script>
+
+<div id="outside-frame-wrap">
+  <iframe id="outside-frame" src="./outside-map.html"></iframe>
+</div>
+
+<script src="./js/timeline-outside-frame.js"></script>
+
+</body>
+</html>

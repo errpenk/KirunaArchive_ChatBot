@@ -1,0 +1,114 @@
+
+html.phone-app,
+html.phone-app body{
+  overscroll-behavior:none;
+}
+html.phone-app #nav,
+html.tablet-app #nav,
+html.phone-app .nav-tabs,
+html.tablet-app .nav-tabs,
+html.phone-app .ntab.on,
+html.tablet-app .ntab.on{
+  box-shadow:none!important;
+}
+html.phone-app.chat-compose-active,
+html.phone-app.chat-compose-active body{
+  height:var(--chat-stable-vh-px)!important;
+  min-height:var(--chat-stable-vh-px)!important;
+  overflow:hidden!important;
+}
+html.phone-app.chat-compose-active #shell{
+  position:fixed!important;
+  inset:0!important;
+  width:100%!important;
+  height:var(--chat-stable-vh-px)!important;
+  min-height:var(--chat-stable-vh-px)!important;
+  overflow:hidden!important;
+}
+html.phone-app.chat-compose-active #content{
+  overflow:hidden!important;
+}
+html.phone-app.chat-compose-active:not(.chat-compose-collapsing) #chat-panel{
+  left:0!important;
+  top:0!important;
+  width:100%!important;
+  max-width:none!important;
+  height:var(--chat-live-vh-px,100svh)!important;
+  max-height:none!important;
+  border:none!important;
+  border-radius:0!important;
+  transform:none!important;
+}
+html.phone-app.chat-compose-active #chat-panel.open{
+  transform:none!important;
+}
+html.phone-app.chat-compose-active .chat-panel-head{
+  padding-top:max(12px,env(safe-area-inset-top))!important;
+}
+html.phone-app.chat-compose-active .chat-widget-scroll-shell{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  padding:12px 12px 6px!important;
+}
+html.phone-app.chat-compose-active .chat-widget-thread{
+  padding:0 0 12px!important;
+}
+html.phone-app.chat-compose-active .chat-widget-compose{
+  margin:0 12px calc(12px + env(safe-area-inset-bottom))!important;
+  border-radius:18px!important;
+}
+html.phone-app.chat-compose-active #page-chat{
+  height:var(--chat-stable-vh-px)!important;
+  max-height:var(--chat-stable-vh-px)!important;
+  background:#fff!important;
+}
+html.phone-app.chat-compose-active #page-chat .chat-page-shell{
+  width:100%!important;
+  max-width:none!important;
+  height:var(--chat-live-vh-px,100svh)!important;
+  padding:0!important;
+}
+html.phone-app.chat-compose-active #page-chat .chat-page-hero{
+  display:none!important;
+}
+html.phone-app.chat-compose-active #page-chat .chat-page-board{
+  height:100%!important;
+  border:none!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+html.phone-app.chat-compose-active #page-chat .chat-page-scroll-shell{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  padding:12px 12px 0!important;
+}
+html.phone-app.chat-compose-active #page-chat .chat-page-thread{
+  padding-right:0!important;
+}
+html.phone-app.chat-compose-active #page-chat .chat-page-compose{
+  padding:12px 12px calc(12px + env(safe-area-inset-bottom))!important;
+}
+html.phone-app #page-cal .cpevs-panel,
+html.phone-app #page-cal .cpe-list,
+html.tablet-app #page-cal .cpevs-panel,
+html.tablet-app #page-cal .cpe-list{
+  min-height:0!important;
+}
+html.phone-app #page-cal .cpevs-panel,
+html.tablet-app #page-cal .cpevs-panel{
+  display:flex!important;
+  flex-direction:column!important;
+}
+html.phone-app #page-cal .cpe-head,
+html.tablet-app #page-cal .cpe-head{
+  flex:0 0 auto!important;
+}
+html.phone-app #page-cal .cpe-list,
+html.tablet-app #page-cal .cpe-list{
+  flex:1 1 auto!important;
+  overflow-y:auto!important;
+  -webkit-overflow-scrolling:touch!important;
+  overscroll-behavior-y:contain!important;
+  touch-action:pan-y!important;
+  padding-bottom:8px!important;
+}
