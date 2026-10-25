@@ -1253,7 +1253,7 @@
     if(doc!==document&&!doc.getElementById('chat-jump-highlight-style')){
       const style=doc.createElement('style');
       style.id='chat-jump-highlight-style';
-      style.textContent='.chat-jump-highlight{background:#fff1a8!important;border-radius:6px!important}';
+      style.textContent='.chat-jump-highlight,.pop-title.chat-jump-highlight + .pop-desc{background:#fff1a8!important;border-radius:6px!important}';
       doc.head.appendChild(style);
     }
     el.classList.add('chat-jump-highlight');

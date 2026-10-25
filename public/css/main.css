@@ -97,6 +97,7 @@ a{text-decoration:none;color:inherit}
   transform:translate(-50%,-50%);
   object-fit:contain;
   background:#fff;
+  clip-path:inset(2px 0 0);
   z-index:1;
 }
 body.kiruna-intro-video-failed #kiruna-intro-video{
