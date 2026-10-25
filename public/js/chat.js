@@ -1253,8 +1253,7 @@
     if(doc!==document&&!doc.getElementById('chat-jump-highlight-style')){
       const style=doc.createElement('style');
       style.id='chat-jump-highlight-style';
-      style.textContent='.chat-jump-highlight{background:#fff1a8!important;box-shadow:0 0 0 4px rgba(255,241,168,.55)!important;border-radius:6px!important}'+
-        '.pop-title.chat-jump-highlight + .pop-desc{background:rgba(255,241,168,.55)!important;border-radius:6px!important}';
+      style.textContent='.chat-jump-highlight{background:#fff1a8!important;border-radius:6px!important}';
       doc.head.appendChild(style);
     }
     el.classList.add('chat-jump-highlight');

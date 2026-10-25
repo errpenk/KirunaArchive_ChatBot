@@ -234,14 +234,14 @@
 }
 .chat-node-btn:focus{outline:none}
 #chat-page-rail{width:48px;order:2;overflow-y:auto;overflow-x:hidden}
-#chat-page-rail::before{left:8px;background:#d6dce1}
+#chat-page-rail::before{left:13px;background:#d6dce1}
 #chat-page-rail:not(.is-empty)::before{display:none}
 #chat-page-rail .chat-node-track{position:relative;min-height:100%}
 #chat-page-rail .chat-node-track::before{
-  content:'';position:absolute;top:0;bottom:0;left:8px;width:1px;background:#d6dce1;
+  content:'';position:absolute;top:0;bottom:0;left:13px;width:1px;background:#d6dce1;
 }
 #chat-page-rail .chat-node-btn{
-  left:0;width:48px;height:30px;display:flex;align-items:center;gap:8px;
+  left:5px;width:calc(100% - 5px);height:30px;display:flex;align-items:center;gap:8px;
   padding:0;border:0;border-radius:0;background:transparent;color:#7e8d9a;
   transform:translateY(-50%);font:600 10px var(--chat-mono);text-align:left;
 }
@@ -392,7 +392,6 @@
 }
 .chat-jump-highlight{
   background:#fff1a8!important;
-  box-shadow:0 0 0 4px rgba(255,241,168,.55)!important;
   border-radius:6px!important;
 }
 .archive-container-highlight.archive-container-highlight-pulse{
@@ -794,6 +793,7 @@ html.phone-app:not(.chat-compose-active):not(.chat-compose-expanding) #page-chat
   .chat-thread{padding:14px}
   .chat-page-thread{padding:0 6px var(--chat-thread-end-space) 0}
   .chat-page-thread .chat-turn{max-width:100%}
+  .chat-turn.assistant .chat-bubble{border:1px solid #dfe2e5}
   .chat-page-compose{padding:12px 14px 14px}
   .chat-compose{grid-template-columns:minmax(0,1fr) auto;gap:8px}
   .chat-input{min-height:42px;padding-left:16px}
@@ -833,9 +833,9 @@ html.phone-app:not(.chat-compose-active):not(.chat-compose-expanding) #page-chat
   .chat-source-rail-number{font-size:8px}
   .chat-source-rail-text{font-size:9px}
   #chat-page-rail{width:28px}
-  #chat-page-rail::before{left:5px}
-  #chat-page-rail .chat-node-track::before{left:5px}
-  #chat-page-rail .chat-node-btn{width:28px;gap:3px;font-size:8px}
+  #chat-page-rail::before{left:10px}
+  #chat-page-rail .chat-node-track::before{left:10px}
+  #chat-page-rail .chat-node-btn{gap:3px;font-size:8px}
   #chat-page-rail .chat-node-btn::before{width:10px;height:10px;border-width:1.5px}
   .chat-page-thread{padding-right:0}
 }
