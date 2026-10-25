@@ -2269,32 +2269,60 @@
       clearChatActiveTurn(true);
       return;
     }
-    setRailActive(rail,state.activeTurnId);
+    let activeId=state.activeTurnId;
+    if(!activeId&&rail===els.pageRail){
+      const focus=thread.getBoundingClientRect().top+Math.max(24,thread.clientHeight*0.2);
+      const nearest=[...thread.querySelectorAll('.chat-turn.user')].reduce((best,turn)=>{
+        const bubble=turn.querySelector('.chat-bubble')||turn;
+        const rect=bubble.getBoundingClientRect();
+        const distance=Math.abs(rect.top+rect.height/2-focus);
+        return !best||distance<best.distance?{id:turn.dataset.turnId,distance}:best;
+      },null);
+      activeId=nearest?.id||null;
+    }
+    setRailActive(rail,activeId);
   }
 
   function refreshRailLayout(thread, rail){
     if(!thread||!rail) return;
     if(rail===els.pageRail){
       rail.style.removeProperty('height');
+      const track=rail.querySelector('.chat-node-track');
+      const trackHeight=Math.max(thread.scrollHeight,rail.clientHeight)+'px';
+      if(track&&track.style.height!==trackHeight) track.style.height=trackHeight;
+      if(Math.abs(rail.scrollTop-thread.scrollTop)>1) rail.scrollTop=thread.scrollTop;
+      syncRailActive(thread,rail);
     }else{
       rail.style.height=thread.clientHeight+'px';
     }
     const railRect=rail.getBoundingClientRect();
-    rail.querySelectorAll('.chat-node-btn').forEach(btn=>{
+    const threadTop=thread.getBoundingClientRect().top;
+    const railHeight=rail.clientHeight||thread.clientHeight||0;
+    const positions=[...rail.querySelectorAll('.chat-node-btn')].map(btn=>{
       const turn=findTurnEl(thread, btn.getAttribute('data-turn-id'));
-      if(!turn) return;
-      const railHeight=rail.clientHeight||thread.clientHeight||0;
+      if(!turn) return null;
       let center;
       if(rail===els.pageRail){
-        center=22+(turn.offsetTop/Math.max(thread.scrollHeight,1))*Math.max(0,railHeight-44);
+        const bubble=turn.querySelector('.chat-bubble')||turn;
+        const rect=bubble.getBoundingClientRect();
+        center=rect.top+rect.height/2-threadTop+thread.scrollTop;
+        if(btn.classList.contains('active')){
+          const pinned=clamp(center,thread.scrollTop+16,thread.scrollTop+railHeight-16);
+          return {btn,center:pinned,pinned:pinned!==center};
+        }
       }else{
         const bubble=turn.querySelector('.chat-bubble')||turn;
         const bubbleRect=bubble.getBoundingClientRect();
         center=bubbleRect.top+(bubbleRect.height/2)-railRect.top;
       }
-      btn.style.top=clamp(center, 12, Math.max(12, railHeight-12))+'px';
+      return {btn,center:rail===els.pageRail?center:clamp(center,12,Math.max(12,railHeight-12)),pinned:false};
     });
-    syncRailActive(thread,rail);
+    positions.forEach(position=>{
+      if(!position) return;
+      position.btn.classList.toggle('is-pinned',position.pinned);
+      position.btn.style.top=position.center+'px';
+    });
+    if(rail!==els.pageRail) syncRailActive(thread,rail);
   }
 
   function ensureThreadSyncBinding(thread){
@@ -2325,7 +2353,8 @@
       return;
     }
     const markers=buildTurnMarkers();
-    rail.innerHTML=markers.map((marker,index)=>'<button class="chat-node-btn" type="button" data-turn-id="'+escapeHtml(marker.id)+'" aria-label="Jump to question '+(index+1)+': '+escapeHtml(marker.question)+'" title="'+escapeHtml(marker.question)+'">'+(rail===els.pageRail?'<span>'+String(index+1).padStart(2,'0')+'</span>':'')+'</button>').join('');
+    const buttons=markers.map((marker,index)=>'<button class="chat-node-btn" type="button" data-turn-id="'+escapeHtml(marker.id)+'" aria-label="Jump to question '+(index+1)+': '+escapeHtml(marker.question)+'" title="'+escapeHtml(marker.question)+'">'+(rail===els.pageRail?'<span>'+String(index+1).padStart(2,'0')+'</span>':'')+'</button>').join('');
+    rail.innerHTML=rail===els.pageRail?'<div class="chat-node-track">'+buttons+'</div>':buttons;
     rail.querySelectorAll('.chat-node-btn').forEach(btn=>{
       btn.addEventListener('click',()=>{
         const turnId=btn.getAttribute('data-turn-id');
@@ -2343,6 +2372,12 @@
     });
     thread._chatRail=rail;
     ensureThreadSyncBinding(thread);
+    if(rail===els.pageRail&&!rail._chatScrollBound){
+      rail._chatScrollBound=true;
+      rail.addEventListener('scroll',()=>{
+        if(Math.abs(thread.scrollTop-rail.scrollTop)>1) thread.scrollTop=rail.scrollTop;
+      },{passive:true});
+    }
     refreshRailLayout(thread,rail);
   }
 
