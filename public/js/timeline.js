@@ -1,8 +1,4 @@
 
-/* ══════════════════════════════════════════════════════════════
-   DATA — match the "完善版" calendar/timeline events exactly,
-   with date precision added only where Temporal Zoom needs it.
-═══════════════════════════════════════════════════════════════ */
 const MONTH_NAMES = [
   'January','February','March','April','May','June',
   'July','August','September','October','November','December'
@@ -28,18 +24,6 @@ function normalizeEvent(ev){
   };
 }
 
-function parseIssuanceDate(raw){
-  const value = String(raw || '').trim();
-  const match = value.match(/^(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?/);
-  if(!match) return {year:2000, month:1, day:1, datePrecision:'year'};
-  return {
-    year:Number(match[1]),
-    month:match[2] ? Number(match[2]) : 1,
-    day:match[3] ? Number(match[3]) : 1,
-    datePrecision:match[3] ? 'day' : match[2] ? 'month' : 'year',
-  };
-}
-
 function archiveImageUrl(source, id){
   return 'images/' + source + '/' + source + '-' + String(id).padStart(3,'0') + '.jpg';
 }
@@ -48,98 +32,7 @@ function archiveImageBackground(source, id){
   return 'background-image:url(' + url + '),linear-gradient(90deg,var(--g5) 0%,var(--g4) 45%,var(--g5) 100%);background-size:cover,cover;background-position:center,center;animation:none;';
 }
 
-const CORE_EVENTS = [
-  {id:1,year:1900,month:5,day:17,era:'industrial',cat:'mine',featured:true,
-   title:'LKAB Begins Industrial Mining',loc:'Kiirunavaara Mine, Kiruna',
-   desc:"LKAB commences large-scale iron ore extraction at Kiirunavaara. The mine grew into one of the world's largest underground iron ore operations, producing approximately 27 million tonnes of iron ore annually."},
-  {id:2,year:1902,month:11,day:15,era:'industrial',cat:'infra',featured:false,
-   title:'Malmbanan Railway Completed',loc:'Kiruna Station (Kiruna C)',
-   desc:"The Ore Railway (Malmbanan) linking Kiruna to Narvik's ice-free port is completed - 473 km of Arctic engineering built 1899-1902. Still the primary export route for Swedish iron ore today."},
-  {id:3,year:1910,month:6,day:3,era:'industrial',cat:'urban',featured:true,
-   title:'Garden City Master Plan',loc:'Old Town Centre (Gamla Centrum)',
-   desc:"Architect Per Hallman designs Kiruna's urban plan based on Ebenezer Howard's Garden City principles - separating industrial and residential zones with a central square and ordered street grid."},
-  {id:4,year:1943,month:9,day:8,era:'industrial',cat:'mine',featured:false,
-   title:'Peak Wartime Ore Production',loc:'LKAB Mine - Southern Zone',
-   desc:"WWII drives Swedish iron ore exports to historic peaks - Sweden supplied both Allied and Axis powers. Kiruna's workforce surges and the city expands. The postwar boom sustained rapid growth into the 1960s."},
-  {id:5,year:1958,month:10,day:22,era:'growth',cat:'urban',featured:true,
-   title:'City Hall (Stadshus) Inaugurated',loc:'Town Hall Square (Stadshustorget)',
-   desc:"Artur von Schmalensee's iconic Kiruna Stadshus opens. Later voted Sweden's most beautiful public building, its distinctive clock tower and Sami-inspired ornamentation made it a cultural landmark."},
-  {id:6,year:1969,month:12,day:9,era:'growth',cat:'mine',featured:false,
-   title:'The 1969 Strike',loc:'LKAB, Kiruna',
-   desc:'Approximately 4,800 miners at LKAB staged a massive 57-day strike against a harsh rationalization and time-study system (UMS), permanently altering Swedish labor laws.'},
-  {id:7,year:1984,month:7,day:4,era:'growth',cat:'infra',featured:false,
-   title:'Esrange Space Centre Expansion',loc:'Esrange Space Centre (SSC)',
-   desc:"The Swedish Space Corporation's Esrange facility 45 km east of Kiruna undergoes major expansion, supporting rockets, balloons and satellite tracking - Europe's northernmost commercial space hub."},
-  {id:8,year:2004,month:4,day:16,era:'relocation',cat:'urban',featured:true,
-   title:'City Relocation Decision Adopted',loc:'New Town Centre Site (Nya Centrum)',
-   desc:"LKAB's deformation prognosis confirms 60% of Kiruna's city centre will be uninhabitable by 2033. Municipality and LKAB jointly announce the relocation of the entire city centre 3 km northeast."},
-  {id:9,year:2012,month:8,day:28,era:'relocation',cat:'social',featured:false,
-   title:'Old City Hall Demolished',loc:'Old City Hall site (Gamla Stadshuset)',
-   desc:"The 1958 Stadshus - voted Sweden's most beautiful building - is demolished as the deformation zone expands. After public protest, the iconic clock tower is carefully cut free and transported intact to the new city centre, where it stands today."},
-  {id:10,year:2018,month:9,day:1,era:'relocation',cat:'urban',featured:true,
-   title:'Kristallen City Hall & New Centre Open',loc:'Kristallen City Hall, New Kiruna Centre',
-   desc:'Henning Larsen Architects\' Kristallen ("The Crystal") city hall opens, anchoring the new city centre 3 km east. The building\'s aurora-inspired form and Sami motifs mark the most visible milestone in the relocation.'},
-  {id:11,year:2023,month:5,day:9,era:'relocation',cat:'env',featured:false,
-   title:'Old Town Subsidence Milestone',loc:'Old Town Eastern Subsidence Zone',
-   desc:'Monitoring confirms cumulative ground displacement in old city has reached critical thresholds. Several historic buildings show structural cracking. Evacuation timetable shortened to 2029.'},
-  {id:12,year:2035,month:12,day:15,era:'relocation',cat:'urban',featured:true,
-   title:'New Kiruna: Target Completion',loc:'New Kiruna - Full District (Nya Kiruna)',
-   desc:'Target year for full completion of the Kiruna relocation programme. By 2035, LKAB estimates over 6,000 additional residents (beyond those already moved) will have relocated to Nya Kiruna - 3 km northeast across 30+ years.'},
-];
-
-const DOCS = [
-  {title:'Compilation of responses "So what the people of Kiruna think?" (15)', issuance_date:'2008', type:'Informative Doc.', description:"This document is a compilation of the responses to the survey 'What is your impression of Kiruna?' Citizens identified the Church, Hjalmar Lundbohmsgarden, and the Town Hall as buildings of significant value. The municipality viewed this consultation positively and proposed various engagement opportunities over the years."},
-  {title:'Detail plan for Bolagsomradet Gruvstadspark (18)', issuance_date:'2010-10-20', type:'Prescriptive Doc.', description:'First of 8 detailed plans in the old center of Kiruna, transforming residential areas into mining zones for demolition. Covers the town hall, Ullspiran district, and A10 highway. Gained legal validity in 2012.'},
-  {title:'Development Plan (41)', issuance_date:'2014-03-17', type:'Design Doc.', description:"The development plan shapes the new city, written in Swedish for Kiruna's citizens. Divided into four parts; the third spanning 80 pages describes the city's new form and relocation strategies through plans, sections, images, and diagrams."},
-  {title:'Deformation forecast (45)', issuance_date:'2014-12', type:'Technical Doc.', description:"LKAB's deformation forecast outlining expected ground subsidence areas and intervention timing due to the Kiirunavaara mine expansion at 1,365 m depth."},
-  {title:'Construction of Scandic Hotel begins (63)', issuance_date:'2019-04', type:'Material effect', description:'After two extensions of the land acquisition agreement, construction of the Scandic hotel finally began in 2019 in the new city centre.'},
-  {title:'Town Hall demolition (64)', issuance_date:'2019-04', type:'Informative Doc.', description:'After the new town hall was completed, the old building "The Igloo" was demolished. The Sami door handles and the clock tower were preserved - the tower relocated to the central square of New Kiruna.'},
-  {title:'Construction of Aurora Center begins (65)', issuance_date:'2019-05', type:'Material effect', description:'Work began on the Aurora Center, a multifunctional complex including the municipal library. Connected to the Scandic hotel by a skywalk, mirroring the layout of the old city.'},
-  {title:'Construction of Block 1 begins (69)', issuance_date:'2019-06', type:'Material effect', description:'Simultaneously with the Aurora Center, work began on Block 1, a mixed-use building overlooking the main square - the first residential buildings in the new town.'},
-  {title:'Detail plan for square and commercial street (50)', issuance_date:'2016-06-22', type:'Prescriptive Doc.', description:'First detailed plan implemented from the new masterplan. Defines 9 dense blocks near the town hall, including 6 buildings facing the main square. Mixed public/private functions with residential use prominent.'},
-  {title:'Gruvstadspark 2, etapp 5, Kyrkan (81)', issuance_date:'2021-09-04', type:'Prescriptive Doc.', description:'Last detailed plan of the second planning phase, concerning the area around the Kiruna Church. Six buildings, half serving religious functions. Specifies the church will be dismantled 2025-2026 and reassembled by 2029.'},
-  {title:'Demolition documentation, Kiruna City Hall (76)', issuance_date:'2020-11-26', type:'Informative Doc.', description:"162-page study by the Norrbotten Museum analyzing the city hall's materials before demolition in April 2019 - preserving knowledge of every structural detail."},
-  {title:'Deformation forecast (62)', issuance_date:'2019-04', type:'Technical Doc.', description:'Third deformation forecast published in 2019, five years after the second. The deformation line remains unchanged; what varies are intervention timing and the shape of affected zones.'},
-  {title:'Detailed plan for Gruvstadspark 2, etapp 3 (58)', issuance_date:'2018-10', type:'Prescriptive Doc.', description:'Third Detailed Plan of the second demolition phase, covering a narrow elongated area straddling the old railway. Sole designated land use is mining, temporarily used as a park during an interim phase.'},
-  {title:'Vision 2099 (4)', issuance_date:'2004', type:'Design Doc.', description:"The first project document for the new city of Kiruna, created in response to LKAB's letter. Despite being presented anonymously, its principles proved fundamental in all subsequent planning documents."},
-  {title:'Adjusted development plan (47)', issuance_date:'2015', type:'Design Doc.', description:"Update of the Development Plan one year after its creation. The central square takes its final shape; the large school complex north of it appears for the first time. Still the version in use today after 10 years."},
-  {title:'Detailed Overview Plan for the Central Area of Kiruna 2014 (44)', issuance_date:'2014-06', type:'Prescriptive Doc.', description:'Intermediate-scale planning instrument for central Kiruna. Incorporates all Development Plan projections into a prescriptive tool. Compliance is not mandatory but supports Detailed Plans.'},
-  {title:'Detailed plan for LINBANAN 1 (42)', issuance_date:'2014-03', type:'Prescriptive Doc.', description:'First Detailed Plan for the new city center. Covers the land for a single building: Kristallen, the new Town Hall and the first building constructed in New Kiruna.'},
-  {title:'Mail to Kiruna kommun (2)', issuance_date:'2004-03-19', type:'Prescriptive Doc.', description:"The act that initiates the relocation of Kiruna. LKAB communicates its intention to construct a new mining level at 1,365 m depth and urges the municipality to begin planning the city's relocation."},
-  {title:'Construction of new city hall begins (48)', issuance_date:'2015', type:'Material effect', description:'Kiruna Town Hall was the first building rebuilt in the new town center in 2015. It remained isolated for some time due to a slowdown in mining activities.'},
-  {title:'Detail plan for square and commercial street (49)', issuance_date:'2016-06-22', type:'Prescriptive Doc.', description:'Approved July 2016, this is the first detailed plan implemented from the new masterplan. Defines the area near the town hall with 9 blocks, 6 facing the main square.'},
-  {title:'Detail plan for Bolagsomradet Gruvstad-spark (18b)', issuance_date:'2010-10-20', type:'Prescriptive Doc.', description:'One of 8 detailed plans in old Kiruna center transforming residential areas into mining zones for demolition. Gained legal validity in 2012.'},
-  {title:'Kiruna Church closes (102)', issuance_date:'2024-06-02', type:'Material effect', description:"On June 2, the Kiruna Church closed for relocation preparations following a solemn ceremony. Relocation scheduled for summer 2025, taking two days. Voted 'Sweden's most beautiful building constructed before 1950.'"},
-];
-
-function typeToCat(type){
-  const s = String(type || '').toLowerCase();
-  if(s.includes('design')) return 'urban';
-  if(s.includes('prescriptive') || s.includes('overview')) return 'urban';
-  if(s.includes('technical')) return 'mine';
-  if(s.includes('material')) return 'infra';
-  return 'social';
-}
-
-const EVS = CORE_EVENTS.map(normalizeEvent);
-
-DOCS.forEach((doc, i) => {
-  const parsed = parseIssuanceDate(doc.issuance_date);
-  let era = 'relocation';
-  if(parsed.year < 1950) era = 'industrial';
-  else if(parsed.year < 2004) era = 'growth';
-
-  EVS.push(normalizeEvent({
-    id:100 + i,
-    ...parsed,
-    era,
-    cat:typeToCat(doc.type),
-    title:doc.title,
-    featured:false,
-    loc:doc.type || 'Document',
-    desc:doc.description || '',
-  }));
-});
+const EVS = window.KirunaArchiveData.EVENTS.map(normalizeEvent);
 
 EVS.sort((a,b) => a.year - b.year || a.month - b.month || a.day - b.day || a.id - b.id);
 const EV_BY_ID = new Map(EVS.map(ev => [ev.id, ev]));

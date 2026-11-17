@@ -28,8 +28,8 @@
       return s.length === 2 ? parseInt(s[1])*100 + (MONTHS[s[0]]||0) : parseInt(s[0])*100;
     }
 
-    const allDocs = RAW.map((r, i) => ({
-      idx: i+1, rawDate: r[0], title: r[1], actor: r[2], field: r[3], label: r[4], desc: r[5], hasImg: r[6],
+    const allDocs = RAW.map(r => ({
+      idx: r[7], rawDate: r[0], title: r[1], actor: r[2], field: r[3], label: r[4], desc: r[5], hasImg: r[6],
       year: getYear(r[0]), month: getMonth(r[0]), sk: sortKey(r[0])
     })).sort((a,b) => a.sk - b.sk);
 

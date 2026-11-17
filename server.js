@@ -13,6 +13,7 @@ const __dirname = path.dirname(__filename);
 const PUBLIC_DIR = path.join(__dirname, "public");
 const INDEX_FILE = path.join(PUBLIC_DIR, "index.html");
 const TIMELINE_FILE = path.join(PUBLIC_DIR, "timeline.html");
+const ARCHIVE_DATA_FILE = path.join(PUBLIC_DIR, "js", "archive-data.js");
 const OUTSIDE_DATA_FILE = path.join(PUBLIC_DIR, "js", "outside-data.js");
 
 const PORT = Number(process.env.PORT || 3000);
@@ -558,6 +559,19 @@ function buildTimelineFrameEntries($) {
   return entries;
 }
 
+function buildInsideEventEntries({ EVENTS }) {
+  return EVENTS.map(ev => ({
+      heading: ev.title,
+      text: [ev.year, ev.loc, ev.desc, ...(ev.tags || []), ...(ev.stakeholders || [])].filter(Boolean).join(" · "),
+      pageId: "page-archive",
+      sectionId: `inside-event-${ev.id}`,
+      locationLabel: `Map · ${ev.year}`,
+      sourceType: "event",
+      eventId: ev.id,
+      year: ev.year
+    }));
+}
+
 function buildTimelineOutsideEntries({ RAW: rawDocs, FIELD_META: fieldMeta }) {
   const monthMap = {
     january: 1,
@@ -580,7 +594,7 @@ function buildTimelineOutsideEntries({ RAW: rawDocs, FIELD_META: fieldMeta }) {
   };
 
   return rawDocs
-        .map((row, index) => {
+        .map((row) => {
           const rawDate = normalizeWhitespace(row?.[0] || "");
           const title = normalizeWhitespace(row?.[1] || "");
           const actor = normalizeWhitespace(row?.[2] || "");
@@ -594,10 +608,10 @@ function buildTimelineOutsideEntries({ RAW: rawDocs, FIELD_META: fieldMeta }) {
             heading: title,
             text: [rawDate, actor, field, label, desc].filter(Boolean).join(" · "),
             pageId: "page-timeline2",
-            sectionId: `outside-doc-${index + 1}`,
+            sectionId: `outside-doc-${row[7]}`,
             locationLabel: ["Time", "Outside Map", rawDate].filter(Boolean).join(" · "),
             sourceType: "outside-doc",
-            docIdx: index + 1,
+            docIdx: row[7],
             year,
             month: monthMap[monthToken] || 0,
             fieldColor: fieldMeta?.[field]?.color || "#86868b"
@@ -627,6 +641,7 @@ function chunkArchiveEntries(entries) {
         sectionId: entry.sectionId,
         locationLabel: entry.locationLabel,
         sourceType: entry.sourceType || "text",
+        eventId: entry.eventId ?? null,
         docIdx: entry.docIdx ?? null,
         year: entry.year ?? null
       };
@@ -650,6 +665,7 @@ function chunkArchiveEntries(entries) {
       sectionId: chunk.sectionId,
       locationLabel: chunk.locationLabel,
       sourceType: chunk.sourceType || "text",
+      eventId: chunk.eventId ?? null,
       docIdx: chunk.docIdx ?? null,
       year: chunk.year ?? null,
       searchText: normalizeWhitespace(chunk.heading + " " + chunk.text).toLowerCase(),
@@ -660,18 +676,25 @@ function chunkArchiveEntries(entries) {
 }
 
 async function loadArchiveChunks() {
-  const [html, timelineHtml, outsideDataScript] = await Promise.all([
+  const [html, timelineHtml, archiveDataScript, outsideDataScript] = await Promise.all([
     fs.readFile(INDEX_FILE, "utf8"),
     fs.readFile(TIMELINE_FILE, "utf8"),
+    fs.readFile(ARCHIVE_DATA_FILE, "utf8"),
     fs.readFile(OUTSIDE_DATA_FILE, "utf8")
   ]);
   const context = { window: {} };
+  vm.runInNewContext(archiveDataScript, context, { filename: ARCHIVE_DATA_FILE, timeout: 1000 });
   vm.runInNewContext(outsideDataScript, context, { filename: OUTSIDE_DATA_FILE, timeout: 1000 });
+  const archiveData = context.window.KirunaArchiveData;
   const outsideData = context.window.KirunaOutsideData;
-  if (!Array.isArray(outsideData?.RAW) || !outsideData.FIELD_META) {
-    throw new Error("Outside archive data missing.");
+  const outsideIds = outsideData?.RAW?.map(row => row[7]);
+  if (!Array.isArray(archiveData?.EVENTS) || !Array.isArray(outsideIds) ||
+      outsideIds.some(id => !Number.isInteger(id) || id < 1) ||
+      new Set(outsideIds).size !== outsideIds.length) {
+    throw new Error("Archive event data has missing or duplicate stable IDs.");
   }
   const entries = [
+    ...buildInsideEventEntries(archiveData),
     ...buildArchiveEntries(cheerio.load(html)),
     ...buildTimelineFrameEntries(cheerio.load(timelineHtml)),
     ...buildTimelineOutsideEntries(outsideData)
@@ -955,6 +978,28 @@ function buildArchiveEnhancementInput(question, history, sources) {
 }
 
 function toArchiveSource(hit) {
+  if (hit.sourceType === "event") {
+    return {
+      kind: "archive",
+      sourceType: "event",
+      title: hit.heading,
+      domain: "Kiruna Archive",
+      url: "",
+      snippet: hit.text.slice(0, 180),
+      locationLabel: hit.locationLabel,
+      locator: {
+        type: "event",
+        pageId: "page-archive",
+        eventId: hit.eventId,
+        year: hit.year,
+        heading: hit.heading,
+        query: hit.text.slice(0, 220),
+        matchText: hit.text,
+        highlightText: hit.text.slice(0, 120),
+        queryTokens: tokenize(hit.heading + " " + hit.text).slice(0, 12)
+      }
+    };
+  }
   if (hit.sourceType === "outside-doc") {
     return {
       kind: "archive",

@@ -37,14 +37,14 @@
       imgUrl:ev.imgUrl||galleryImageUrl('inside',ev.id),
     }));
 
-    const outsideWithImages=window.KirunaOutsideData.RAW.map(([date,title,,field],index)=>({
-      id:'outside-'+(index+1),
-      docIdx:index+1,
+    const outsideWithImages=window.KirunaOutsideData.RAW.map(row=>({
+      id:'outside-'+row[7],
+      docIdx:row[7],
       source:'outside',
-      year:Number(date.match(/\d{4}/)?.[0])||0,
-      title:title.replaceAll('"',''),
-      meta:date+' · '+field,
-      imgUrl:galleryImageUrl('outside',index+1)
+      year:Number(row[0].match(/\d{4}/)?.[0])||0,
+      title:row[1].replaceAll('"',''),
+      meta:row[0]+' · '+row[3],
+      imgUrl:galleryImageUrl('outside',row[7])
     }));
     return [...inside,...outsideWithImages].sort((a,b)=>a.year-b.year||0);
   }

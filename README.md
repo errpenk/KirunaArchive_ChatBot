@@ -17,6 +17,12 @@ Minimal Railway-ready version of the Kiruna Archive with a real chat backend.
 - `public/css/` and `public/js/` contain each page's styles and scripts. Main-page CSS is loaded in cascade order: base, archive, responsive, report, discourse, compare, app mode, and adaptive overrides.
 - `public/js/outside-data.js` supplies the same document data to the main search and Outside view.
 
+## Adding archive events
+
+- Add Inside Map events to `public/js/archive-data.js`: use `CORE_EVENTS` for historical events and `DOCS` for archive documents. Give each new record a unique numeric `id`; never change an existing ID. Documents need `issuance_date` and `coordinates: {type: "Point", coordinates: [longitude, latitude]}` so the map can place them. The map, time view, gallery, client chat search, and server chat index read this file.
+- Add Outside Map documents to `public/js/outside-data.js`. Each row ends with a unique, permanent numeric ID. Image files, when present, use `public/images/outside/outside-<ID padded to three digits>.jpg`. Inside images use `public/images/inside/inside-<ID padded to three digits>.jpg`.
+- Run `npm test`, then deploy both the static frontend and the API. The API builds its search index when it starts, so it needs a restart or redeploy to read changed records.
+
 ## Local run
 
 1. Install dependencies:
