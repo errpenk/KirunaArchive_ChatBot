@@ -299,6 +299,20 @@ function relatedMapEvents(ev,visibleEvents){
 }
 
 let activePage='home',activeId=null,eraFilter='all',calYear=2010,cpYear=2010,cpSel=null,calYearFilter=null;
+const PAGE_PATHS={home:'/',archive:'/map',timeline2:'/time',gallery:'/gallery',discourse:'/discourse',chat:'/chat'};
+const PATH_PAGES=Object.fromEntries(Object.entries(PAGE_PATHS).map(([page,path])=>[path,page]));
+let _handlingPopstate=false;
+
+function pageFromPath(){
+  const path=window.location.pathname.replace(/\/+$/,'')||'/';
+  return PATH_PAGES[path]||'home';
+}
+
+function syncPageUrl(page,replace=false){
+  const path=PAGE_PATHS[page]||'/';
+  if(window.location.pathname===path) return;
+  history[replace?'replaceState':'pushState']({page},'',path+window.location.search+window.location.hash);
+}
 document.body.classList.add('on-home');
 let leafletMap=null,leafletMarkers={},mapAreaLayers={};
 window.getKirunaLeafletMap=function(){return leafletMap;};
@@ -655,6 +669,7 @@ function showPage(p,fromPage){
   const prev=activePage;
   const viaTopNav=fromPage===undefined && prev!==p;
   activePage=p;
+  if(!_handlingPopstate) syncPageUrl(p);
 
   /* ── Determine entrance direction from nav tab order ── */
   const NAV_ORDER=['home','archive','timeline2','gallery','discourse','chat'];
@@ -889,6 +904,7 @@ window.showPage=showPage;
 function initMap(){
   if(leafletMap)return;
   leafletMap=L.map('leaflet-map',{center:[67.857,20.26],zoom:13,zoomControl:false});
+  leafletMap.on('move zoom resize',()=>requestAnimationFrame(centerMapPopupCard));
 
   const cartoLayer=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
     attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>',
@@ -1505,7 +1521,7 @@ function renderMarkers(){
       iconSize:[box,box],iconAnchor:[box/2,box/2],popupAnchor:[0,-(Math.round(s/2)+6)]
     });
     const m=L.marker([ev.lat,ev.lng],{icon,zIndexOffset:isActive?300:0}).addTo(leafletMap);
-    const shortDesc=ev.desc.length>90?ev.desc.slice(0,88)+'…':ev.desc;
+    const shortDesc=ev.desc;
     const tagsHtml=(ev.tags||[]).map(t=>`<span class="popup-expand-tag">${t}</span>`).join('');
     const stakeholders=ev.stakeholders||((ev.sources||[]).map(s=>s.t.split(/[,.(]/)[0].trim()).filter(Boolean));
     const stakeholdersHtml=stakeholders.length?`<div class="popup-stakeholder-label">Stakeholders</div><div class="popup-stakeholders-row">${stakeholders.map(s=>`<span class="popup-stakeholder-pill">${s}</span>`).join('')}</div>`:'';
@@ -1536,60 +1552,22 @@ function renderMarkers(){
   <button class="popup-btn" onclick="window._togglePopupDetail('${pid}',this,${ev.lat},${ev.lng})">View Details</button>
   <button class="popup-btn popup-btn-sec" onclick="window.openGalleryItem('inside',${ev.id})">View in Gallery</button>
 </div>`;
-    const popupPaddingTopLeft=(window.isPhoneAppMode&&window.isPhoneAppMode())
-      ?L.point(18,82)
-      :(window.isTabletAppMode&&window.isTabletAppMode())
-        ?L.point(24,36)
-        :L.point(20,20);
-    const popupPaddingBottomRight=(window.isPhoneAppMode&&window.isPhoneAppMode())
-      ?L.point(18,82)
-      :(window.isTabletAppMode&&window.isTabletAppMode())
-        ?L.point(24,220)
-        :L.point(20,80);
-    const popupViewportPaddingTopLeft=(window.isPhoneAppMode&&window.isPhoneAppMode())
-      ?L.point(18,82)
-      :(window.isTabletAppMode&&window.isTabletAppMode())
-        ?L.point(48,40)
-        :popupPaddingTopLeft;
-    const popupViewportPaddingBottomRight=(window.isPhoneAppMode&&window.isPhoneAppMode())
-      ?L.point(18,82)
-      :(window.isTabletAppMode&&window.isTabletAppMode())
-        ?L.point(48,220)
-        :popupPaddingBottomRight;
-    function ensurePopupInViewport(){
-      const popup=m.getPopup&&m.getPopup();
-      const syncDelay=(window.isPhoneAppMode&&window.isPhoneAppMode())?240:180;
-      setTimeout(()=>{
-        if(!(m.isPopupOpen&&m.isPopupOpen()))return;
-        try{leafletMap.invalidateSize({animate:false});}catch(e){}
-        try{popup&&popup.update();}catch(e){}
-        try{
-          leafletMap.panInside(m.getLatLng(),{
-            paddingTopLeft:popupViewportPaddingTopLeft,
-            paddingBottomRight:popupViewportPaddingBottomRight,
-            animate:true
-          });
-        }catch(e){}
-        setTimeout(()=>{
-          if(!(m.isPopupOpen&&m.isPopupOpen()))return;
-          try{popup&&popup.update();}catch(e){}
-        },120);
-      },syncDelay);
-    }
     m.bindPopup(L.popup({
       closeButton:false,
       maxWidth:320,
       minWidth:280,
-      autoPan:true,
-      autoPanPaddingTopLeft:popupPaddingTopLeft,
-      autoPanPaddingBottomRight:popupPaddingBottomRight
+      autoPan:false
     }).setContent(popHtml));
     m.on('popupopen',()=>{
+      const mapSize=leafletMap.getSize();
+      const mapEl=leafletMap.getContainer();
+      mapEl.style.setProperty('--popup-center-x',`${mapSize.x/2}px`);
+      mapEl.style.setProperty('--popup-center-y',`${mapSize.y/2}px`);
+      requestAnimationFrame(centerMapPopupCard);
       window._mapPopupOpen=true;
       window._mapDetailOpen=false;
       document.documentElement.classList.remove('map-sheet-collapsed');
       if(window._syncMapChromeState) window._syncMapChromeState();
-      ensurePopupInViewport();
     });
     m.on('popupclose',()=>{
       window._mapPopupOpen=false;
@@ -1629,6 +1607,19 @@ function renderMarkers(){
 }
 
 let _preDetailView=null;
+function centerMapPopupCard(){
+  if(!leafletMap)return;
+  const mapEl=leafletMap.getContainer();
+  const card=mapEl.querySelector('.leaflet-popup-content-wrapper');
+  if(!card)return;
+  const mapRect=mapEl.getBoundingClientRect();
+  const cardRect=card.getBoundingClientRect();
+  const styles=getComputedStyle(mapEl);
+  const x=parseFloat(styles.getPropertyValue('--popup-center-x'))||leafletMap.getSize().x/2;
+  const y=parseFloat(styles.getPropertyValue('--popup-center-y'))||leafletMap.getSize().y/2;
+  mapEl.style.setProperty('--popup-center-x',`${x+mapRect.left+mapRect.width/2-cardRect.left-cardRect.width/2}px`);
+  mapEl.style.setProperty('--popup-center-y',`${y+mapRect.top+mapRect.height/2-cardRect.top-cardRect.height/2}px`);
+}
 window._togglePopupDetail=function(pid,btn,lat,lng){
   const el=document.getElementById(pid);
   if(!el)return;
@@ -1649,17 +1640,6 @@ window._togglePopupDetail=function(pid,btn,lat,lng){
   if(open){
     _preDetailView={center:leafletMap.getCenter(),zoom:leafletMap.getZoom()};
     const targetZoom=15;
-    leafletMap.once('zoomend moveend',()=>{
-      const markerPt=leafletMap.latLngToContainerPoint([lat,lng]);
-      const mapSize=leafletMap.getSize();
-      const cardH=420;
-      const desiredMarkerY=mapSize.y/2+cardH/2-26;
-      const dy=desiredMarkerY-markerPt.y;
-      if(Math.abs(dy)>20){
-        const newCenter=leafletMap.containerPointToLatLng([markerPt.x,markerPt.y-dy]);
-        leafletMap.panTo(newCenter,{animate:true,duration:.42});
-      }
-    });
     leafletMap.flyTo([lat,lng],targetZoom,{animate:true,duration:.82,easeLinearity:.18});
   } else {
     if(_preDetailView){
@@ -3103,6 +3083,14 @@ setTimeout(alignTlpControls, 100);
   const el=document.getElementById(id);
   if(el) el.addEventListener('click',()=>showPage(page));
 });
+window.addEventListener('popstate',()=>{
+  _handlingPopstate=true;
+  window.showPage(pageFromPath());
+  _handlingPopstate=false;
+});
+const initialPage=pageFromPath();
+history.replaceState({page:initialPage},'',PAGE_PATHS[initialPage]+window.location.search+window.location.hash);
+if(initialPage!=='home') showPage(initialPage);
 document.getElementById('logo-btn').addEventListener('click',()=>showPage('home'));
 // Home → Archive buttons pass 'home' as origin
 document.getElementById('btn-explore').addEventListener('click',()=>showPage('archive','home'));

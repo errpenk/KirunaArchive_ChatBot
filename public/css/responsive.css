@@ -242,7 +242,7 @@
     font-size:11px!important;padding:5px 10px!important;
   }
   /* On mobile, hide era panel in map — accessed via sidebar */
-  .era-panel{display:none!important;}
+  .era-panel,
   .legend{display:none!important;}
   /* Ruler stays usable */
   #map-ruler{height:48px;}

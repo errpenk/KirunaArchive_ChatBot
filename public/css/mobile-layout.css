@@ -3,12 +3,9 @@ html.phone-app,
 html.phone-app body{
   overscroll-behavior:none;
 }
-html.phone-app #nav,
-html.tablet-app #nav,
-html.phone-app .nav-tabs,
-html.tablet-app .nav-tabs,
-html.phone-app .ntab.on,
-html.tablet-app .ntab.on{
+html:is(.phone-app,.tablet-app) #nav,
+html:is(.phone-app,.tablet-app) .nav-tabs,
+html:is(.phone-app,.tablet-app) .ntab.on{
   box-shadow:none!important;
 }
 html.phone-app.chat-compose-active,
@@ -94,17 +91,14 @@ html.tablet-app #page-cal .cpevs-panel,
 html.tablet-app #page-cal .cpe-list{
   min-height:0!important;
 }
-html.phone-app #page-cal .cpevs-panel,
-html.tablet-app #page-cal .cpevs-panel{
+html:is(.phone-app,.tablet-app) #page-cal .cpevs-panel{
   display:flex!important;
   flex-direction:column!important;
 }
-html.phone-app #page-cal .cpe-head,
-html.tablet-app #page-cal .cpe-head{
+html:is(.phone-app,.tablet-app) #page-cal .cpe-head{
   flex:0 0 auto!important;
 }
-html.phone-app #page-cal .cpe-list,
-html.tablet-app #page-cal .cpe-list{
+html:is(.phone-app,.tablet-app) #page-cal .cpe-list{
   flex:1 1 auto!important;
   overflow-y:auto!important;
   -webkit-overflow-scrolling:touch!important;

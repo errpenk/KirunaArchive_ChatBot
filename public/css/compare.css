@@ -48,7 +48,6 @@
   transition:background .15s;color:#1c1c1e;font-size:13px;
   flex-shrink:0;margin-left:auto;
 }
-.cmp-close:hover{background:rgba(0,0,0,.12);}
 
 .cmp-body{
   overflow-y:auto;

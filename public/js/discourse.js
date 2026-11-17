@@ -1016,7 +1016,7 @@ function initDiscourse(){
         onmouseover="this.style.opacity=1;this.style.transform='scale(1)'"
         onmouseout="this.style.opacity=this.dataset.op;this.style.transform='scale(1)'">
         <span style="font-size:${fs}px;color:#fff;font-weight:500;letter-spacing:-.01em;line-height:1;opacity:1">${item.w}</span>
-        <span style="font-size:8px;color:#fff;font-family:monospace;line-height:1;opacity:.78">${item.c}</span>
+        <span style="font-size:8px;color:#fff;font-family:var(--sans);line-height:1;opacity:.78">${item.c}</span>
       </span>`;
     }).join('');
 
@@ -1262,7 +1262,7 @@ function initDiscourse(){
       <div style="display:flex;align-items:center;gap:10px;padding:5px 0;cursor:default;opacity:0;transform:translateX(-10px);
         transition:opacity .32s ease ${delay}ms,transform .32s cubic-bezier(.22,1,.36,1) ${delay}ms"
         class="xr-vt-row">
-        <span style="width:16px;font-size:9px;color:#b8c0c8;text-align:right;font-family:monospace;flex-shrink:0">${i+1}</span>
+        <span style="width:16px;font-size:9px;color:#b8c0c8;text-align:right;font-family:var(--sans);flex-shrink:0">${i+1}</span>
         <span style="width:138px;font-size:10.5px;color:#3a4250;font-weight:500;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${item.t}">${item.t.replace(/_/g,' ')}</span>
         <div style="flex:1;position:relative;height:2px;background:#f0f1f3;border-radius:1px">
           <div style="position:absolute;left:0;top:0;height:2px;border-radius:1px;
@@ -1276,7 +1276,7 @@ function initDiscourse(){
             left:0;transition:left .7s cubic-bezier(.22,1,.36,1) ${delay+80}ms"
             class="xr-vt-dot" data-w="${pct}"></div>
         </div>
-        <span style="width:36px;font-size:9.5px;color:#96a0aa;text-align:right;font-family:monospace;flex-shrink:0">${item.v}</span>
+        <span style="width:36px;font-size:9.5px;color:#96a0aa;text-align:right;font-family:var(--sans);flex-shrink:0">${item.v}</span>
       </div>`;
     }).join('');
 

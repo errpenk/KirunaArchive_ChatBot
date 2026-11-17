@@ -530,9 +530,7 @@ html.phone-app{
   /* Prevent horizontal overflow everywhere */
   overflow-x:hidden;
 }
-html.phone-app #shell{
-  overflow:hidden;
-}
+html.phone-app #shell,
 html.phone-app #content{
   overflow:hidden;
 }
@@ -785,8 +783,7 @@ html.phone-app .nav-tabs{
   justify-content:space-evenly!important;
   overflow-x:hidden!important;
 }
-html.phone-app .nav-tabs,
-html.tablet-app .nav-tabs{
+html:is(.phone-app,.tablet-app) .nav-tabs{
   position:static!important;
   left:auto!important;
   top:auto!important;
@@ -801,7 +798,7 @@ html.tablet-app .nav-tabs{
   top:12px;left:12px;
 }
 @media(max-width:600px){
-  .tl2-back-floating{ top:8px!important;left:8px!important; }
+  .tl2-back-floating,
   .chat-page-back{ top:8px!important;left:8px!important; }
 }
 
@@ -827,14 +824,10 @@ html.phone-app #page-discourse .dc-platform-panel.on{
   overflow:visible!important;
 }
 
-html.phone-app #page-discourse .dc-dash{
-  padding-bottom:24px!important;
-}
-
+html.phone-app #page-discourse .dc-dash,
 html.phone-app #page-discourse .dc-section:last-of-type{
   padding-bottom:24px!important;
 }
-
 
 /* keyboard avoid overlap */
 .chat-widget-thread,
@@ -852,8 +845,6 @@ html.phone-app .chat-page-thread{
 .chat-turn:last-child{
  margin-bottom:24px;
 }
-
-
 
 html.phone-app #chat-panel{
 display:flex;
@@ -877,8 +868,6 @@ html.phone-app .chat-input{
 max-height:84px; /* 限制输入框别无限长 */
 overflow-y:auto;
 }
-
-
 
 /* ===== FINAL PHONE CALENDAR EVENTS SCROLL FIX ===== */
 
@@ -1080,10 +1069,7 @@ html.phone-app .ntab.on::after{
   right:10px!important;
 }
 
-html.phone-app #page-cal .cpgrid-panel{
-  border-radius:0!important;
-}
-
+html.phone-app #page-cal .cpgrid-panel,
 html.phone-app #page-cal .cpevs-panel{
   border-radius:0!important;
 }
@@ -1140,10 +1126,8 @@ html.phone-app #chat-panel{
 }
 
 /* FINAL STRICT FIXES — phone calendar scroll, white nav, tablet chat */
-html.phone-app #nav,
-html.tablet-app #nav,
-html.phone-app .nav-tabs,
-html.tablet-app .nav-tabs{
+html:is(.phone-app,.tablet-app) #nav,
+html:is(.phone-app,.tablet-app) .nav-tabs{
   background:#fff!important;
   background-color:#fff!important;
   box-shadow:none!important;
@@ -1291,13 +1275,6 @@ html.embedded-phone .cpe-list::-webkit-scrollbar-thumb{
 
 .cpe-fullscreen-btn{
   display:none;
-}
-
-html.tablet-app #page-cal .cpe-fullscreen-btn,
-html.embedded-tablet .cpe-fullscreen-btn,
-html:not(.phone-app) #page-cal .cpe-fullscreen-btn,
-html:not(.embedded-phone) .cpe-fullscreen-btn{
-  display:none!important;
 }
 
 @media (max-width:1100px){
@@ -1762,28 +1739,23 @@ html.embedded-phone .cpevs-panel::after{
   display:none!important;
 }
 
-html.phone-app #chat-source-return-btn .chat-source-return-desktop,
-html.tablet-app #chat-source-return-btn .chat-source-return-desktop{
+html:is(.phone-app,.tablet-app) #chat-source-return-btn .chat-source-return-desktop{
   display:none!important;
 }
 
-html.phone-app #chat-source-return-btn .chat-source-return-touch,
-html.tablet-app #chat-source-return-btn .chat-source-return-touch{
+html:is(.phone-app,.tablet-app) #chat-source-return-btn .chat-source-return-touch{
   display:block!important;
 }
 
-html.phone-app #page-discourse .dc-ptab,
-html.tablet-app #page-discourse .dc-ptab{
+html:is(.phone-app,.tablet-app) #page-discourse .dc-ptab{
   border-bottom-color:transparent!important;
 }
 
-html.phone-app #page-discourse .dc-ptab .dc-ptab-icon,
-html.tablet-app #page-discourse .dc-ptab .dc-ptab-icon{
+html:is(.phone-app,.tablet-app) #page-discourse .dc-ptab .dc-ptab-icon{
   display:flex!important;
 }
 
-html.phone-app #page-discourse .dc-nav-indicator,
-html.tablet-app #page-discourse .dc-nav-indicator{
+html:is(.phone-app,.tablet-app) #page-discourse .dc-nav-indicator{
   display:block!important;
   opacity:1!important;
   height:2.5px!important;

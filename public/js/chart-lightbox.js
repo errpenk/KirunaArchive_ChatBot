@@ -57,7 +57,7 @@
   const lbCounter = document.createElement('div');
   lbCounter.style.cssText = [
     'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);',
-    'font-size:11px;color:rgba(255,255,255,.82);font-family:monospace;',
+    'font-size:11px;color:rgba(255,255,255,.82);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;',
     'letter-spacing:.08em;white-space:nowrap;pointer-events:none;',
     'z-index:9812;transition:opacity .22s;background:rgba(0,0,0,.22);',
     'padding:4px 12px;border-radius:980px;backdrop-filter:blur(6px);',

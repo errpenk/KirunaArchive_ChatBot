@@ -764,9 +764,7 @@ html.tablet-app .sbtab{
   padding:12px 0;
   font-size:12px;
 }
-html.tablet-app .tl-row{
-  padding:14px 18px;
-}
+html.tablet-app .tl-row,
 html.tablet-app .cal-head{
   padding:14px 18px;
 }
@@ -957,8 +955,7 @@ html.tablet-app #rpt-compare-btn{
 }
 
 /* Adaptive app refinement — flatter surfaces, tighter radii, denser map fallback */
-html.phone-app,
-html.tablet-app{
+html:is(.phone-app,.tablet-app){
   --ui-radius-xs:10px;
   --ui-radius-sm:14px;
   --ui-radius-md:18px;
@@ -971,17 +968,14 @@ html.tablet-app{
   --ui-shadow-soft:0 10px 24px rgba(15,23,42,.06);
   --ui-shadow-medium:0 14px 30px rgba(15,23,42,.08);
 }
-html.phone-app .nav-tabs,
-html.tablet-app .nav-tabs{
+html:is(.phone-app,.tablet-app) .nav-tabs{
   border-radius:16px;
   box-shadow:none;
 }
-html.phone-app .ntab,
-html.tablet-app .ntab{
+html:is(.phone-app,.tablet-app) .ntab{
   border-radius:12px;
 }
-html.phone-app .ntab.on,
-html.tablet-app .ntab.on{
+html:is(.phone-app,.tablet-app) .ntab.on{
   box-shadow:none;
 }
 html.phone-app .btn-dark,
@@ -1010,22 +1004,17 @@ html.tablet-app .tlp-vbtn,
 html.tablet-app .era-opt{
   border-radius:var(--ui-radius-sm)!important;
 }
-html.phone-app .btn-dark,
-html.tablet-app .btn-dark{
+html:is(.phone-app,.tablet-app) .btn-dark{
   box-shadow:none;
 }
-html.phone-app .btn-outline,
-html.tablet-app .btn-outline{
+html:is(.phone-app,.tablet-app) .btn-outline{
   border-color:var(--ui-stroke-strong);
 }
-html.phone-app .nav-search-input,
-html.tablet-app .nav-search-input,
-html.phone-app .search-results-dropdown,
-html.tablet-app .search-results-dropdown{
+html:is(.phone-app,.tablet-app) .nav-search-input,
+html:is(.phone-app,.tablet-app) .search-results-dropdown{
   border-radius:var(--ui-radius-sm);
 }
-html.phone-app .search-results-dropdown,
-html.tablet-app .search-results-dropdown{
+html:is(.phone-app,.tablet-app) .search-results-dropdown{
   border:1px solid var(--ui-stroke);
   box-shadow:var(--ui-shadow-medium);
 }
@@ -1037,8 +1026,7 @@ html.tablet-app .hero-inner{
   border-radius:28px;
   box-shadow:var(--ui-shadow-medium);
 }
-html.phone-app .stats-inner,
-html.tablet-app .stats-inner{
+html:is(.phone-app,.tablet-app) .stats-inner{
   background:rgba(255,255,255,.76);
   box-shadow:none;
 }
@@ -1073,15 +1061,13 @@ html.tablet-app .cards-grid{
   border-radius:22px;
   overflow:hidden;
 }
-html.phone-app .card,
-html.tablet-app .card{
+html:is(.phone-app,.tablet-app) .card{
   background:#fff;
   border:none;
   border-radius:0;
   box-shadow:none;
 }
-html.phone-app .card:hover,
-html.tablet-app .card:hover{
+html:is(.phone-app,.tablet-app) .card:hover{
   box-shadow:none;
   transform:none;
 }
@@ -1144,26 +1130,21 @@ html.tablet-app .cpevs-panel,
 html.tablet-app .phase-era-block{
   border-radius:24px;
 }
-html.phone-app #map-ruler,
-html.tablet-app #map-ruler{
+html:is(.phone-app,.tablet-app) #map-ruler{
   background:rgba(248,249,252,.82);
   box-shadow:0 10px 24px rgba(15,23,42,.09);
 }
-html.phone-app .sb-tabs::after,
-html.tablet-app .sb-tabs::after{
+html:is(.phone-app,.tablet-app) .sb-tabs::after{
   box-shadow:none;
 }
-html.phone-app .tlp-view-toggle,
-html.tablet-app .tlp-view-toggle{
+html:is(.phone-app,.tablet-app) .tlp-view-toggle{
   border:1px solid var(--ui-stroke);
   box-shadow:none;
 }
-html.phone-app .tl-row,
-html.tablet-app .tl-row{
+html:is(.phone-app,.tablet-app) .tl-row{
   transform:none;
 }
-html.phone-app .tl-row::before,
-html.tablet-app .tl-row::before{
+html:is(.phone-app,.tablet-app) .tl-row::before{
   left:12px;
   right:10px;
   border-radius:12px;
@@ -1174,30 +1155,24 @@ html.tablet-app .tl-row:hover,
 html.tablet-app .tl-row.on{
   transform:none;
 }
-html.phone-app .tl-row:hover::before,
-html.tablet-app .tl-row:hover::before{
+html:is(.phone-app,.tablet-app) .tl-row:hover::before{
   background:rgba(15,23,42,.04);
 }
-html.phone-app .tl-row.on::before,
-html.tablet-app .tl-row.on::before{
+html:is(.phone-app,.tablet-app) .tl-row.on::before{
   background:rgba(0,102,204,.06);
   box-shadow:inset 2.5px 0 0 rgba(0,102,204,.72);
 }
-html.phone-app .peb-events,
-html.tablet-app .peb-events{
+html:is(.phone-app,.tablet-app) .peb-events{
   background:rgba(15,23,42,.08);
 }
-html.phone-app .peb-event,
-html.tablet-app .peb-event{
+html:is(.phone-app,.tablet-app) .peb-event{
   background:#fff;
 }
-html.phone-app .peb-event:hover,
-html.tablet-app .peb-event:hover{
+html:is(.phone-app,.tablet-app) .peb-event:hover{
   background:rgba(244,247,251,.96);
   transform:none!important;
 }
-html.phone-app .popup-btn-row,
-html.tablet-app .popup-btn-row{
+html:is(.phone-app,.tablet-app) .popup-btn-row{
   gap:8px;
 }
 html.phone-app .popup-btn,
@@ -1220,19 +1195,16 @@ html.tablet-app .srd-empty,
 html.tablet-app .cpe-empty{
   background:rgba(250,251,253,.9);
 }
-html.phone-app .leaflet-popup-content-wrapper,
-html.tablet-app .leaflet-popup-content-wrapper{
+html:is(.phone-app,.tablet-app) .leaflet-popup-content-wrapper{
   border-radius:18px!important;
   border:1px solid var(--ui-stroke)!important;
   box-shadow:var(--ui-shadow-medium)!important;
 }
-html.phone-app .leaflet-control-zoom,
-html.tablet-app .leaflet-control-zoom{
+html:is(.phone-app,.tablet-app) .leaflet-control-zoom{
   border-radius:16px!important;
   box-shadow:0 8px 20px rgba(15,23,42,.12)!important;
 }
-html.phone-app #map-back-btn,
-html.tablet-app #map-back-btn{
+html:is(.phone-app,.tablet-app) #map-back-btn{
   border-radius:14px!important;
   box-shadow:0 10px 22px rgba(15,23,42,.1)!important;
 }
@@ -1276,7 +1248,6 @@ html.tablet-app.map-density-compact .leaflet-control-zoom{
 html.tablet-app.map-density-compact #map-back-btn{
   left:18px!important;
 }
-html.phone-app.map-density-compact #map-ruler-inner,
-html.tablet-app.map-density-compact #map-ruler-inner{
+html:is(.phone-app,.tablet-app).map-density-compact #map-ruler-inner{
   padding-bottom:12px;
 }

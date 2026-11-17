@@ -8,7 +8,7 @@ input{-webkit-tap-highlight-color:transparent;}
   --accent:#0066cc;--featured:#bf5af2;
   --serif:-apple-system-ui-serif,'New York','Georgia',serif;
   --sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;
-  --mono:'SF Mono','Menlo','Monaco',monospace;
+  --mono:var(--sans);
 }
 html,body{height:100%;overflow:hidden;font-family:var(--sans);color:var(--b);background:var(--w);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden;}
 button{border:none;background:none;cursor:pointer;font-family:inherit;color:inherit}
@@ -16,7 +16,7 @@ a{text-decoration:none;color:inherit}
 #shell{display:grid;grid-template-rows:52px 1fr;height:100svh;overflow:hidden}
 
 /* NAV */
-#nav{background:rgba(255,255,255,.88);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid rgba(0,0,0,.12);display:flex;align-items:center;justify-content:space-between;column-gap:clamp(10px,1.8vw,22px);padding:0 28px;padding-left:max(28px,env(safe-area-inset-left));padding-right:max(28px,env(safe-area-inset-right));z-index:200;position:relative;}
+#nav{background:rgba(255,255,255,.88);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:0;display:flex;align-items:center;justify-content:space-between;column-gap:clamp(10px,1.8vw,22px);padding:0 28px;padding-left:max(28px,env(safe-area-inset-left));padding-right:max(28px,env(safe-area-inset-right));z-index:200;position:relative;}
 .logo{--logo-w:119px;--logo-h:21px;width:var(--logo-w);height:var(--logo-h);font-family:var(--serif);font-size:18px;font-weight:400;cursor:pointer;flex-shrink:0;letter-spacing:-.01em;justify-self:start;position:relative;z-index:2;display:flex;align-items:center;overflow:hidden}
 .logo em{font-style:italic;color:var(--g3)}
 .logo-img{width:100%;height:100%;display:block;object-fit:contain;object-position:left center}
@@ -25,7 +25,7 @@ a{text-decoration:none;color:inherit}
 .nav-tabs::-webkit-scrollbar{display:none;}
 .ntab{font-size:13px;font-weight:500;padding:0 clamp(10px,1.25vw,18px);height:52px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-bottom:none;color:var(--g3);transition:color .18s cubic-bezier(.4,0,.2,1);white-space:nowrap;letter-spacing:-.01em;position:relative;flex:0 0 auto}
 .ntab::after{content:'';position:absolute;bottom:0;left:50%;right:50%;height:2px;background:var(--b);border-radius:1px;transition:left .3s cubic-bezier(.4,0,.2,1),right .3s cubic-bezier(.4,0,.2,1)}
-.ntab:hover{color:var(--b)}
+.ntab:hover,
 .ntab.on{color:var(--b)}
 .ntab.on::after{left:clamp(8px,1.25vw,18px);right:clamp(8px,1.25vw,18px)}
 .nav-r{display:flex;gap:8px;align-items:center;min-width:0;flex-shrink:0;justify-self:end;position:relative;z-index:2;margin-left:auto}
@@ -59,7 +59,6 @@ a{text-decoration:none;color:inherit}
 }
 .srd-item{display:flex;gap:10px;padding:10px 14px;cursor:pointer;transition:background .1s;align-items:flex-start;border-bottom:.5px solid var(--g5)}
 .srd-item:last-child{border-bottom:none}
-.srd-item:hover{background:var(--g6)}
 .srd-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px}
 .srd-copy{min-width:0;flex:1}
 .srd-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px}
@@ -379,7 +378,6 @@ body.kiruna-intro-exiting #mobile-intro-progress{
 .cards-section-outer{width:100%}
 .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1px;background:var(--g5);border:1px solid var(--g5);border-radius:20px;overflow:hidden}
 .card{background:var(--w);padding:26px 24px;cursor:pointer;transition:background .12s;position:relative}
-.card:hover{background:var(--g6)}
 .card-era{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--g3);margin-bottom:9px;display:flex;align-items:center;gap:5px}
 .card-cat-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .card-yr{font-family:var(--serif);font-size:38px;letter-spacing:-.05em;line-height:1;margin-bottom:8px;font-weight:400}

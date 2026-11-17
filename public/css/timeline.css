@@ -9,7 +9,7 @@
   --serif:'Source Serif 4',-apple-system-ui-serif,'New York','Georgia',serif;
   --display:'Playfair Display','New York',serif;
   --sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;
-  --mono:'Space Mono','SF Mono','Menlo',monospace;
+  --mono:var(--sans);
 }
 html,body{height:100%;overflow:hidden;font-family:var(--sans);color:var(--b);background:var(--w);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
 button{border:none;background:none;cursor:pointer;font-family:inherit;color:inherit}
@@ -804,7 +804,7 @@ html.embedded-tablet .txt-title{font-size:9px}
   padding:12px 18px;border-bottom:none;cursor:pointer;transition:background .1s;
 }
 .cpe-ev:hover{background:var(--g6)}
-.cpe-ev.is-active{background:#eef1f6}
+.cpe-ev.is-active,
 .cpe-ev.is-active:hover{background:#eef1f6}
 .cpe-ev.is-hover-linked{background:#f4f7fb}
 .cpe-ev:hover .cpe-ev-title{color:var(--accent)}
@@ -1053,9 +1053,9 @@ html.embedded-tablet .txt-title{font-size:9px}
 html.embedded-phone #gesture-hint{display:flex;}
 html.embedded-phone #shell.calendar-mode #gesture-hint{display:none;}
 html.embedded-tablet #gesture-hint{display:flex;}
-html.embedded-tablet #shell.calendar-mode #gesture-hint{display:none;}
+html.embedded-tablet #shell.calendar-mode #gesture-hint,
 html.embedded-phone #shell.outside-active #gesture-hint,
-html.embedded-tablet #shell.outside-active #gesture-hint{display:none;}
+html.embedded-tablet #shell.outside-active #gesture-hint,
 html.embedded-tablet #gesture-hint .gh-row:first-child{display:none;}
 .gh-row{
   display:flex;align-items:center;gap:9px;

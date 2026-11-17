@@ -13,7 +13,7 @@
 
         --serif: 'Playfair Display', 'Source Serif 4', -apple-system-ui-serif, 'New York', 'Georgia', serif;
         --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        --mono: 'Space Mono', 'SF Mono', 'Menlo', 'Monaco', monospace;
+        --mono: var(--sans);
 
         --card-w: 320px;
         --card-gap: 20px;

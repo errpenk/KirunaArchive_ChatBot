@@ -1081,9 +1081,9 @@
 
   function buildApiUnavailableMessage(question){
     return localizeForQuestion(question,{
-      zh:'我没有找到强直接命中，而且当前连不上 AI API。',
-      it:'Non ho trovato una corrispondenza diretta forte e l\'API AI non è disponibile in questo momento.',
-      en:'I could not find a strong direct match, and the AI API is unavailable right now.'
+      zh:'我目前没有找到足够可靠的直接匹配。请换一个关键词或时间范围再试。',
+      it:'Non ho trovato una corrispondenza diretta abbastanza affidabile. Prova con un altro termine o intervallo di date.',
+      en:'I could not find a reliable direct match. Try a different keyword or date range.'
     });
   }
 

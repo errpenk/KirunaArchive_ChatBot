@@ -5,8 +5,6 @@
   overflow-y:auto;overflow-x:hidden;position:absolute;inset:0;
   background:var(--g6);scrollbar-width:thin;scrollbar-color:var(--g4) transparent;
 }
-#page-discourse::-webkit-scrollbar{width:5px;}
-#page-discourse::-webkit-scrollbar-thumb{background:var(--g4);border-radius:3px;}
 
 /* ── Discourse CSS variables (scoped) ── */
 #page-discourse{
@@ -193,7 +191,6 @@
 .dc-tbl{width:100%;border-collapse:collapse;font-size:11px;white-space:nowrap;}
 .dc-tbl th{color:var(--g3);font-weight:600;padding:7px 10px;border-bottom:1px solid var(--g5);text-align:left;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;font-family:var(--mono);}
 .dc-tbl td{padding:9px 10px;border-bottom:1px solid var(--g5);color:var(--b);font-family:var(--sans);}
-.dc-tbl tr:last-child td{border-bottom:none;}
 
 /* Dive deeper CTA inside Report */
 .rpt-discourse-cta{
@@ -232,7 +229,7 @@
   --dpos:#6b9e8f;--dneu:#9eaab4;--dneg:#c07a6a;--dbrand:#5d7a96;
   --dgrid:#e8e8ed;--dtxt:#86868b;
   --display:"Playfair Display","Georgia",serif;
-  --mono-d:"Space Mono",monospace;
+  --mono-d:var(--sans);
 }
 
 /* ── Hero ── */
@@ -306,7 +303,7 @@
   min-width:max-content;
 }
 .dc-ptab:hover{color:var(--dp);}
-.dc-ptab:active{transform:none;}
+.dc-ptab:active,
 .dc-ptab.on{transform:none;}
 .dc-ptab .dc-ptab-icon{
   width:22px;height:22px;border-radius:5px;
@@ -367,13 +364,12 @@
     margin:0 0 10px;font:600 18px/1.2 var(--display);color:var(--dp);
   }
   .dc-data-aside p{
-    display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:7;
+    display:block;overflow:visible;
     margin:0;font:400 12px/1.65 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
     color:var(--dp2);
   }
 }
-html.phone-app #page-discourse .dc-data-aside,
-html.tablet-app #page-discourse .dc-data-aside{display:none!important}
+html:is(.phone-app,.tablet-app) #page-discourse .dc-data-aside{display:none!important}
 @media(prefers-reduced-motion:reduce){
   .dc-data-aside,.dc-data-aside-note{transition:none!important}
 }
@@ -464,9 +460,7 @@ html.tablet-app #page-discourse .dc-data-aside{display:none!important}
 }
 
 /* ── Chart container (tilt-card interactive) ── */
-.dc-chart-card:hover{
-  box-shadow:0 6px 22px rgba(0,0,0,.07);
-}
+
 /* No hover shadow on no-zoom cards */
 .dc-chart-card[data-no-zoom]:hover{box-shadow:none!important;}
 .dc-chart-inner{position:relative;width:100%;}
@@ -521,7 +515,7 @@ html.tablet-app #page-discourse .dc-data-aside{display:none!important}
   border:none;border-right:1px solid var(--db);margin:0;
   display:flex;flex-direction:column;justify-content:center;
 }
-.dc-two-col .dc-chart-card:last-child{border-right:none;}
+
 .dc-two-col .dc-chart-card:has(.dc-spoke-wrap) .dc-chart-title{
   min-height:2.4em;
   display:flex;
@@ -535,7 +529,6 @@ html.tablet-app #page-discourse .dc-data-aside{display:none!important}
 .dc-two-col .dc-bar-grid,
 .dc-two-col .dc-rank-grid{align-content:start;}
 /* The chart/table content inside should fill and center */
-.dc-two-col .dc-tbl-wrap{margin-top:auto;margin-bottom:auto;}
 
 /* Three-col — horizontal scroll with fade */
 .dc-three-col-wrap{
@@ -566,7 +559,7 @@ html.tablet-app #page-discourse .dc-data-aside{display:none!important}
   display:flex;flex-direction:column;
   width:280px;
 }
-.dc-three-col .dc-chart-card:last-child{border-right:none;}
+
 .dc-three-col .dc-chart-card:has(.dc-spoke-wrap) .dc-chart-title{
   min-height:2.4em;
   display:flex;
@@ -609,7 +602,7 @@ html.tablet-app #page-discourse .dc-data-aside{display:none!important}
 
 /* ── Keyword frequency visualisation ── */
 .dc-kw-wrap{margin:24px 0;}
-.dc-kw-tabs{ cursor:default; }
+.dc-kw-tabs,
 .dc-pill-wrap{ cursor:default; }
 .dc-kw-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;justify-content:center;}
 .dc-kw-tab{
@@ -721,9 +714,6 @@ html.tablet-app #page-discourse .dc-data-aside{display:none!important}
   grid-template-columns:1fr;
   column-gap:32px;
   column-fill:balance;
-}
-.dc-wf-rows-wrap.dc-wf-multi{
-  grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));
 }
 
 /* ── Horizontal bar rows (existing simpler style for subreddits) ── */
@@ -844,7 +834,6 @@ html.tablet-app #page-discourse .dc-data-aside{display:none!important}
   opacity:0;transform:translateY(20px);
   transition:opacity .55s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.22,1,.36,1);
 }
-.dc-rv.in{opacity:1;transform:translateY(0);}
 
 /* ── Discourse: back-to-top + side TOC ── */
 #dc-btn-top{
@@ -920,7 +909,6 @@ html.tablet-app #page-discourse .dc-data-aside{display:none!important}
   transform:translateX(0);
   transition:opacity .26s ease .04s, transform .32s cubic-bezier(.22,1,.36,1) .04s!important;
 }
-
 
 .dc-toc-label{
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
@@ -1151,45 +1139,38 @@ body.overlay-open #dc-toc-panel{
   .dc-card-n{font-size:1.4rem;}
   .dc-three-col .dc-chart-card{width:260px;}
   .dc-chart-card{padding:20px 18px 16px;}
-  .dc-two-col.dc-two-col-align-top .dc-chart-title{min-height:auto;}
+  .dc-two-col.dc-two-col-align-top .dc-chart-title,
   .dc-two-col.dc-two-col-align-top .dc-chart-desc{min-height:auto;}
   .dc-pill-wrap{padding:16px 18px;}
 }
 
-
-
 /* Final adaptive polish — phone/tablet only, keep desktop untouched */
-html.phone-app .hero-inner,
-html.tablet-app .hero-inner{
+html:is(.phone-app,.tablet-app) .hero-inner{
   border:none!important;
   border-radius:0!important;
   background:transparent!important;
   box-shadow:none!important;
 }
-html.phone-app .eyebrow,
-html.tablet-app .eyebrow{
+html:is(.phone-app,.tablet-app) .eyebrow{
   padding:0!important;
   border-radius:0!important;
   background:transparent!important;
   color:var(--g3)!important;
   box-shadow:none!important;
 }
-html.phone-app .stats-inner,
-html.tablet-app .stats-inner{
+html:is(.phone-app,.tablet-app) .stats-inner{
   background:transparent!important;
   border:none!important;
   border-radius:0!important;
   box-shadow:none!important;
   overflow:visible!important;
 }
-html.phone-app .stat-cell,
-html.tablet-app .stat-cell{
+html:is(.phone-app,.tablet-app) .stat-cell{
   background:transparent!important;
   border-radius:0!important;
   box-shadow:none!important;
 }
-html.phone-app .cards-section-outer .section-inner,
-html.tablet-app .cards-section-outer .section-inner{
+html:is(.phone-app,.tablet-app) .cards-section-outer .section-inner{
   background:transparent!important;
   border:none!important;
   border-radius:0!important;
@@ -1197,12 +1178,10 @@ html.tablet-app .cards-section-outer .section-inner{
   padding-left:0!important;
   padding-right:0!important;
 }
-html.phone-app .cards-section-outer,
-html.tablet-app .cards-section-outer{
+html:is(.phone-app,.tablet-app) .cards-section-outer{
   padding-top:8px!important;
 }
-html.phone-app .cards-grid,
-html.tablet-app .cards-grid{
+html:is(.phone-app,.tablet-app) .cards-grid{
   background:transparent!important;
   border:none!important;
   border-radius:0!important;
@@ -1325,9 +1304,6 @@ html.tablet-app .leaflet-control-zoom,
 html.tablet-app #map-back-btn{
   transition:opacity .28s cubic-bezier(.22,1,.36,1),transform .32s cubic-bezier(.22,1,.36,1),box-shadow .24s ease!important;
 }
-html.phone-app .sb-tabs{
-  display:none!important;
-}
 html.phone-app #pane-tl{
   display:flex!important;
   padding-top:14px!important;
@@ -1349,18 +1325,14 @@ html.tablet-app .sbtab{
   justify-content:center!important;
   text-align:center!important;
 }
-html.phone-app .tlp-header,
-html.tablet-app .tlp-header{
+html:is(.phone-app,.tablet-app) .tlp-header{
   align-items:center!important;
 }
-html.phone-app .tlp-header > div:first-child,
-html.tablet-app .tlp-header > div:first-child{
+html:is(.phone-app,.tablet-app) .tlp-header > div:first-child{
   min-width:0!important;
 }
-html.phone-app .tlp-title,
-html.tablet-app .tlp-title,
-html.phone-app .tlp-hint,
-html.tablet-app .tlp-hint{
+html:is(.phone-app,.tablet-app) .tlp-title,
+html:is(.phone-app,.tablet-app) .tlp-hint{
   white-space:nowrap!important;
   overflow:hidden!important;
   text-overflow:ellipsis!important;
@@ -1371,29 +1343,18 @@ html.phone-app .tlp-title{
 html.phone-app .tlp-hint{
   font-size:10px!important;
 }
-html.phone-app .tlp-controls > span,
-html.tablet-app .tlp-controls > span{
+html:is(.phone-app,.tablet-app) .tlp-controls > span{
   display:none!important;
 }
-html.phone-app #tlpv-combined,
-html.tablet-app #tlpv-combined{
-  display:flex!important;
-}
-html.phone-app .tlp-vbtn,
-html.tablet-app .tlp-vbtn{
+html:is(.phone-app,.tablet-app) .tlp-vbtn{
   justify-content:center!important;
   min-width:88px!important;
 }
-html.phone-app .tlp-vbtn svg,
-html.tablet-app .tlp-vbtn svg{
+html:is(.phone-app,.tablet-app) .tlp-vbtn svg,
+html:is(.phone-app,.tablet-app) #page-timeline #dtl-body{
   display:none!important;
 }
-html.phone-app #page-timeline #dtl-body,
-html.tablet-app #page-timeline #dtl-body{
-  display:none!important;
-}
-html.phone-app #dtl-text-body,
-html.tablet-app #dtl-text-body{
+html:is(.phone-app,.tablet-app) #dtl-text-body{
   background:transparent!important;
   border:none!important;
   border-radius:0!important;
@@ -1401,16 +1362,14 @@ html.tablet-app #dtl-text-body{
   overflow-y:auto!important;
   overflow-x:hidden!important;
 }
-html.phone-app #dtl-text-body .txt-stage,
-html.tablet-app #dtl-text-body .txt-stage{
+html:is(.phone-app,.tablet-app) #dtl-text-body .txt-stage{
   display:block!important;
   min-width:0!important;
   width:100%!important;
   height:auto!important;
   padding:8px 0 28px 0!important;
 }
-html.phone-app #dtl-text-body .txt-center-line,
-html.tablet-app #dtl-text-body .txt-center-line{
+html:is(.phone-app,.tablet-app) #dtl-text-body .txt-center-line{
   top:0!important;
   bottom:0!important;
   left:16px!important;
@@ -1420,8 +1379,7 @@ html.tablet-app #dtl-text-body .txt-center-line{
   transform:none!important;
   background:rgba(15,23,42,.18)!important;
 }
-html.phone-app #dtl-text-body .txt-col,
-html.tablet-app #dtl-text-body .txt-col{
+html:is(.phone-app,.tablet-app) #dtl-text-body .txt-col{
   display:block!important;
   width:auto!important;
   height:auto!important;
@@ -1430,30 +1388,25 @@ html.tablet-app #dtl-text-body .txt-col{
   opacity:1!important;
   transform:none!important;
 }
-html.phone-app #dtl-text-body .txt-col::before,
-html.tablet-app #dtl-text-body .txt-col::before{
+html:is(.phone-app,.tablet-app) #dtl-text-body .txt-col::before{
   inset:-4px 0 0 0!important;
 }
-html.phone-app #dtl-text-body .txt-col:hover .txt-label,
-html.tablet-app #dtl-text-body .txt-col:hover .txt-label{
+html:is(.phone-app,.tablet-app) #dtl-text-body .txt-col:hover .txt-label{
   transform:none!important;
 }
-html.phone-app #dtl-text-body .txt-dot,
-html.tablet-app #dtl-text-body .txt-dot{
+html:is(.phone-app,.tablet-app) #dtl-text-body .txt-dot{
   top:14px!important;
   left:16px!important;
   transform:translate(-50%,0)!important;
 }
-html.phone-app #dtl-text-body .txt-connector,
-html.tablet-app #dtl-text-body .txt-connector{
+html:is(.phone-app,.tablet-app) #dtl-text-body .txt-connector{
   top:0!important;
   bottom:-4px!important;
   left:16px!important;
   width:1px!important;
   height:auto!important;
 }
-html.phone-app #dtl-text-body .txt-label,
-html.tablet-app #dtl-text-body .txt-label{
+html:is(.phone-app,.tablet-app) #dtl-text-body .txt-label{
   position:relative!important;
   top:auto!important;
   bottom:auto!important;
@@ -1464,18 +1417,15 @@ html.tablet-app #dtl-text-body .txt-label{
   text-align:left!important;
   gap:4px!important;
 }
-html.phone-app #dtl-text-body .txt-yr,
-html.tablet-app #dtl-text-body .txt-yr{
+html:is(.phone-app,.tablet-app) #dtl-text-body .txt-yr{
   font-size:11px!important;
   color:var(--g3)!important;
 }
-html.phone-app #dtl-text-body .txt-title,
-html.tablet-app #dtl-text-body .txt-title{
+html:is(.phone-app,.tablet-app) #dtl-text-body .txt-title{
   font-size:13px!important;
   line-height:1.38!important;
 }
-html.phone-app #dtl-text-body .txt-cat,
-html.tablet-app #dtl-text-body .txt-cat{
+html:is(.phone-app,.tablet-app) #dtl-text-body .txt-cat{
   font-size:10px!important;
 }
 html.phone-app #page-cal .cpgrid-panel,
@@ -1494,8 +1444,7 @@ html.tablet-app #page-cal .cp-day-empty{
 html.phone-app #page-cal .cpgrid-panel{
   margin-bottom:10px!important;
 }
-html.phone-app .cards-section-outer .sec-header,
-html.tablet-app .cards-section-outer .sec-header{
+html:is(.phone-app,.tablet-app) .cards-section-outer .sec-header{
   padding-top:0!important;
 }
 
@@ -1642,7 +1591,7 @@ html.tablet-app .cards-section-outer .sec-header{
   margin-bottom:6px;padding-right:40px;
 }
 #dc-lightbox-desc{
-  font-family:'Space Mono',monospace;
+  font-family:var(--sans);
   font-size:9px;color:#96a0aa;letter-spacing:.03em;
   margin-bottom:24px;line-height:1.6;
 }
@@ -1744,7 +1693,7 @@ html.tablet-app .cards-section-outer .sec-header{
 /* Rank grid & pill grid in lightbox */
 #dc-lightbox-content .dc-rank-grid,
 #dc-lightbox-content .xr-vt-row{pointer-events:none;}
-#dc-lightbox-content .dc-pill-wrap{cursor:default!important;}
+#dc-lightbox-content .dc-pill-wrap,
 #dc-lightbox-content .dc-wf-bubbles .dc-wf-bubble{cursor:default!important;}
 
 /* Press effect on zoomable items */
@@ -1966,7 +1915,7 @@ body > button[aria-label="Next chart"]:hover{
   .dc-two-col .dc-chart-card:has(.dc-spoke-wrap) .dc-chart-title,
   .dc-two-col .dc-chart-card:has(.dc-spoke-wrap) .dc-chart-desc,
   .dc-two-col-chart-table .dc-chart-title,
-  .dc-two-col-chart-table .dc-chart-desc{min-height:auto;}
+  .dc-two-col-chart-table .dc-chart-desc,
   .dc-three-col .dc-chart-card:has(.dc-spoke-wrap) .dc-chart-title,
   .dc-three-col .dc-chart-card:has(.dc-spoke-wrap) .dc-chart-desc{min-height:auto;}
 }

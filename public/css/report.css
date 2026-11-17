@@ -13,7 +13,7 @@
   --text:#1c1c1e;--text2:#484850;--text3:#909098;--border:#dde3ea;
   --serif:"Source Serif 4","Georgia",serif;
   --display:"Playfair Display","Georgia",serif;
-  --mono:"Space Mono",monospace;
+  --mono:var(--sans);
   --hh:52px;
   --w:#ffffff;
 }
@@ -97,7 +97,7 @@
   background:#dde3ea;margin:30px 0;border:1px solid #dde3ea;}
 #rpt .card,#page-report .card{background:#ffffff!important;padding:20px 18px!important;min-height:80px;}
 #rpt .card-n,#page-report .card-n{font-family:"Playfair Display","Georgia",serif;font-size:1.85rem;font-weight:700;color:#4d6b8a!important;line-height:1;margin-bottom:6px;display:block!important;}
-#rpt .card-l,#page-report .card-l{font-family:"Space Mono","Courier New",monospace!important;font-size:10px!important;color:#909098!important;letter-spacing:.6px;text-transform:uppercase;line-height:1.55;display:block!important;}
+#rpt .card-l,#page-report .card-l{font-family:var(--sans)!important;font-size:10px!important;color:#909098!important;letter-spacing:.6px;text-transform:uppercase;line-height:1.55;display:block!important;}
 #rpt .card.or .card-n,#page-report .card.or .card-n{color:#d4621a!important;}
 #rpt .card.rd .card-n,#page-report .card.rd .card-n{color:#b83030!important;}
 
@@ -462,7 +462,7 @@ body.on-report #btn-top.visible{opacity:1;pointer-events:auto;transform:translat
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
   font-size:10.5px;font-weight:500;letter-spacing:-.01em;
   color:rgba(28,28,30,.55);white-space:nowrap;
-  transition:color .18s;text-align:right;
+  text-align:right;
   transform:translateX(6px);
   transition:color .18s, transform .22s cubic-bezier(.4,0,.2,1);
   pointer-events:none;

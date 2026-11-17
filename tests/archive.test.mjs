@@ -30,6 +30,10 @@ test("split archive data is available to chat", async () => {
     assert.equal(health?.ok, true);
     assert.ok(health.archiveChunks >= 100);
 
+    const mapPage = await fetch(`http://127.0.0.1:${port}/map`);
+    assert.equal(mapPage.status, 200);
+    assert.match(await mapPage.text(), /id="page-archive"/);
+
     const response = await fetch(`http://127.0.0.1:${port}/api/chat`, {
       method: "POST",
       headers: { "content-type": "application/json" },

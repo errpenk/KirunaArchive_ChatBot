@@ -8,12 +8,10 @@
   background:#fff;
 }
 
-html.phone-app #page-timeline,
-html.tablet-app #page-timeline{
+html:is(.phone-app,.tablet-app) #page-timeline{
   background:#fafbfc;
 }
-html.phone-app .tlp-header,
-html.tablet-app .tlp-header{
+html:is(.phone-app,.tablet-app) .tlp-header{
   margin:0;
   padding:28px 40px 14px;
   border:none;
@@ -23,18 +21,14 @@ html.tablet-app .tlp-header{
   backdrop-filter:none;
   -webkit-backdrop-filter:none;
 }
-html.phone-app .tlp-controls,
-html.tablet-app .tlp-controls{
+html:is(.phone-app,.tablet-app) .tlp-controls{
   gap:12px;
 }
-html.phone-app .tlp-controls > span,
-html.tablet-app .tlp-controls > span,
-html.phone-app #tlpv-combined,
-html.tablet-app #tlpv-combined{
+html:is(.phone-app,.tablet-app) .tlp-controls > span,
+html:is(.phone-app,.tablet-app) #tlpv-combined{
   display:none !important;
 }
-html.phone-app .tlp-view-toggle,
-html.tablet-app .tlp-view-toggle{
+html:is(.phone-app,.tablet-app) .tlp-view-toggle{
   padding:0;
   gap:0;
   background:transparent;
@@ -42,8 +36,7 @@ html.tablet-app .tlp-view-toggle{
   box-shadow:none;
   overflow:visible;
 }
-html.phone-app .tlp-vbtn,
-html.tablet-app .tlp-vbtn{
+html:is(.phone-app,.tablet-app) .tlp-vbtn{
   min-height:40px;
   padding:0 16px;
   border:1px solid rgba(15,23,42,.12);
@@ -52,61 +45,48 @@ html.tablet-app .tlp-vbtn{
   color:#5f6673;
   box-shadow:none;
 }
-html.phone-app .tlp-vbtn.on,
-html.tablet-app .tlp-vbtn.on{
+html:is(.phone-app,.tablet-app) .tlp-vbtn.on{
   background:#fff;
   color:#1d1d1f;
   border-color:rgba(15,23,42,.16);
   box-shadow:none;
 }
-html.phone-app .phase-outer,
-html.tablet-app .phase-outer{
+html:is(.phone-app,.tablet-app) .phase-outer{
   padding:0 40px 48px;
   background:transparent;
   gap:0;
 }
-html.phone-app .phase-era-block,
-html.tablet-app .phase-era-block{
+html:is(.phone-app,.tablet-app) .phase-era-block{
   background:transparent;
   border:none;
   border-radius:0;
   box-shadow:none;
   overflow:visible;
 }
-html.phone-app .peb-head,
-html.tablet-app .peb-head{
+html:is(.phone-app,.tablet-app) .peb-head{
   padding:22px 0 12px;
   border-bottom:none;
 }
-html.phone-app .peb-events,
-html.tablet-app .peb-events{
+html:is(.phone-app,.tablet-app) .peb-events{
   display:block;
   background:transparent;
   border-radius:0;
   overflow:visible;
 }
-html.phone-app .peb-event,
-html.tablet-app .peb-event{
+html:is(.phone-app,.tablet-app) .peb-event{
   padding:14px 0;
   border-top:1px solid rgba(15,23,42,.08);
   background:transparent;
 }
-html.phone-app .peb-event:hover,
-html.tablet-app .peb-event:hover{
-  background:transparent;
-  transform:none !important;
-}
-html.phone-app .peb-evt-title,
-html.tablet-app .peb-evt-title{
+
+html:is(.phone-app,.tablet-app) .peb-evt-title{
   font-size:13px;
 }
 
-html.phone-app #page-cal,
-html.tablet-app #page-cal{
+html:is(.phone-app,.tablet-app) #page-cal{
   background:#fafbfc;
 }
-html.phone-app .cph,
-html.tablet-app .cph{
+html:is(.phone-app,.tablet-app) .cph{
   margin:0;
   padding:28px 40px 16px;
   border:none;
@@ -116,8 +96,7 @@ html.tablet-app .cph{
   backdrop-filter:none;
   -webkit-backdrop-filter:none;
 }
-html.phone-app .cpbody,
-html.tablet-app .cpbody{
+html:is(.phone-app,.tablet-app) .cpbody{
   gap:22px;
   padding:0 40px 40px;
   background:transparent;
@@ -132,14 +111,11 @@ html.tablet-app .cpevs-panel{
   box-shadow:none;
 }
 
-html.phone-app #page-cal,
-html.tablet-app #page-cal{
+html:is(.phone-app,.tablet-app) #page-cal{
   overflow-y:auto;
 }
-html.phone-app .cph,
-html.tablet-app .cph,
-html.phone-app .tlp-header,
-html.tablet-app .tlp-header{
+html:is(.phone-app,.tablet-app) .cph,
+html:is(.phone-app,.tablet-app) .tlp-header{
   margin:0;
   border:none;
   border-radius:0;
@@ -148,28 +124,23 @@ html.tablet-app .tlp-header{
   backdrop-filter:none;
   -webkit-backdrop-filter:none;
 }
-html.phone-app .tlp-controls,
-html.tablet-app .tlp-controls{
+html:is(.phone-app,.tablet-app) .tlp-controls{
   justify-content:flex-start;
 }
-html.phone-app .tlp-view-toggle,
-html.tablet-app .tlp-view-toggle{
+html:is(.phone-app,.tablet-app) .tlp-view-toggle{
   padding:0;
   background:transparent;
   border:none;
   box-shadow:none;
 }
-html.phone-app .phase-outer,
-html.tablet-app .phase-outer{
+html:is(.phone-app,.tablet-app) .phase-outer{
   background:transparent;
   gap:0;
 }
-html.phone-app #page-timeline #dtl-body,
-html.tablet-app #page-timeline #dtl-body{
+html:is(.phone-app,.tablet-app) #page-timeline #dtl-body{
   display:none !important;
 }
-html.phone-app .phase-era-block,
-html.tablet-app .phase-era-block{
+html:is(.phone-app,.tablet-app) .phase-era-block{
   background:transparent;
   border:none;
   border-radius:0;
@@ -177,34 +148,29 @@ html.tablet-app .phase-era-block{
   opacity:1;
   transform:none;
 }
-html.phone-app .peb-head,
-html.tablet-app .peb-head{
+html:is(.phone-app,.tablet-app) .peb-head{
   padding:20px 0 12px;
   border-bottom:none;
 }
-html.phone-app .peb-events,
-html.tablet-app .peb-events{
+html:is(.phone-app,.tablet-app) .peb-events{
   display:block;
   background:transparent;
   border-radius:0;
 }
-html.phone-app .peb-event,
-html.tablet-app .peb-event{
+html:is(.phone-app,.tablet-app) .peb-event{
   padding:14px 0;
   border-top:1px solid rgba(15,23,42,.08);
   background:transparent;
   opacity:1;
   transform:none;
 }
-html.phone-app .peb-event:hover,
-html.tablet-app .peb-event:hover{
+html:is(.phone-app,.tablet-app) .peb-event:hover{
   background:transparent;
   transform:none !important;
 }
 html.phone-app .cph{
   padding:18px 16px 10px;
 }
-
 
 html.phone-app #cal-grid-wrap{
   overflow:visible;
@@ -227,7 +193,6 @@ html.phone-app .cp-ev-tag{
   line-height:1.2;
 }
 
-
 html.phone-app .cp-back{
   display:none;
 }
@@ -238,32 +203,27 @@ html.tablet-app .cpbody{
   padding:0 26px 34px;
 }
 
-html.phone-app #sidebar,
-html.tablet-app #sidebar{
+html:is(.phone-app,.tablet-app) #sidebar{
   background:#ffffff;
   backdrop-filter:none;
   -webkit-backdrop-filter:none;
   box-shadow:0 12px 32px rgba(15,23,42,.12);
 }
-html.phone-app .sb-tabs,
-html.tablet-app .sb-tabs{
+html:is(.phone-app,.tablet-app) .sb-tabs{
   background:#fff;
 }
-html.phone-app .sb-tabs::after,
-html.tablet-app .sb-tabs::after{
+html:is(.phone-app,.tablet-app) .sb-tabs::after{
   background:#f3f5f7;
   border:1px solid rgba(15,23,42,.08);
 }
-html.phone-app #map-ruler,
-html.tablet-app #map-ruler{
+html:is(.phone-app,.tablet-app) #map-ruler{
   background:rgba(255,255,255,.98);
 }
 html.phone-app .map-home-btn,
 html.phone-app #map-fs-btn,
 html.tablet-app .map-home-btn,
 html.tablet-app #map-fs-btn,
-html.phone-app .leaflet-control-zoom,
-html.tablet-app .leaflet-control-zoom{
+html:is(.phone-app,.tablet-app) .leaflet-control-zoom{
   background:#fff !important;
   border:1px solid rgba(15,23,42,.08) !important;
   box-shadow:0 10px 24px rgba(15,23,42,.12) !important;
@@ -386,13 +346,10 @@ html.phone-app .popup-btn-row{
   }
 }
 
-
-html.phone-app #tlpv-combined,
-html.tablet-app #tlpv-combined{
+html:is(.phone-app,.tablet-app) #tlpv-combined{
   display:flex!important;
 }
-html.phone-app .tlp-vbtn .tlpv-label,
-html.tablet-app .tlp-vbtn .tlpv-label{
+html:is(.phone-app,.tablet-app) .tlp-vbtn .tlpv-label{
   display:inline!important;
 }
 
@@ -583,10 +540,7 @@ html.phone-app.map-popup-open #map-ruler{
   transform:none!important;
 }
 html.phone-app.map-popup-open .map-home-btn,
-html.phone-app.map-popup-open #map-fs-btn{
-  opacity:1!important;
-  pointer-events:auto!important;
-}
+html.phone-app.map-popup-open #map-fs-btn,
 html.phone-app.map-popup-open .leaflet-control-zoom{
   opacity:1!important;
   pointer-events:auto!important;
@@ -650,8 +604,6 @@ html.phone-app #dtl-text-body .txt-col{
   padding:0 0 16px 52px!important;
 }
 
-
-
 @keyframes phoneSheetNudge{
   0%,100%{transform:translateY(0);}
   38%{transform:translateY(14px);}
@@ -670,8 +622,8 @@ html.phone-app.map-detail-open .map-edge-indicator {
 /* by-phase text starts at 58px (40px padding + 8px dot + 10px gap) */
 /* txt-dot is 10px wide, translate(-50%) centers it on left value → left:45px = left-edge at 40px */
 html.phone-app #dtl-text-body .txt-center-line,
-html.phone-app #dtl-text-body .txt-connector { left:45px!important; }
-html.phone-app #dtl-text-body .txt-dot { left:45px!important; }
+html.phone-app #dtl-text-body .txt-connector,
+html.phone-app #dtl-text-body .txt-dot{ left:45px!important; }
 html.phone-app #dtl-text-body .txt-col { min-height:82px!important; padding:0 0 16px 58px!important; }
 
 /* 3. Calendar: fix scrollable events list (flex min-height:auto bug) */
@@ -849,13 +801,9 @@ html.phone-app.map-fs-active #map-fs-btn {
 html.phone-app .popup-expand {
   max-height:600px!important; opacity:1!important; overflow:visible!important;
 }
-html.phone-app .popup-expand-loc { display:none!important; }
-html.phone-app .popup-short-desc { display:none!important; }
-html.phone-app .popup-btn-row { display:none!important; }
-
-
-
-
+html.phone-app .popup-expand-loc,
+html.phone-app .popup-short-desc,
+html.phone-app .popup-btn-row{ display:none!important; }
 
 /* Tablet keeps the phone-side refinements elsewhere, but timeline follows the desktop/web layout. */
 html.tablet-app #page-timeline{
@@ -1109,7 +1057,6 @@ html.tablet-app #page-discourse{
   -webkit-overflow-scrolling:touch!important;
 }
 
-
 /* Tablet mirrors the phone presentation everywhere except timeline, which keeps the web layout above. */
 html.tablet-app{
   --app-card:rgba(255,255,255,.88);
@@ -1194,11 +1141,6 @@ html.tablet-app .ntab{
   font-size:11px!important;
   font-weight:600!important;
   color:#636366!important;
-}
-html.tablet-app .ntab.on{
-  background:rgba(255,255,255,.96)!important;
-  color:#111827!important;
-  box-shadow:0 6px 18px rgba(15,23,42,.08)!important;
 }
 html.tablet-app #page-home{
   padding-bottom:calc(28px + env(safe-area-inset-bottom))!important;
@@ -1408,9 +1350,7 @@ html.tablet-app #leaflet-map{
 }
 html.tablet-app #sidebar,
 html.tablet-app.map-popup-open #sidebar,
-html.tablet-app.map-fs-active #sidebar{
-  display:none!important;
-}
+html.tablet-app.map-fs-active #sidebar,
 html.tablet-app .era-panel,
 html.tablet-app .legend{
   display:none!important;
@@ -1584,9 +1524,7 @@ html.tablet-app #page-discourse .dc-two-col-chart-table .dc-chart-card:last-chil
 html.tablet-app #page-discourse .dc-chart-card{
   margin:12px 0!important;
 }
-html.tablet-app #page-discourse .dc-chart-canvas{
-  min-width:0!important;
-}
+
 html.tablet-app #page-discourse .dc-chart-canvas canvas,
 html.tablet-app #dc-lightbox-content canvas,
 html.tablet-app #dc-lightbox-content img{
@@ -2105,9 +2043,7 @@ html.tablet-app #page-discourse .dc-card-stat{
   padding-right:12px!important;
 }
 html.phone-app #page-discourse .dc-hs:nth-child(odd),
-html.phone-app #page-discourse .dc-card-stat:nth-child(odd){
-  padding-right:12px!important;
-}
+html.phone-app #page-discourse .dc-card-stat:nth-child(odd),
 html.phone-app #page-discourse .dc-hs:last-child,
 html.phone-app #page-discourse .dc-card-stat:last-child:nth-child(odd){
   padding-right:12px!important;
@@ -2117,8 +2053,7 @@ html.phone-app body{
   -webkit-text-size-adjust:100%;
   text-size-adjust:100%;
 }
-html.phone-app .logo,
-html.tablet-app .logo{
+html:is(.phone-app,.tablet-app) .logo{
   display:none!important;
 }
 html.phone-app .chat-input,
@@ -2127,15 +2062,13 @@ html.phone-app #chat-page-input{
   font-size:16px!important;
   line-height:1.55!important;
 }
-html.phone-app #nav,
-html.tablet-app #nav{
+html:is(.phone-app,.tablet-app) #nav{
   display:grid!important;
   grid-template-columns:minmax(0,1fr)!important;
   justify-items:center!important;
   align-items:center!important;
 }
-html.phone-app .nav-tabs,
-html.tablet-app .nav-tabs{
+html:is(.phone-app,.tablet-app) .nav-tabs{
   position:static!important;
   left:auto!important;
   top:auto!important;
@@ -2180,26 +2113,21 @@ html.phone-app #page-gallery .gallery-year-rail-nodes{
 html.phone-app #page-gallery .gallery-rail-dot{
   margin-left:8px!important;
 }
-html.phone-app #page-chat,
-html.tablet-app #page-chat{
+html:is(.phone-app,.tablet-app) #page-chat{
   height:var(--chat-page-visible-height,100%)!important;
   max-height:var(--chat-page-visible-height,100%)!important;
   transition:height .38s cubic-bezier(.32,.72,0,1) !important;
 }
-html.phone-app #page-chat .chat-page-shell,
-html.tablet-app #page-chat .chat-page-shell{
+html:is(.phone-app,.tablet-app) #page-chat .chat-page-shell{
   padding-bottom:max(12px, env(safe-area-inset-bottom))!important;
 }
-html.phone-app #page-chat .chat-page-compose,
-html.tablet-app #page-chat .chat-page-compose{
+html:is(.phone-app,.tablet-app) #page-chat .chat-page-compose{
   padding-bottom:max(12px, calc(10px + env(safe-area-inset-bottom)))!important;
 }
-html.phone-app #chat-panel,
-html.tablet-app #chat-panel{
+html:is(.phone-app,.tablet-app) #chat-panel{
   max-height:var(--chat-floating-visible-height,calc(100vh - 24px))!important;
 }
-html.phone-app #chat-panel .chat-widget-compose,
-html.tablet-app #chat-panel .chat-widget-compose{
+html:is(.phone-app,.tablet-app) #chat-panel .chat-widget-compose{
   margin-bottom:max(12px, env(safe-area-inset-bottom))!important;
 }
 
