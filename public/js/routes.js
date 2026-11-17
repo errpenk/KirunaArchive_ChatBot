@@ -78,7 +78,7 @@
           window.openComparePanel();
         }else window.closeComparePanel({immediate:true});
       }
-      if(state.page==='gallery'&&state.item!==null)window.restoreGalleryItem(state.source,state.item);
+      if(state.page==='gallery'&&state.item!==null)await window.restoreGalleryItem(state.source,state.item);
       if(state.page==='timeline2'){
         const frame=document.getElementById('timeline2-frame');
         if(!frame.contentWindow?.applyTimeRoute){

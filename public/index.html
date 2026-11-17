@@ -924,9 +924,29 @@ import { animate, svg, utils } from './vendor/anime.esm.min.js';
           <div class="gallery-year-rail-nodes" id="gallery-year-rail-nodes"></div>
         </nav>
         <div class="gallery-scroll" id="gallery-scroll">
-          <div class="gallery-content" id="gallery-content">
-            <!-- Built by buildGallery() -->
-          </div>
+          <template id="gallery-grid-template">
+            <div v-for="group in groups" :key="group.year" class="gallery-year-group" :data-year="group.year">
+              <div class="gallery-year-label">{{ group.label }}</div>
+              <div class="gallery-grid">
+                <div v-for="item in group.items" :key="item.id" class="gallery-tile"
+                  :data-gallery-id="item.id" :data-gallery-title="item.title"
+                  :data-gallery-meta="item.meta" :data-gallery-color="item.color || ''"
+                  :data-gallery-gradient="item.gradient" :data-gallery-img-url="item.imgUrl || ''"
+                  tabindex="0" :aria-label="item.title"
+                  @click="openTile($event)" @keydown.enter.prevent="openTile($event)" @keydown.space.prevent="openTile($event)">
+                  <div class="gallery-tile-bg" :style="{background:item.gradient}">
+                    <img v-if="item.imgUrl" class="gallery-tile-image" :src="item.imgUrl" alt="" loading="lazy" decoding="async">
+                  </div>
+                  <div class="gallery-tile-source-dot" :style="{background:item.color}"></div>
+                  <div class="gallery-tile-label">
+                    <div class="gallery-tile-title">{{ item.title }}</div>
+                    <div class="gallery-tile-meta">{{ item.meta }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
+          <div class="gallery-content" id="gallery-content"></div>
         </div>
       </div>
     </div>
@@ -1158,6 +1178,7 @@ import { animate, svg, utils } from './vendor/anime.esm.min.js';
 
 <link rel="stylesheet" href="./css/gallery.css">
 
+<script src="./vendor/vue.global.prod.js"></script>
 <script src="./js/gallery.js"></script>
 <script>
 (function(){

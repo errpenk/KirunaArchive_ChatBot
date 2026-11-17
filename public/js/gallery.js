@@ -3,7 +3,7 @@
    GALLERY — build + navigate
    ════════════════════════════════════════════════ */
 (function(){
-  let _built=false;
+  let galleryVm=null;
 
   /* Palette: one shade per category for Inside Map tiles */
   const TILE_COLORS={
@@ -53,8 +53,11 @@
     const content=document.getElementById('gallery-content');
     const countLabel=document.getElementById('gallery-count-label');
     if(!content) return;
-
-    content.innerHTML='';
+    if(!galleryVm)galleryVm=Vue.createApp({
+      data:()=>({groups:[]}),
+      methods:{openTile(event){openLightbox(event.currentTarget)}},
+      template:'#gallery-grid-template'
+    }).mount(content);
 
     const items=collectItems();
     if(countLabel) countLabel.textContent=items.length+' items';
@@ -67,66 +70,12 @@
     });
 
     const years=Object.keys(byYear).sort((a,b)=>+a-+b);
-    years.forEach((year, groupIdx)=>{
-      const group=document.createElement('div');
-      group.className='gallery-year-group';
-      group.dataset.year=year;
-
-      const label=document.createElement('div');
-      label.className='gallery-year-label';
-      label.textContent=year==='0'?'Undated':year;
-      group.appendChild(label);
-
-      const grid=document.createElement('div');
-      grid.className='gallery-grid';
-
-      byYear[year].forEach((item,i)=>{
-        const tile=document.createElement('div');
-        tile.className='gallery-tile';
-        tile.dataset.galleryId=item.id;
-        tile.dataset.galleryTitle=item.title;
-        tile.dataset.galleryMeta=item.meta;
-        tile.dataset.galleryColor=item.color;
-        tile.dataset.galleryGradient=tileGradient(item.color, i+byYear[year].length);
-        tile.dataset.galleryImgUrl=item.imgUrl||'';
-        tile.setAttribute('tabindex','0');
-        tile.setAttribute('aria-label',item.title);
-
-        const bg=document.createElement('div');
-        bg.className='gallery-tile-bg';
-        bg.style.background=tile.dataset.galleryGradient;
-        if(item.imgUrl){
-          const img=document.createElement('img');
-          img.className='gallery-tile-image';
-          img.src=item.imgUrl;
-          img.alt='';
-          img.loading='lazy';
-          img.decoding='async';
-          bg.appendChild(img);
-        }
-
-        const dot=document.createElement('div');
-        dot.className='gallery-tile-source-dot';
-        dot.style.background=item.color;
-
-        const lbl=document.createElement('div');
-        lbl.className='gallery-tile-label';
-        lbl.innerHTML=`<div class="gallery-tile-title">${item.title}</div><div class="gallery-tile-meta">${item.meta}</div>`;
-
-        tile.appendChild(bg);tile.appendChild(dot);tile.appendChild(lbl);
-
-        tile.addEventListener('click',()=>openLightbox(tile));
-        tile.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openLightbox(tile);}});
-
-        grid.appendChild(tile);
-      });
-
-      group.appendChild(grid);
-      content.appendChild(group);
-    });
-
-    _built=true;
+    galleryVm.groups=years.map(year=>({
+      year,label:year==='0'?'Undated':year,
+      items:byYear[year].map((item,i)=>({...item,gradient:tileGradient(item.color,i+byYear[year].length)}))
+    }));
     buildGalleryRail(years);
+    return Vue.nextTick();
   }
 
   function buildGalleryRail(years){
@@ -902,8 +851,8 @@
   window.buildGallery=buildGallery;
   window.openGalleryItem=openGalleryItem;
   window.closeGalleryLightbox=closeLightbox;
-  window.restoreGalleryItem=function(source,id){
-    buildGallery();
+  window.restoreGalleryItem=async function(source,id){
+    await buildGallery();
     const tile=document.querySelector(`.gallery-tile[data-gallery-id="${source}-${id}"]`);
     if(tile)openLightbox(tile);
   };
