@@ -129,23 +129,18 @@
 .popup-expand-pad{height:10px}
 .popup-btn-row{display:flex;flex-direction:column;gap:6px;margin:8px 14px 14px}
 /* View Details: black bg → hover lightens */
-.popup-btn{
+.popup-btn,.popup-btn-sec{
   flex:1;width:100%;
-  background:var(--b);color:#fff;
   text-align:center;padding:10px;border-radius:10px;
   font-size:12px;font-weight:600;cursor:pointer;letter-spacing:-.01em;
   border:1.5px solid var(--b);
   transition:background .18s,color .18s,transform .12s cubic-bezier(.22,1,.36,1);
 }
+.popup-btn{background:var(--b);color:#fff;}
 .popup-btn:hover{background:var(--g2);}
 /* View in Gallery: white bg → hover darkens slightly */
 .popup-btn-sec{
-  flex:1;width:100%;
   background:#fff;color:var(--b);
-  text-align:center;padding:10px;border-radius:10px;
-  font-size:12px;font-weight:600;cursor:pointer;letter-spacing:-.01em;
-  border:1.5px solid var(--b);
-  transition:background .18s,color .18s,transform .12s cubic-bezier(.22,1,.36,1);
   white-space:nowrap;
 }
 .popup-btn-sec:hover{background:var(--g5);}
@@ -832,9 +827,6 @@
   100%{transform:translateX(4px);opacity:1}
 }
 
-/* sidebar rows */
-.tl-row{transition:transform .26s cubic-bezier(.22,1,.36,1),box-shadow .22s ease}
-.tl-row:hover{transform:translateX(4px)}
 /* cards — only animate home page cards, not report cards */
 .card{transition:background .15s,box-shadow .2s;opacity:0;transform:translateY(20px) scale(.97)}
 /* Report cards always visible */
@@ -844,13 +836,8 @@
 .card:hover{background:var(--g6)}
 /* era-opt transitions handled in base rule */
 /* popup */
-.popup-expand{transition:max-height .42s cubic-bezier(.4,0,.2,1),opacity .3s ease}
-.popup-btn{transition:background .18s,color .18s,transform .12s cubic-bezier(.22,1,.36,1)}
-.popup-btn:active{transform:scale(1.03)}
-.popup-btn-sec{transition:background .18s,color .18s,transform .12s cubic-bezier(.22,1,.36,1)}
-.popup-btn-sec:active{transform:scale(1.03)}
+.popup-btn:active,.popup-btn-sec:active{transform:scale(1.03)}
 /* day-cell */
-.day-cell{transition:background .18s ease,color .18s ease,transform .22s cubic-bezier(.22,1,.36,1),box-shadow .24s ease}
 .day-cell:active{transform:scale(.97)}
 /* badges / nav */
 .nbadge{transition:border-color .15s,background .15s,color .15s}
