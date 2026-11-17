@@ -526,8 +526,6 @@
 }
 @media (max-width:900px){
   .tl2-back-floating{top:10px;left:10px}
-}
-@media (max-width:900px){
   .tl2-header{padding:20px 18px 14px;flex-direction:column;align-items:flex-start}
   .tl2-controls{width:100%;justify-content:space-between}
   .tl2-frame-wrap{padding:0}
