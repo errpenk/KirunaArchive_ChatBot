@@ -349,6 +349,9 @@
     function setView(view) {
       S.prevView = S.view;
       S.view = view;
+      window.parent.parent.KirunaRoutes?.update('timeline2',{
+        source:'outside',view:view==='expanded'?'cards':'overview',event:S.activeDocIdx??null
+      });
       syncControls();
     }
 
@@ -979,6 +982,11 @@
       });
 
       return true;
+    };
+
+    window.openOutsideCards = function() {
+      setView("expanded");
+      update();
     };
 
     /* Gallery → Outside Map: go straight to the expanded card view. */

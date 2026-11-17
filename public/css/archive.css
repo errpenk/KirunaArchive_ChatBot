@@ -42,11 +42,11 @@
 .tl-row:focus,.tl-row:focus-visible,.tl-row:focus-within{outline:none !important;box-shadow:none !important;}
 .tl-row::before{content:'';position:absolute;left:30px;right:12px;top:3px;bottom:3px;border-radius:10px;background:transparent;transition:background .18s ease,transform .22s cubic-bezier(.22,1,.36,1);z-index:-1}
 .tl-row:hover,.tl-row.hovered{background:transparent;transform:translateX(4px)}
-.tl-row:hover::before,.tl-row.hovered::before{background:rgba(0,102,204,.07)}
+.tl-row:hover::before,.tl-row.hovered::before{background:#f0f0f2}
 .tl-row.on{background:transparent;transform:translateX(4px);animation:calRowSelectIn .32s cubic-bezier(.22,1,.36,1)}
 .tl-row.on.no-select-anim{animation:none}
 .tl-row.on:hover{background:transparent}
-.tl-row.on:hover::before,.tl-row.on.hovered::before{background:rgba(0,102,204,.1)}
+.tl-row.on:hover::before,.tl-row.on.hovered::before{background:#f0f0f2}
 .tl-row.on::before{background:#f0f0f2}
 .tl-dot-s{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;transition:transform .22s cubic-bezier(.22,1,.36,1),opacity .2s ease,box-shadow .22s ease}
 .tl-row:hover .tl-dot-s,.tl-row.hovered .tl-dot-s{transform:scale(1.16)}

@@ -367,6 +367,7 @@ function initDiscourse(){
       /* ── 2. Update tab indicators ── */
       page.querySelectorAll('.dc-ptab').forEach(t=>t.classList.remove('on'));
       tab.classList.add('on');
+      window.KirunaRoutes.update('discourse',{panel:key});
       moveIndicator(tab, true);
 
       /* ── 3. Exit old panel with fade+slide (transition on inline style so it fires from current state) ── */

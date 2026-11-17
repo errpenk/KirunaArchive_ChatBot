@@ -299,20 +299,7 @@ function relatedMapEvents(ev,visibleEvents){
 }
 
 let activePage='home',activeId=null,eraFilter='all',calYear=2010,cpYear=2010,cpSel=null,calYearFilter=null;
-const PAGE_PATHS={home:'/',archive:'/map',timeline2:'/time',gallery:'/gallery',discourse:'/discourse',chat:'/chat'};
-const PATH_PAGES=Object.fromEntries(Object.entries(PAGE_PATHS).map(([page,path])=>[path,page]));
-let _handlingPopstate=false;
-
-function pageFromPath(){
-  const path=window.location.pathname.replace(/\/+$/,'')||'/';
-  return PATH_PAGES[path]||'home';
-}
-
-function syncPageUrl(page,replace=false){
-  const path=PAGE_PATHS[page]||'/';
-  if(window.location.pathname===path) return;
-  history[replace?'replaceState':'pushState']({page},'',path+window.location.search+window.location.hash);
-}
+let mapSelectionToken=0;
 document.body.classList.add('on-home');
 let leafletMap=null,leafletMarkers={},mapAreaLayers={};
 window.getKirunaLeafletMap=function(){return leafletMap;};
@@ -669,7 +656,7 @@ function showPage(p,fromPage){
   const prev=activePage;
   const viaTopNav=fromPage===undefined && prev!==p;
   activePage=p;
-  if(!_handlingPopstate) syncPageUrl(p);
+  window.KirunaRoutes.page(p);
 
   /* ── Determine entrance direction from nav tab order ── */
   const NAV_ORDER=['home','archive','timeline2','gallery','discourse','chat'];
@@ -1170,7 +1157,9 @@ function initMap(){
   leafletMap.on('click',function(){
     if(activeId===null && calYearFilter===null) return;
     activeId=null;
+    ++mapSelectionToken;
     calYearFilter=null;
+    window.KirunaRoutes.update('archive',{event:null,details:false});
     window._mapDetailOpen=false;
     leafletMap.closePopup();
     if(window._syncMapChromeState) window._syncMapChromeState();
@@ -1216,6 +1205,8 @@ function buildMapRuler(){
     });
     tick.addEventListener('dblclick',()=>{
       activeId=null;calYearFilter=null;
+      ++mapSelectionToken;
+      window.KirunaRoutes.update('archive',{event:null,details:false});
       leafletMap&&leafletMap.closePopup();
       updateMarkerSelectionVisuals();highlightRulerYear(null);
       updateMapTimelinePreviewSelection(null);
@@ -1559,6 +1550,7 @@ function renderMarkers(){
       autoPan:false
     }).setContent(popHtml));
     m.on('popupopen',()=>{
+      window.KirunaRoutes.update('archive',{event:ev.id});
       const mapSize=leafletMap.getSize();
       const mapEl=leafletMap.getContainer();
       mapEl.style.setProperty('--popup-center-x',`${mapSize.x/2}px`);
@@ -1578,6 +1570,8 @@ function renderMarkers(){
       // Toggle: clicking the already-active marker deselects it
       if(activeId===ev.id){
         activeId=null;
+        ++mapSelectionToken;
+        window.KirunaRoutes.update('archive',{event:null,details:false});
         window._mapDetailOpen=false;
         document.documentElement.classList.remove('map-sheet-collapsed');
         updateMarkerSelectionVisuals();
@@ -1589,17 +1583,7 @@ function renderMarkers(){
         setTimeout(updateEdgeIndicators,100);
         return;
       }
-      activeId=ev.id;
-      window._mapDetailOpen=false;
-      document.documentElement.classList.remove('map-sheet-collapsed');
-      if(!syncSidebarTLSelection()) renderSidebarTL();
-      calYear=ev.year;renderSidebarCal();
-      updateMarkerSelectionVisuals();
-      highlightRulerYear(ev.id);
-      updateMapTimelinePreviewSelection(ev.id);
-      if(window._syncMapChromeState) window._syncMapChromeState();
-      setTimeout(updateEdgeIndicators,100);
-      m.openPopup();
+      selectEvent(ev.id);
     });
     leafletMarkers[ev.id]=m;
   });
@@ -1610,7 +1594,7 @@ let _preDetailView=null;
 function centerMapPopupCard(){
   if(!leafletMap)return;
   const mapEl=leafletMap.getContainer();
-  const card=mapEl.querySelector('.leaflet-popup-content-wrapper');
+  const card=mapEl.querySelector('.leaflet-popup');
   if(!card)return;
   const mapRect=mapEl.getBoundingClientRect();
   const cardRect=card.getBoundingClientRect();
@@ -1627,6 +1611,7 @@ window._togglePopupDetail=function(pid,btn,lat,lng){
   const phoneMode=window.isPhoneAppMode&&window.isPhoneAppMode();
   btn.textContent=open?'Hide Details':'View Details';
   window._mapDetailOpen=!!open;
+  window.KirunaRoutes.update('archive',{details:open});
 
   if(phoneMode) document.documentElement.classList.remove('map-sheet-collapsed');
   if(window._syncMapChromeState) window._syncMapChromeState();
@@ -2111,23 +2096,55 @@ function renderCepList(evs,sel){
 }
 
 function selectEvent(id){
-  activeId=id;const ev=EVS.find(e=>e.id===id);if(!ev)return;
+  const ev=EVS.find(e=>e.id===id);if(!ev)return;
+  const token=++mapSelectionToken;
+  activeId=id;
   if(activePage!=='archive')showPage('archive',activePage);
+  window.KirunaRoutes.update('archive',{event:id,details:false});
   if(!syncSidebarTLSelection()) renderSidebarTL();
   calYear=ev.year;renderSidebarCal();
   highlightRulerYear(id);
   updateMapTimelinePreviewSelection(id);
   setTimeout(()=>{
+    if(token!==mapSelectionToken||activePage!=='archive')return;
     if(leafletMarkers[id]) updateMarkerSelectionVisuals();
     else renderMarkers();
     const m=leafletMarkers[id];
     if(m){
       const z=leafletMap.getZoom();
       leafletMap.flyTo([ev.lat,ev.lng],z,{animate:true,duration:.6});
-      setTimeout(()=>m.openPopup(),700);
+      setTimeout(()=>{if(token===mapSelectionToken&&activePage==='archive')m.openPopup();},700);
     }
   },50);
 }
+
+window.applyArchiveRoute=async function(state){
+  ++mapSelectionToken;
+  await new Promise(resolve=>setTimeout(resolve,60));
+  if(activePage!=='archive')return;
+  initMap();
+  eraFilter=state.type;
+  document.querySelectorAll('.era-opt').forEach(btn=>btn.classList.toggle('on',btn.dataset.era===eraFilter));
+  activeId=null;
+  leafletMap.closePopup();
+  renderMarkers();renderSidebarTL();renderSidebarCal();updateRulerFilter();
+  const calendar=state.view==='calendar';
+  document.getElementById('sbtab-cal').classList.toggle('on',calendar);
+  document.getElementById('sbtab-tl').classList.toggle('on',!calendar);
+  document.querySelector('.sb-tabs').dataset.active=calendar?'cal':'tl';
+  for(const pane of ['tl','cal'])document.getElementById('pane-'+pane).classList.toggle('on',calendar===(pane==='cal'));
+  document.getElementById(calendar?'pane-cal':'pane-tl').classList.add('pane-visible');
+  if(!EVS.some(ev=>ev.id===state.event))return;
+  selectEvent(state.event);
+  if(state.details){
+    const marker=leafletMarkers[state.event];
+    marker?.once('popupopen',()=>{
+      const button=document.querySelector('.popup-btn');
+      const ev=EVS.find(ev=>ev.id===state.event);
+      if(button)window._togglePopupDetail('ppx-'+ev.id,button,ev.lat,ev.lng);
+    });
+  }
+};
 
 /* ── Gallery → Map: robust animated open ── */
 function openGalleryToMap(id){
@@ -2734,6 +2751,10 @@ document.getElementById('era-filter-btns').addEventListener('click',e=>{
   const btn=e.target.closest('.era-opt');if(!btn)return;
   document.querySelectorAll('.era-opt').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');eraFilter=btn.getAttribute('data-era');
+  activeId=null;
+  ++mapSelectionToken;
+  leafletMap?.closePopup();
+  window.KirunaRoutes.update('archive',{type:eraFilter,event:null,details:false});
   renderMarkers();renderSidebarTL();renderSidebarCal();
   updateRulerFilter();
   renderMapTimelinePreview();
@@ -2742,6 +2763,9 @@ document.getElementById('era-filter-btns').addEventListener('click',e=>{
 
 /* Tabs — animated switch */
 function switchSidebarTab(to, opts={}){
+  ++mapSelectionToken;
+  leafletMap?.closePopup();
+  window.KirunaRoutes.update('archive',{view:to==='cal'?'calendar':'timeline',event:null,details:false});
   const tabs=document.getElementById('sb-tabs-wrap');
   const fromTl = to==='cal';
   if(tabs) tabs.dataset.active=to;
@@ -2919,6 +2943,8 @@ function buildTimeline2Src(view='overview', year=null){
 
 function resetArchiveOverviewState(opts={}){
   activeId=null;
+  ++mapSelectionToken;
+  window.KirunaRoutes.update('archive',{event:null,details:false});
   calYearFilter=null;
   window._mapPopupOpen=false;
   window._mapDetailOpen=false;
@@ -3083,14 +3109,6 @@ setTimeout(alignTlpControls, 100);
   const el=document.getElementById(id);
   if(el) el.addEventListener('click',()=>showPage(page));
 });
-window.addEventListener('popstate',()=>{
-  _handlingPopstate=true;
-  window.showPage(pageFromPath());
-  _handlingPopstate=false;
-});
-const initialPage=pageFromPath();
-history.replaceState({page:initialPage},'',PAGE_PATHS[initialPage]+window.location.search+window.location.hash);
-if(initialPage!=='home') showPage(initialPage);
 document.getElementById('logo-btn').addEventListener('click',()=>showPage('home'));
 // Home → Archive buttons pass 'home' as origin
 document.getElementById('btn-explore').addEventListener('click',()=>showPage('archive','home'));

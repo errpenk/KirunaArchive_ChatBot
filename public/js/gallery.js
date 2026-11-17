@@ -471,6 +471,8 @@
   }
 
   function _applyTileToFrame(tile, animate, direction){
+    const [routeSource,routeId]=tile.dataset.galleryId.split('-');
+    window.KirunaRoutes.update('gallery',{source:routeSource,item:Number(routeId)});
     const lb=_lightboxEl; if(!lb) return;
     const imgEl=document.getElementById('glb-img');
 
@@ -864,6 +866,7 @@
 
   function closeLightbox(){
     if(!_lightboxEl) return;
+    if(_lightboxEl.classList.contains('open'))window.KirunaRoutes.update('gallery',{item:null});
     closeGalleryImageFullscreen();
     _lightboxEl.classList.add('lb-closing');
     _lightboxEl.classList.remove('open');
@@ -898,5 +901,11 @@
 
   window.buildGallery=buildGallery;
   window.openGalleryItem=openGalleryItem;
+  window.closeGalleryLightbox=closeLightbox;
+  window.restoreGalleryItem=function(source,id){
+    buildGallery();
+    const tile=document.querySelector(`.gallery-tile[data-gallery-id="${source}-${id}"]`);
+    if(tile)openLightbox(tile);
+  };
 
 })();

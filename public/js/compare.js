@@ -94,6 +94,7 @@ function renderCmpTabs(){
 }
 
 window.selectCmpModule = function(key){
+  if(_compareOpen)window.KirunaRoutes.update('discourse',{compare:key.toLowerCase()});
   const prevKey = _currentModule;
   _currentModule = key;
   renderCmpTabs();
@@ -229,6 +230,7 @@ function setCompareButtonState(isOpen){
 }
 
 window.closeComparePanel = function(opts = {}){
+  window.KirunaRoutes.update('discourse',{compare:null});
   const panel = document.getElementById('rpt-compare-panel');
   if(!panel) return;
   const immediate = !!opts.immediate;
@@ -256,6 +258,7 @@ window.closeComparePanel = function(opts = {}){
 };
 
 window.openComparePanel = function(){
+  window.KirunaRoutes.update('discourse',{compare:(_currentModule||'Sentiment').toLowerCase()});
   const panel = document.getElementById('rpt-compare-panel');
   if(!panel) return;
 

@@ -2037,9 +2037,17 @@ function updateHud(){
   viewCountEl.textContent = displayedRange.entries.length;
 }
 
+let routeUpdateTimer=null;
 function updateZoomButtons(){
   const current = getModeIndex();
   zoomBtns.forEach((b,i) => b.classList.toggle('on', i === current));
+  clearTimeout(routeUpdateTimer);
+  routeUpdateTimer=setTimeout(()=>{
+    if(shell.dataset.mapView==='outside')return;
+    window.parent.KirunaRoutes?.update('timeline2',{
+      source:'inside',view:ypv<=3?'calendar':ypv<=24?'year':'overview',year:Math.round(centerYear)
+    },true);
+  },600);
 }
 
 window.refreshTimeline2Hud = function(outsideState = null){
@@ -2752,6 +2760,7 @@ function ribbonJumpTo(e){
 zoomBtns.forEach(b=>{
   b.addEventListener('click', ()=>{
     const lvl = parseInt(b.dataset.lvl);
+    window.parent.KirunaRoutes?.update('timeline2',{source:'inside',view:['overview','year','calendar'][lvl],year:Math.round(centerYear),event:null});
     // Smooth tween to target zoom level
     animateTo(centerYear, LEVELS[lvl].ypv, 500);
     hideHint();
@@ -2765,6 +2774,7 @@ zoomBtns.forEach(b=>{
   const mapTabs = document.querySelectorAll('.map-tab');
 
   function setMapView(view){
+    window.parent.KirunaRoutes?.update('timeline2',{source:view,view:'overview',event:null});
     // Toggle parent tab active state
     mapTabs.forEach(t => t.classList.toggle('on', t.dataset.view === view));
     shell.dataset.mapView = view;
@@ -2820,6 +2830,7 @@ function schedulePopoverFit(){
   });
 }
 function openPopover(ev){
+  window.parent.KirunaRoutes?.update('timeline2',{event:ev.id,year:ev.year});
   const pop = document.getElementById('popover');
   const mapBtn = document.getElementById('pop-map-link');
   const hero = document.getElementById('pop-hero');
@@ -2852,6 +2863,7 @@ function openPopover(ev){
   schedulePopoverFit();
 }
 function closePopover(restoreOverview = (getMode() !== 'calendar')){
+  window.parent.KirunaRoutes?.update('timeline2',{event:null});
   const pop = document.getElementById('popover');
   pop.classList.remove('show');
   fitPopoverCard();
@@ -3251,7 +3263,9 @@ window.applyExternalViewState = function(view = 'overview', year = null){
     targetYpv = LEVELS[2].ypv;
     cpYear = targetYear;
     cpSel = null;
-  } else if(normalizedView === 'year' || normalizedView === 'timeline' || normalizedView === 'overview'){
+  } else if(normalizedView === 'year'){
+    targetYpv = LEVELS[1].ypv;
+  } else if(normalizedView === 'timeline' || normalizedView === 'overview'){
     targetYpv = LEVELS[0].ypv;
   }
   animateTo(targetYear, targetYpv, 420);
@@ -3270,6 +3284,30 @@ window.forceTimelineLayout = function(){
   measure();
   layout();
   alignHeaderCenterToParentTabs();
+};
+window.applyTimeRoute=function(state){
+  document.getElementById('map-tab-'+state.source).click();
+  if(state.source==='outside'){
+    const frame=document.getElementById('outside-frame');
+    const apply=()=>state.view==='cards'
+      ?frame.contentWindow?.openOutsideDocFromGallery?.(state.event)
+      :frame.contentWindow?.openOutsideDocSearch?.(state.event);
+    if(state.event!==null){
+      if(frame.contentWindow?.openOutsideDocSearch)apply();
+      else frame.addEventListener('load',apply,{once:true});
+    }else if(state.view==='cards'){
+      const open=()=>frame.contentWindow?.openOutsideCards?.();
+      if(frame.contentWindow?.openOutsideCards)open();
+      else frame.addEventListener('load',open,{once:true});
+    }
+    return;
+  }
+  document.getElementById('popover').classList.remove('show');
+  window.applyExternalViewState(state.view,state.year);
+  if(state.event!==null){
+    const ev=EV_BY_ID.get(state.event);
+    if(ev)openPopover(ev);
+  }
 };
 
 /* Exposed for gallery → Time animation sequence:

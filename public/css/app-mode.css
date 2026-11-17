@@ -1159,8 +1159,8 @@ html:is(.phone-app,.tablet-app) .tl-row:hover::before{
   background:rgba(15,23,42,.04);
 }
 html:is(.phone-app,.tablet-app) .tl-row.on::before{
-  background:rgba(0,102,204,.06);
-  box-shadow:inset 2.5px 0 0 rgba(0,102,204,.72);
+  background:#f0f0f2;
+  box-shadow:none;
 }
 html:is(.phone-app,.tablet-app) .peb-events{
   background:rgba(15,23,42,.08);

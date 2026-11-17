@@ -506,7 +506,7 @@ html.phone-app .tl-row::before{
   border-radius:14px!important;
 }
 html.phone-app .tl-row.on::before{
-  background:rgba(0,102,204,.08)!important;
+  background:#f0f0f2!important;
   box-shadow:none!important;
 }
 html.phone-app #map-ruler{

@@ -3,6 +3,24 @@ import { spawn } from "node:child_process";
 import net from "node:net";
 import { once } from "node:events";
 import { test } from "node:test";
+import { readFile } from "node:fs/promises";
+import vm from "node:vm";
+
+test("module URLs round-trip and reject unsupported route values", async()=>{
+  const context={URL,URLSearchParams,window:{addEventListener(){}},document:{addEventListener(){}}};
+  vm.runInNewContext(await readFile(new URL('../public/js/routes.js',import.meta.url),'utf8'),context);
+  const {parse,format}=context.window.KirunaRoutes;
+  for(const path of [
+    '/', '/map', '/map/event/42?view=calendar&type=urban&details=1',
+    '/time/inside/year?year=2014&event=42', '/time/outside/cards?event=4',
+    '/gallery/inside/42', '/gallery/outside/4',
+    '/discourse/x/posts', '/discourse/x/replies', '/discourse/reddit/posts',
+    '/discourse/reddit/replies?compare=keywords', '/chat'
+  ])assert.equal(format(parse(new URL(path,'https://archive.test'))),path);
+  assert.equal(format(parse(new URL('/map/event/not-a-number?type=invalid&details=oops','https://archive.test'))),'/map');
+  assert.equal(format(parse(new URL('/time/inside/cards?year=nope','https://archive.test'))),'/time/inside/overview');
+  assert.equal(format(parse(new URL('/discourse','https://archive.test'))),'/discourse/x/posts');
+});
 
 test("split archive data is available to chat", async () => {
   const listener = net.createServer();
@@ -33,6 +51,9 @@ test("split archive data is available to chat", async () => {
     const mapPage = await fetch(`http://127.0.0.1:${port}/map`);
     assert.equal(mapPage.status, 200);
     assert.match(await mapPage.text(), /id="page-archive"/);
+    const deepPage=await fetch(`http://127.0.0.1:${port}/map/event/42?details=1`);
+    assert.equal(deepPage.status,200);
+    assert.match(await deepPage.text(), /<base href="\/">/);
 
     const response = await fetch(`http://127.0.0.1:${port}/api/chat`, {
       method: "POST",
