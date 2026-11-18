@@ -1250,7 +1250,7 @@ function renderMarkers(){
 </div>`;
     m.bindPopup(L.popup({
       closeButton:false,
-      maxWidth:320,
+      maxWidth:420,
       minWidth:280,
       autoPan:false
     }).setContent(popHtml));
@@ -1301,14 +1301,18 @@ function centerMapPopupCard(){
   const mapEl=leafletMap.getContainer();
   const card=mapEl.querySelector('.leaflet-popup');
   if(!card)return;
-  mapEl.style.setProperty('--map-popup-max-height',`${Math.max(140,mapEl.clientHeight-16)}px`);
   const mapRect=mapEl.getBoundingClientRect();
+  const rulerTop=document.getElementById('map-ruler')?.getBoundingClientRect().top;
+  const bottom=rulerTop>mapRect.top?Math.min(mapRect.bottom,rulerTop):mapRect.bottom;
+  const visibleTop=mapRect.top+12;
+  const visibleBottom=bottom-12;
+  mapEl.style.setProperty('--map-popup-max-height',`${Math.max(0,visibleBottom-visibleTop)}px`);
   const cardRect=card.getBoundingClientRect();
   const styles=getComputedStyle(mapEl);
   const x=parseFloat(styles.getPropertyValue('--popup-center-x'))||leafletMap.getSize().x/2;
   const y=parseFloat(styles.getPropertyValue('--popup-center-y'))||leafletMap.getSize().y/2;
   mapEl.style.setProperty('--popup-center-x',`${x+mapRect.left+mapRect.width/2-cardRect.left-cardRect.width/2}px`);
-  mapEl.style.setProperty('--popup-center-y',`${y+mapRect.top+mapRect.height/2-cardRect.top-cardRect.height/2}px`);
+  mapEl.style.setProperty('--popup-center-y',`${y+(visibleTop+visibleBottom)/2-cardRect.top-cardRect.height/2}px`);
 }
 window._togglePopupDetail=function(pid,btn,lat,lng){
   const el=document.getElementById(pid);
@@ -1323,6 +1327,7 @@ window._togglePopupDetail=function(pid,btn,lat,lng){
   if(window._syncMapChromeState) window._syncMapChromeState();
   // hide short desc when details are open to avoid duplicate text
   const popupInner=el.closest('.leaflet-popup-content')||el.parentElement;
+  popupInner.classList.toggle('details-open',open);
   const shortDesc=popupInner?popupInner.querySelector('.popup-short-desc'):null;
   if(shortDesc){
     if(open){shortDesc.classList.add('hidden');}

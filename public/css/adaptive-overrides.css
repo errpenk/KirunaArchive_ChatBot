@@ -266,7 +266,6 @@ html.phone-app .leaflet-popup-content-wrapper{
 }
 html.phone-app .leaflet-popup-content{
   width:min(288px,calc(100vw - 44px)) !important;
-  max-height:min(calc(100vh - 180px),var(--map-popup-max-height,100vh)) !important;
 }
 html.phone-app .popup-btn-row{
   position:sticky;
@@ -799,7 +798,7 @@ html.phone-app.map-fs-active #map-fs-btn {
 
 /* 13. Map popup: auto-show expanded content; hide location box and toggle button */
 html.phone-app .popup-expand {
-  max-height:600px!important; opacity:1!important; overflow:visible!important;
+  display:block!important;
 }
 html.phone-app .popup-expand-loc,
 html.phone-app .popup-short-desc,
@@ -1401,7 +1400,6 @@ html.tablet-app .leaflet-popup-content-wrapper{
 }
 html.tablet-app .leaflet-popup-content{
   width:min(320px,calc(100vw - 64px))!important;
-  max-height:min(calc(100vh - 220px),var(--map-popup-max-height,100vh))!important;
 }
 html.tablet-app .popup-btn-row{
   position:sticky!important;
