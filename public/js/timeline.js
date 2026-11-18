@@ -379,11 +379,6 @@ function ribbonPxForYear(year, width = railWidth){
   return RIBBON_EDGE_PAD + (clampedPos / axisSpan) * innerWidth;
 }
 
-function ribbonPctForYear(year, width = railWidth){
-  const safeWidth = Math.max(width, 1);
-  return (ribbonPxForYear(year, safeWidth) / safeWidth) * 100;
-}
-
 function ensureRibbonBaseLayout(){
   const width = Math.max(railWidth, 1);
   if(ribbonBaseLayoutWidth === width && ribbonBasePctById.size === EVS.length) return;
@@ -417,14 +412,6 @@ function ribbonXToYear(clientX){
   const innerWidth = Math.max(1, rect.width - RIBBON_EDGE_PAD * 2);
   const t = clamp01((localX - RIBBON_EDGE_PAD) / innerWidth);
   return timelinePosToYear(t * getTimelineAxisSpan());
-}
-
-function ribbonXToTimelinePos(clientX){
-  const rect = ribbonTrack.getBoundingClientRect();
-  const localX = Math.max(0, Math.min(rect.width, clientX - rect.left));
-  const innerWidth = Math.max(1, rect.width - RIBBON_EDGE_PAD * 2);
-  const t = clamp01((localX - RIBBON_EDGE_PAD) / innerWidth);
-  return t * getTimelineAxisSpan();
 }
 
 /* Timeline hit-testing stays anchored to the visible year label. */
@@ -760,46 +747,6 @@ function lerp(a, b, t){
   return a + (b - a) * t;
 }
 
-function getOverviewProgress(){
-  return clamp01((24 - ypv) / 12);
-}
-
-function getCalendarProgress(){
-  return clamp01((8 - ypv) / 5);
-}
-
-function getTimelineStep(){
-  const overviewToYear = getOverviewProgress();
-  const yearToCalendar = getCalendarProgress();
-  return lerp(210, 260, overviewToYear) * lerp(1, 0.82, yearToCalendar);
-}
-
-function getTimelinePadding(){
-  return Math.max(140, Math.min(260, stageW * 0.26));
-}
-
-function getTimelineContentWidth(){
-  return getTimelinePadding() * 2 + Math.max(0, EVS.length - 1) * getTimelineStep();
-}
-
-function getColumnX(index){
-  return getTimelinePadding() + index * getTimelineStep();
-}
-
-function getVisibleTimelineEntries(){
-  const edgeMargin = getMode() === 'overview' ? 120 : 150;
-  const visible = [];
-
-  EVS.forEach((ev, index) => {
-    const screenX = yearToX(evFractionalYear(ev));
-    if(screenX >= -edgeMargin && screenX <= stageW + edgeMargin){
-      visible.push({ev, index, screenX});
-    }
-  });
-
-  return visible;
-}
-
 function isEntryWithinViewport(x, halfWidth, bleed = 12){
   return x >= -halfWidth - bleed && x <= stageW + halfWidth + bleed;
 }
@@ -849,120 +796,6 @@ function dedupeGuideLines(entries, minGap){
     });
 }
 
-function filterDenseOverviewLabels(entries, minGap){
-  const shown = [];
-  [...entries]
-    .sort((a,b) => a.x - b.x || a.index - b.index)
-    .forEach(entry => {
-      entry.showLabel = true;
-      const prev = shown[shown.length - 1];
-      if(!prev || entry.x - prev.x >= minGap){
-        shown.push(entry);
-        return;
-      }
-
-      const prevScore = (prev.featured ? 4 : 0) + Math.max(0, OVERVIEW_LABEL_MAX_LANES - prev.lane);
-      const nextScore = (entry.featured ? 4 : 0) + Math.max(0, OVERVIEW_LABEL_MAX_LANES - entry.lane);
-      if(nextScore > prevScore){
-        prev.showLabel = false;
-        shown[shown.length - 1] = entry;
-      } else {
-        entry.showLabel = false;
-      }
-    });
-}
-
-function rectsIntersect(a, b){
-  return !(a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top);
-}
-
-function getOverviewEntryScore(entry){
-  return (entry.featured ? 4 : 0) + Math.max(0, OVERVIEW_LABEL_MAX_LANES - entry.lane);
-}
-
-function setTextEntryVisibility(entry, visible){
-  entry.col.classList.toggle('show', visible);
-  entry.col.style.opacity = visible ? '1.000' : '0.000';
-  entry.col.style.pointerEvents = visible ? 'auto' : 'none';
-  if(entry.guide){
-    entry.guide.style.opacity = visible && entry.showGuide ? '1' : '0';
-  }
-}
-
-function resolveRenderedOverviewCollisions(entries){
-  const kept = [];
-
-  [...entries]
-    .sort((a,b) => a.x - b.x || a.index - b.index)
-    .forEach(entry => {
-      if(!entry.label) return;
-      const rect = entry.label.getBoundingClientRect();
-      const colliding = kept.filter(other => rectsIntersect(rect, other.label.getBoundingClientRect()));
-      if(!colliding.length){
-        kept.push(entry);
-        return;
-      }
-
-      const currentScore = getOverviewEntryScore(entry);
-      const strongerCollision = colliding.some(other => getOverviewEntryScore(other) >= currentScore);
-      if(strongerCollision){
-        setTextEntryVisibility(entry, false);
-        return;
-      }
-
-      colliding.forEach(other => {
-        setTextEntryVisibility(other, false);
-        const idx = kept.indexOf(other);
-        if(idx !== -1) kept.splice(idx, 1);
-      });
-      kept.push(entry);
-    });
-}
-
-function getDetailEntryScore(entry){
-  const ev = EVS[entry.index];
-  return (ev?.featured ? 100 : 0) + (ev && ev.id < 100 ? 10 : 0) + (entry.index / 1000);
-}
-
-function setDetailEntryVisibility(entry, visible){
-  entry.col.classList.toggle('show', visible);
-  entry.col.style.opacity = visible ? '1.000' : '0.000';
-  entry.col.style.pointerEvents = visible ? 'auto' : 'none';
-  if(entry.guide){
-    entry.guide.style.opacity = visible && entry.showGuide ? '1' : '0';
-  }
-}
-
-function resolveRenderedDetailCollisions(entries){
-  const kept = [];
-
-  [...entries]
-    .sort((a,b) => a.x - b.x || a.index - b.index)
-    .forEach(entry => {
-      if(!entry.card) return;
-      const rect = entry.card.getBoundingClientRect();
-      const colliding = kept.filter(other => rectsIntersect(rect, other.card.getBoundingClientRect()));
-      if(!colliding.length){
-        kept.push(entry);
-        return;
-      }
-
-      const currentScore = getDetailEntryScore(entry);
-      const strongerCollision = colliding.some(other => getDetailEntryScore(other) > currentScore);
-      if(strongerCollision){
-        setDetailEntryVisibility(entry, false);
-        return;
-      }
-
-      colliding.forEach(other => {
-        setDetailEntryVisibility(other, false);
-        const idx = kept.indexOf(other);
-        if(idx !== -1) kept.splice(idx, 1);
-      });
-      kept.push(entry);
-    });
-}
-
 function animatePanByYears(deltaYears, duration = 180){
   // deltaYears is really "delta in pos units" (ypv-scaled steps).
   // Compute the target pos directly, then convert to year just for animateTo's API.
@@ -973,25 +806,6 @@ function animatePanByYears(deltaYears, duration = 180){
   const halfSpan = ypv / 2;
   const safePos = Math.max(halfSpan, Math.min(axisSpan - halfSpan, targetPos));
   animateTo(timelinePosToYear(safePos), ypv, duration);
-}
-
-function getTimelinePageStep(){
-  const visible = getVisibleTimelineEntries();
-  return Math.max(1, visible.length - 2);
-}
-
-function getTimelineVisibleRange(){
-  const visible = getVisibleTimelineEntries();
-  if(!visible.length) return null;
-
-  const sorted = [...visible].sort((a,b) => evFractionalYear(a.ev) - evFractionalYear(b.ev) || a.ev.id - b.ev.id);
-  return {
-    startYear: sorted[0].ev.year,
-    endYear: sorted[sorted.length - 1].ev.year,
-    startValue: evFractionalYear(sorted[0].ev),
-    endValue: evFractionalYear(sorted[sorted.length - 1].ev),
-    entries: sorted
-  };
 }
 
 function getTimelineViewportEntries(mode = getMode(), bleed = 0){
@@ -1059,21 +873,6 @@ function getDisplayedTimelineRange(){
     startValue: evFractionalYear(entries[0]),
     endValue: evFractionalYear(entries[entries.length - 1]),
     entries
-  };
-}
-
-function getRibbonDisplayRange(){
-  if(getMode() === 'calendar'){
-    const block = cpBlock(cpYear);
-    return {start: block.start, end: block.end};
-  }
-
-  const displayedRange = getDisplayedTimelineRange();
-  if(!displayedRange) return {start: YR_MIN, end: YR_MAX};
-
-  return {
-    start: Math.max(YR_MIN, Math.floor(displayedRange.startValue)),
-    end: Math.min(YR_MAX, Math.ceil(displayedRange.endValue))
   };
 }
 
@@ -1720,10 +1519,6 @@ function navigateCalendarBy(dir){
   return true;
 }
 
-function monthName(m){
-  return MONTH_NAMES[m - 1];
-}
-
 let lastCalendarNavTriggerAt = 0;
 function triggerCalendarNav(dir){
   const now = performance.now();
@@ -2191,6 +1986,21 @@ function buildRibbon(){
   });
 }
 
+function resetRibbonViewport(dots){
+  updateRibbonLabels(YR_MIN, YR_MAX, 0, 100);
+  ribbonViewportLeftPct = 0;
+  ribbonViewportRightPct = 100;
+  hideRibbonHoverYear();
+  ribbonViewport.style.left = '0%';
+  ribbonViewport.style.width = '100%';
+  animateRibbonViewportIfNeeded(0, 100);
+  dots.forEach(d => {
+    d.classList.remove('in-view');
+    d.style.opacity = '1';
+    d.style.pointerEvents = 'auto';
+  });
+}
+
 function updateRibbonViewport(){
   const mode = getMode();
   const dots = Array.from(ribbonTrack.querySelectorAll('.ribbon-dot'));
@@ -2216,18 +2026,7 @@ function updateRibbonViewport(){
   } else {
     const displayedRange = getDisplayedTimelineRange();
     if(!displayedRange){
-      updateRibbonLabels(YR_MIN, YR_MAX, 0, 100);
-      ribbonViewportLeftPct = 0;
-      ribbonViewportRightPct = 100;
-      hideRibbonHoverYear();
-      ribbonViewport.style.left = '0%';
-      ribbonViewport.style.width = '100%';
-      animateRibbonViewportIfNeeded(0, 100);
-      dots.forEach(d => {
-        d.classList.remove('in-view');
-        d.style.opacity = '1';
-        d.style.pointerEvents = 'auto';
-      });
+      resetRibbonViewport(dots);
       return;
     }
     rangeStart = displayedRange.startValue;
@@ -2237,18 +2036,7 @@ function updateRibbonViewport(){
   }
 
   if(rangeEnd < rangeStart){
-    updateRibbonLabels(YR_MIN, YR_MAX, 0, 100);
-    ribbonViewportLeftPct = 0;
-    ribbonViewportRightPct = 100;
-    hideRibbonHoverYear();
-    ribbonViewport.style.left = '0%';
-    ribbonViewport.style.width = '100%';
-    animateRibbonViewportIfNeeded(0, 100);
-    dots.forEach(d => {
-      d.classList.remove('in-view');
-      d.style.opacity = '1';
-      d.style.pointerEvents = 'auto';
-    });
+    resetRibbonViewport(dots);
     return;
   }
 
@@ -2351,14 +2139,6 @@ function applyEmbeddedPinchZoom(scale, clientX, baseYpv = ypv){
   updateHud();
   return nextYpv;
 }
-window.__codexGetTimelineYpv = () => Number(ypv) || 72;
-window.__codexPinchZoomBy = (scale, clientX, baseYpv) => applyEmbeddedPinchZoom(scale, clientX, baseYpv);
-window.__codexFinalizePinchZoom = () => {
-  layout();
-  updateHud();
-  return true;
-};
-
 function handleTimelineZoom(deltaY, clientX){
   const now = performance.now();
   if(wheelGestureModeSwitchConsumed) return;
@@ -3024,128 +2804,6 @@ window.syncTimelineAdaptiveUi = function(){
 // Resize
 window.addEventListener('resize', ()=>{ measure(); layout(); syncEmbeddedAppMode(); alignHeaderCenterToParentTabs(); });
 
-/* ══════════════════════════════════════════════════════════════
-   ONBOARDING — plays once per session. Pantomimes the core
-   interactions with a fake cursor. Users can skip.
-═══════════════════════════════════════════════════════════════ */
-function runOnboarding(){
-  const onboard = document.getElementById('onboard');
-  const cursor = document.getElementById('onboard-cursor');
-  const caption = document.getElementById('onboard-caption');
-  const skip = document.getElementById('onboard-skip');
-
-  let cancelled = false;
-  const timers = [];
-
-  function cleanup(){
-    if(cancelled) return;
-    cancelled = true;
-    timers.forEach(t => clearTimeout(t));
-    if(tweenRAF) cancelAnimationFrame(tweenRAF);
-    onboard.classList.remove('on');
-    setTimeout(() => {
-      // restore to overview if user didn't interact
-      ypv = LEVELS[0].ypv;
-      centerYear = DEFAULT_OVERVIEW_CENTER;
-      clampCenter(); layout();
-    }, 400);
-  }
-  skip.addEventListener('click', cleanup);
-  // Any user interaction kills onboarding
-  const killers = ['wheel','mousedown','keydown','touchstart'];
-  killers.forEach(ev => {
-    window.addEventListener(ev, function once(){
-      cleanup();
-      killers.forEach(e2 => window.removeEventListener(e2, once));
-    }, {once: true, capture: true});
-  });
-
-  function wait(ms){
-    return new Promise(res => {
-      const t = setTimeout(res, ms);
-      timers.push(t);
-    });
-  }
-  function moveCursor(xPct, yPct){
-    cursor.style.transform = `translate(-50%, -50%) translate(${xPct}vw, ${yPct}vh)`;
-  }
-  function setCaption(text){
-    caption.textContent = text;
-    caption.classList.add('on');
-  }
-  function hideCaption(){
-    caption.classList.remove('on');
-  }
-  function click(){
-    cursor.classList.add('click');
-    setTimeout(() => cursor.classList.remove('click'), 500);
-  }
-
-  async function play(){
-    // Start: show overview fully (set zoom)
-    ypv = LEVELS[0].ypv;
-    centerYear = DEFAULT_OVERVIEW_CENTER;
-    clampCenter(); layout();
-
-    await wait(300);
-    onboard.classList.add('on');
-    if(cancelled) return;
-
-    // 1. Cursor appears in middle, caption: "Scroll to zoom through time"
-    moveCursor(-20, -10);
-    await wait(100);
-    moveCursor(0, 0);
-    setCaption('Scroll to zoom through time');
-    await wait(1200);
-    if(cancelled) return;
-
-    // 2. Simulate a scroll zoom — animate into timeline view
-    hideCaption();
-    await wait(300);
-    animateTo(1990, 12, 1600);
-    await wait(1800);
-    if(cancelled) return;
-
-    // 3. Caption: "← → to hop between events"
-    setCaption('Use ← → to jump between events');
-    await wait(900);
-    if(cancelled) return;
-
-    // 4. Simulate arrow key hop — pick an event to flash
-    const ev = EVS.find(e => e.year === 2004) || EVS.find(e => e.featured);
-    if(ev){
-      animateTo(evFractionalYear(ev), 28, 700);
-      await wait(800);
-      if(cancelled) return;
-      flashEvent(ev.id);
-    }
-    await wait(1000);
-    if(cancelled) return;
-
-    // 5. Caption: "Or drag the ribbon below"
-    setCaption('Or drag the timeline ribbon below');
-    // Move cursor to ribbon area
-    moveCursor(0, 30);
-    // Add pulse to ribbon dots
-    document.querySelectorAll('.ribbon-dot.featured').forEach(d => d.classList.add('breathe'));
-    await wait(1800);
-    if(cancelled) return;
-
-    // 6. Fade out, return to overview
-    hideCaption();
-    await wait(300);
-    onboard.classList.remove('on');
-    animateTo(DEFAULT_OVERVIEW_CENTER, LEVELS[0].ypv, 1200);
-
-    // stop breathing after a bit
-    setTimeout(() => {
-      document.querySelectorAll('.ribbon-dot.breathe').forEach(d => d.classList.remove('breathe'));
-    }, 4000);
-  }
-
-  play();
-}
-
 window.applyExternalViewState = function(view = 'overview', year = null){
   const normalizedView = String(view || 'overview').trim().toLowerCase();
   const targetYear = Number.isFinite(year)
@@ -3243,7 +2901,3 @@ alignHeaderCenterToParentTabs();
 if(initialViewState.level !== null || initialViewState.year !== null){
   hint.classList.add('hide');
 }
-
-// Trigger onboarding after a short beat (only if user hasn't seen it)
-const ONBOARD_KEY = 'kiruna_onboard_seen_v1';
-sessionStorage.setItem(ONBOARD_KEY, '1');

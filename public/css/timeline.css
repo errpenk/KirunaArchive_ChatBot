@@ -518,59 +518,6 @@ html.embedded-tablet .txt-title{font-size:9px}
   transition:opacity .3s ease;
 }
 
-/* ═══════════════════════════════════════════════════════
-   ONBOARDING — a cursor that pantomimes the key interactions.
-   Shows only once per session (respects localStorage).
-════════════════════════════════════════════════════════*/
-#onboard{
-  position:absolute;top:0;left:0;right:0;bottom:0;
-  pointer-events:none;z-index:50;
-  opacity:0;transition:opacity .5s ease;
-}
-#onboard.on{opacity:1}
-#onboard-cursor{
-  position:absolute;top:50%;left:50%;
-  width:28px;height:28px;
-  transition:transform 1.2s cubic-bezier(.45,.05,.55,.95),opacity .4s ease;
-  filter:drop-shadow(0 4px 8px rgba(0,0,0,.2));
-  will-change:transform;
-}
-#onboard-cursor svg{width:100%;height:100%}
-#onboard-cursor.click::after{
-  content:'';position:absolute;top:50%;left:50%;
-  transform:translate(-50%,-50%);
-  width:8px;height:8px;border-radius:50%;
-  background:rgba(0,102,204,.5);
-  animation:onboardClick .5s ease-out;
-}
-@keyframes onboardClick{
-  0%{width:8px;height:8px;opacity:1}
-  100%{width:60px;height:60px;opacity:0}
-}
-#onboard-caption{
-  position:absolute;top:30%;left:50%;transform:translateX(-50%);
-  background:rgba(29,29,31,.95);color:#fff;
-  padding:10px 18px;border-radius:24px;
-  font-family:var(--sans);font-size:12px;font-weight:500;
-  letter-spacing:-.005em;white-space:nowrap;
-  box-shadow:0 8px 24px rgba(0,0,0,.25);
-  transition:opacity .4s ease,transform .4s cubic-bezier(.22,1,.36,1);
-  opacity:0;
-}
-#onboard-caption.on{opacity:1}
-#onboard-skip{
-  position:absolute;top:80px;right:32px;
-  pointer-events:auto;
-  background:rgba(255,255,255,.9);backdrop-filter:blur(20px);
-  border:.5px solid var(--g4);
-  padding:7px 14px;border-radius:20px;
-  font-family:var(--mono);font-size:10px;font-weight:600;
-  letter-spacing:.08em;text-transform:uppercase;color:var(--g2);
-  cursor:pointer;
-  transition:background .15s ease;
-}
-#onboard-skip:hover{background:var(--w)}
-
 /* Event flash — when you hop to one via keyboard, it flashes */
 .ev.flash .ev-inner{
   animation:evFlash 1s cubic-bezier(.4,0,.2,1);

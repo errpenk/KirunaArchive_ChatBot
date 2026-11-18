@@ -366,16 +366,6 @@
       update();
     }
 
-    function openCardEvent(doc) {
-      const vp = document.getElementById("cards-vp");
-      const years = filteredYears();
-      S.backLink = { from: "expanded", filter: S.filter, year: years[S.yIdx], cardsScrollLeft: vp.scrollLeft, docIdx: doc.idx };
-      S.activeDocIdx = doc.idx;
-      S.pendingOverviewRestore = { docIdx: doc.idx };
-      setView("collapsed");
-      update();
-    }
-
     function goBack() {
       if (!S.backLink) return;
       const snap = S.backLink;
@@ -423,12 +413,6 @@
       const target = card.offsetLeft + (card.offsetWidth / 2) - (vp.clientWidth / 2);
       vp.scrollTo({ left: Math.max(0, target), behavior });
       return true;
-    }
-
-    function scheduleOutsideDocCardCenter(docIdx) {
-      [0, 120, 360, 760].forEach((delay, index) => {
-        setTimeout(() => centerOutsideDocCard(docIdx, index === 0 ? "auto" : "smooth"), delay);
-      });
     }
 
     function scheduleOutsideGalleryArrivalFlip(docIdx) {

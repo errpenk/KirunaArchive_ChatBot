@@ -1,0 +1,44 @@
+.archive-locate-flash{
+  animation:archiveLocateFlash 1.6s cubic-bezier(.22,1,.36,1);
+}
+@keyframes archiveLocateFlash{
+  0%{box-shadow:0 0 0 0 rgba(255,205,64,.38);background:rgba(255,241,168,.92)}
+  70%{box-shadow:0 0 0 16px rgba(255,205,64,0);background:rgba(255,241,168,.42)}
+  100%{box-shadow:0 0 0 0 rgba(255,205,64,0);background:transparent}
+}
+.archive-inline-highlight{
+  background:#fff1a8;
+  color:inherit;
+  border-radius:4px;
+  padding:0 .08em;
+  box-shadow:0 0 0 4px rgba(255,241,168,.48);
+}
+.archive-container-highlight{
+  background:rgba(255,241,168,.42)!important;
+  box-shadow:0 0 0 4px rgba(255,241,168,.42)!important;
+  border-radius:16px!important;
+}
+.archive-container-highlight.archive-container-highlight-pulse,
+.archive-inline-highlight.archive-inline-highlight-pulse{
+  animation:archiveInlineHighlightPulse 1.6s cubic-bezier(.22,1,.36,1);
+}
+@keyframes archiveInlineHighlightPulse{
+  0%{box-shadow:0 0 0 0 rgba(255,205,64,.55);background:#fff1a8}
+  70%{box-shadow:0 0 0 14px rgba(255,205,64,0);background:#fff6c7}
+  100%{box-shadow:0 0 0 0 rgba(255,205,64,0);background:#fff1a8}
+}
+/* Outside-doc chat highlight */
+.ov-event-row.chat-outside-highlight{
+  background:rgba(255,241,168,.55)!important;
+  outline:2px solid rgba(255,205,64,.95)!important;
+  outline-offset:2px!important;
+  box-shadow:0 0 0 8px rgba(255,241,168,.36)!important;
+  transition:background .26s ease,box-shadow .26s ease,outline-color .26s ease;
+}
+/* Timeline text/detail col highlight */
+.txt-col.archive-locate-flash,
+.dtl-col.archive-locate-flash{
+  border-radius:10px;
+  z-index:10;
+  position:relative;
+}
