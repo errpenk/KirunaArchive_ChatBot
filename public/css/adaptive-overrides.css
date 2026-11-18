@@ -266,7 +266,7 @@ html.phone-app .leaflet-popup-content-wrapper{
 }
 html.phone-app .leaflet-popup-content{
   width:min(288px,calc(100vw - 44px)) !important;
-  max-height:calc(100vh - 180px) !important;
+  max-height:min(calc(100vh - 180px),var(--map-popup-max-height,100vh)) !important;
 }
 html.phone-app .popup-btn-row{
   position:sticky;
@@ -1050,7 +1050,6 @@ html.tablet-app #page-timeline .peb-event:hover{
 html.tablet-app #page-timeline .peb-evt-title{
   font-size:12px!important;
 }
-html.tablet-app #page-report,
 html.tablet-app #page-discourse{
   overflow-y:auto!important;
   overflow-x:hidden!important;
@@ -1402,7 +1401,7 @@ html.tablet-app .leaflet-popup-content-wrapper{
 }
 html.tablet-app .leaflet-popup-content{
   width:min(320px,calc(100vw - 64px))!important;
-  max-height:calc(100vh - 220px)!important;
+  max-height:min(calc(100vh - 220px),var(--map-popup-max-height,100vh))!important;
 }
 html.tablet-app .popup-btn-row{
   position:sticky!important;
@@ -1583,7 +1582,6 @@ html.tablet-app body:has(#page-home:not(.off)) #nav{
   -webkit-backdrop-filter:none!important;
 }
 html.tablet-app #page-home,
-html.tablet-app #page-report,
 html.tablet-app #page-discourse{
   background:#fff!important;
 }
@@ -1611,7 +1609,6 @@ html.tablet-app #page-home .btn-outline:active,
 html.tablet-app #page-home .card:hover{
   box-shadow:none!important;
 }
-html.tablet-app #page-report,
 html.tablet-app #page-discourse{
   border-radius:0!important;
   box-shadow:none!important;
@@ -1868,29 +1865,6 @@ html.tablet-app #page-timeline #phase-outer[style*='display: none']{
   display:none!important;
 }
 
-html.tablet-app #page-report #rpt .cards{
-  display:grid!important;
-  grid-template-columns:repeat(3,minmax(0,1fr))!important;
-  gap:0!important;
-  margin:24px 0!important;
-  background:transparent!important;
-  border:none!important;
-}
-html.tablet-app #page-report #rpt .card{
-  min-height:0!important;
-  padding:14px 20px!important;
-  background:transparent!important;
-  border:none!important;
-  border-radius:0!important;
-  box-shadow:none!important;
-}
-html.tablet-app #page-report #rpt .cards .card + .card{
-  border-left:1px solid rgba(15,23,42,.12)!important;
-}
-html.tablet-app #page-report #rpt .dark .cards .card + .card{
-  border-left-color:rgba(255,255,255,.18)!important;
-}
-
 html.tablet-app #page-discourse .dc-hero-stats{
   display:grid!important;
   grid-template-columns:repeat(5,minmax(0,1fr))!important;
@@ -2096,13 +2070,6 @@ html.phone-app #page-discourse .dc-nav-inner{
 html.phone-app #page-discourse .dc-ptab{
   justify-content:center!important;
   text-align:center!important;
-}
-html.phone-app #page-gallery .gallery-grid{
-  grid-template-columns:repeat(3,minmax(0,1fr))!important;
-  gap:8px!important;
-}
-html.phone-app #page-gallery .gallery-scroll{
-  padding:18px 12px calc(42px + env(safe-area-inset-bottom)) 10px!important;
 }
 html.phone-app #page-gallery .gallery-year-rail{
   width:64px!important;

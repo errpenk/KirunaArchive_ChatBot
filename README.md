@@ -14,8 +14,8 @@ Minimal Railway-ready version of the Kiruna Archive with a real chat backend.
 
 - `public/index.html` contains the main page markup and intro scripts.
 - `public/timeline.html` and `public/outside-map.html` contain the timeline and Outside views.
-- `public/css/` and `public/js/` contain each page's styles and scripts. Main-page CSS is loaded in cascade order: base, archive, responsive, report, discourse, compare, app mode, and adaptive overrides.
-- The gallery card grid is a small Vue island in `public/index.html` and `public/js/gallery.js`; its pinned runtime and license are in `public/vendor/`. The gallery lightbox and year rail remain in `gallery.js`.
+- `public/css/` and `public/js/` contain each page's styles and scripts. Main-page CSS is loaded in cascade order: base, archive, responsive, discourse, compare, app mode, and adaptive overrides.
+- The gallery card grid and year rail use Vue in `public/index.html` and `public/js/gallery.js`; the gallery lightbox remains in `gallery.js`. The main search results use a small Vue view in `public/index.html` and `public/js/archive.js`. The pinned Vue runtime and license are in `public/vendor/`.
 - Map ruler wheel, drag, and touch input lives in `public/js/map-ruler-input.js`; map rendering and event selection remain in `public/js/archive.js`.
 - `public/js/responsive-collisions.js` keeps navigation and map-sidebar overlap checks out of the archive view logic.
 - `public/js/outside-data.js` supplies the same document data to the main search and Outside view.

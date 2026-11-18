@@ -924,14 +924,12 @@ html.tablet-app .cp-day,
 html.tablet-app .cp-day-empty{
   min-height:96px;
 }
-html.tablet-app #page-report,
 html.tablet-app #page-discourse{
   border-radius:var(--tablet-radius);
   overflow:hidden;
   box-shadow:var(--tablet-shadow);
   background:#fff;
 }
-html.tablet-app #btn-top,
 html.tablet-app #dc-btn-top,
 html.tablet-app #rpt-compare-btn{
   right:34px;
@@ -1089,7 +1087,6 @@ html.tablet-app .cpevs-panel,
 html.tablet-app .phase-era-block,
 html.tablet-app .era-panel,
 html.tablet-app .legend,
-html.tablet-app #page-report,
 html.tablet-app #page-discourse{
   border:1px solid var(--ui-stroke);
   box-shadow:var(--ui-shadow-soft);

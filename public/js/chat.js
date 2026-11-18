@@ -658,7 +658,7 @@
       const pageLabel=getPageLabel(pageId);
       let currentHeading=getSectionHeading(page,pageLabel);
       page.querySelectorAll(LOCAL_CHAT_TEXT_SELECTOR).forEach(el=>{
-        if(!el||el.closest('#nav,#chat-panel,#page-chat,#toc-panel,#toc-tab,#toc-trigger,#toc-edge-cue,#chat-fab')) return;
+        if(!el||el.closest('#nav,#chat-panel,#page-chat,#chat-fab')) return;
         const text=normalizeSearchText(el.textContent||'');
         if(!text) return;
         const isHeading=el.matches('h1,h2,h3,h4,.sec-title,.sub,.src-title,.src-group-label,.dc-h2,.dc-chart-title');

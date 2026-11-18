@@ -384,7 +384,7 @@ function switchTimelineView(targetView, opts={}){
 }
 
 function showPage(p,fromPage){
-  if(p==='report' && !document.getElementById('page-report')) p='discourse';
+  if(p==='report') p='discourse';
   // Dismiss the chat-source return button whenever the page changes
   if(typeof window.clearChatSourceReturnAnchor==='function') window.clearChatSourceReturnAnchor();
   const prev=activePage;
@@ -508,36 +508,6 @@ function showPage(p,fromPage){
       observeHTLNodes();
     });
   }
-  if(p==='report'){
-    document.getElementById('toc-trigger').style.display='block';
-    document.getElementById('toc-panel').style.display='flex';
-    document.getElementById('toc-edge-cue').classList.add('show');
-    const ea=document.getElementById('toc-tab');if(ea)ea.classList.add('show');
-    document.getElementById('rpt-progress').classList.add('show');
-    if(window._initReportOnce&&!window._reportInitialized){
-      window._initReportOnce();
-    } else if(window._reportInitialized){
-      // Re-invalidate maps after page transition completes
-      [80, 200, 400].forEach(delay=>setTimeout(()=>{
-        if(window._rptMaps)window._rptMaps.forEach(m=>{try{m.invalidateSize();}catch(e){}});
-      }, delay));
-      // Ensure btn-top visibility is correct
-      setTimeout(()=>{ if(window._updateTOC) window._updateTOC(); }, 100);
-    }
-  } else {
-    const tt=document.getElementById('toc-trigger');
-    const tp=document.getElementById('toc-panel');
-    const ec=document.getElementById('toc-edge-cue');
-    const ea=document.getElementById('toc-tab');
-    const rp=document.getElementById('rpt-progress');
-    if(tt)tt.style.display='none';
-    if(tp){tp.style.display='none';tp.classList.remove('toc-visible');}
-    if(ec)ec.classList.remove('show');
-    if(ea)ea.classList.remove('show');
-    if(rp)rp.classList.remove('show');
-    const topBtn=document.getElementById('btn-top');
-    if(topBtn)topBtn.classList.remove('visible');
-  }
   if(p==='discourse'&&!window._discourseInitialized){
     window._discourseInitialized=true;
     initDiscourse();
@@ -559,7 +529,7 @@ function showPage(p,fromPage){
     if(trigger) { trigger.style.display='block'; }
     if(tocPanel) { tocPanel.style.display='flex'; }
     if(edge) edge.classList.add('show');
-    /* Restore INDEX tab immediately to avoid the white gap when leaving report */
+    /* Restore INDEX tab immediately to avoid the white gap after navigation */
     const dcTab=document.getElementById('dc-toc-tab');
     if(dcTab) {
       dcTab.style.display='flex';
@@ -626,6 +596,7 @@ function initMap(){
   if(leafletMap)return;
   leafletMap=L.map('leaflet-map',{center:[67.857,20.26],zoom:13,zoomControl:false});
   leafletMap.on('move zoom resize',()=>requestAnimationFrame(centerMapPopupCard));
+  if(window.ResizeObserver)new ResizeObserver(()=>requestAnimationFrame(centerMapPopupCard)).observe(leafletMap.getContainer());
 
   const cartoLayer=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
     attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>',
@@ -1330,6 +1301,7 @@ function centerMapPopupCard(){
   const mapEl=leafletMap.getContainer();
   const card=mapEl.querySelector('.leaflet-popup');
   if(!card)return;
+  mapEl.style.setProperty('--map-popup-max-height',`${Math.max(140,mapEl.clientHeight-16)}px`);
   const mapRect=mapEl.getBoundingClientRect();
   const cardRect=card.getBoundingClientRect();
   const styles=getComputedStyle(mapEl);
@@ -1934,6 +1906,18 @@ window.openGalleryToMap=openGalleryToMap;
 /* Search */
 const searchInput=document.getElementById('nav-search');
 const searchDrop=document.getElementById('search-dropdown');
+const searchVm=Vue.createApp({
+  data:()=>({items:[],query:''}),
+  methods:{
+    openResult(item){
+      setSearchDropdownOpen(false);
+      searchInput.value='';
+      if(item.source==='outside')openOutsideSearchResult(item.docIdx,item.year);
+      else selectEvent(item.id);
+    }
+  },
+  template:'#search-results-template'
+}).mount(searchDrop);
 const navEl=document.getElementById('nav');
 const navLogoEl=document.getElementById('logo-btn');
 const navTabsEl=document.querySelector('#nav .nav-tabs');
@@ -2036,7 +2020,7 @@ window.openOutsideFromGallery=openOutsideFromGallery;
   setTimeout(()=>warmOutsideSearchIndex(attempt+1),200);
 })();
 function doSearch(q){
-  if(!q.trim()){setSearchDropdownOpen(false);return;}
+  if(!q.trim()){searchVm.items=[];setSearchDropdownOpen(false);return;}
   const lq=q.toLowerCase();
   const insideRes=EVS
     .filter(ev=>ev.emoji!=='📄')
@@ -2069,27 +2053,16 @@ function doSearch(q){
       color:doc.color||'#86868b'
     }));
   const res=[...insideRes,...outsideRes].slice(0,8);
+  searchVm.query=q;
+  searchVm.items=res;
   if(!res.length){
     if(!_outsideSearchCacheReady){
       setTimeout(()=>{
         if(searchInput.value.trim()===q.trim()) doSearch(q);
       },220);
     }
-    searchDrop.innerHTML=`<div class="srd-empty">No results for "${q}"</div>`;
   }
-  else{
-    searchDrop.innerHTML=res.map(item=>`<div class="srd-item" data-source="${item.source}" data-id="${item.id??''}" data-doc-idx="${item.docIdx??''}" data-year="${item.year??''}"><div class="srd-dot" style="background:${item.color}"></div><div class="srd-copy"><div class="srd-meta"><div class="srd-yr">${item.meta}</div><div class="srd-source">${item.sourceLabel}</div></div><div class="srd-title">${item.title}</div></div></div>`).join('');
-    searchDrop.querySelectorAll('.srd-item').forEach(r=>r.addEventListener('click',()=>{
-      setSearchDropdownOpen(false);
-      searchInput.value='';
-      if(r.getAttribute('data-source')==='outside'){
-        openOutsideSearchResult(+r.getAttribute('data-doc-idx'), Number(r.getAttribute('data-year')));
-      } else {
-        selectEvent(+r.getAttribute('data-id'));
-      }
-    }));
-    animateStaggerIn(searchDrop.querySelectorAll('.srd-item'),{axis:'y',distance:6,step:18,duration:180});
-  }
+  else Vue.nextTick(()=>{if(searchInput.value===q)animateStaggerIn(searchDrop.querySelectorAll('.srd-item'),{axis:'y',distance:6,step:18,duration:180});});
   setSearchDropdownOpen(true);
 }
 searchInput.addEventListener('input',e=>doSearch(e.target.value));

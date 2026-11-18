@@ -54,8 +54,17 @@
     const countLabel=document.getElementById('gallery-count-label');
     if(!content) return;
     if(!galleryVm)galleryVm=Vue.createApp({
-      data:()=>({groups:[]}),
-      methods:{openTile(event){openLightbox(event.currentTarget)}},
+      data:()=>({groups:[],activeYear:null}),
+      methods:{
+        openTile(event){openLightbox(event.currentTarget)},
+        jumpYear(year){
+          const group=document.querySelector(`.gallery-year-group[data-year="${year}"]`);
+          const scroll=document.getElementById('gallery-scroll');
+          if(group&&scroll)scroll.scrollTo({top:Math.max(0,group.offsetTop-24),behavior:'smooth'});
+          this.activeYear=year;
+          document.querySelector(`.gallery-rail-node[data-year="${year}"]`)?.scrollIntoView({behavior:'smooth',block:'nearest'});
+        }
+      },
       template:'#gallery-grid-template'
     }).mount(content);
 
@@ -74,63 +83,15 @@
       year,label:year==='0'?'Undated':year,
       items:byYear[year].map((item,i)=>({...item,gradient:tileGradient(item.color,i+byYear[year].length)}))
     }));
-    buildGalleryRail(years);
+    bindGalleryRail();
     return Vue.nextTick();
   }
 
-  function buildGalleryRail(years){
+  function bindGalleryRail(){
     const rail=document.getElementById('gallery-year-rail-nodes');
     const railEl=document.getElementById('gallery-year-rail');
     if(!rail) return;
-    rail.innerHTML='';
 
-    years.forEach(year=>{
-      const node=document.createElement('div');
-      node.className='gallery-rail-node';
-      node.dataset.year=year;
-      node.setAttribute('tabindex','0');
-      node.setAttribute('role','button');
-      node.setAttribute('aria-label','Jump to '+year);
-
-      const dot=document.createElement('div');
-      dot.className='gallery-rail-dot';
-
-      const lbl=document.createElement('div');
-      lbl.className='gallery-rail-year';
-      lbl.textContent=year==='0'?'Undated':year;
-
-      node.appendChild(dot);
-      node.appendChild(lbl);
-
-      const activate=(yr)=>{
-        const group=document.querySelector(`.gallery-year-group[data-year="${yr}"]`);
-        if(group){
-          const scroll=document.getElementById('gallery-scroll');
-          if(scroll){
-            /* Scroll so the year group label sits near top with some breathing room */
-            const groupTop=group.offsetTop;
-            const scrollTarget=Math.max(0, groupTop - 24);
-            scroll.scrollTo({top:scrollTarget, behavior:'smooth'});
-          } else {
-            group.scrollIntoView({behavior:'smooth',block:'start'});
-          }
-        }
-        document.querySelectorAll('.gallery-rail-node').forEach(n=>n.classList.remove('active'));
-        node.classList.add('active');
-        node.scrollIntoView({behavior:'smooth',block:'nearest'});
-      };
-
-      node.addEventListener('click',()=>activate(year));
-      node.addEventListener('keydown',e=>{
-        if(e.key==='Enter'||e.key===' '){e.preventDefault();activate(year);}
-        if(e.key==='ArrowDown'){e.preventDefault();const next=node.nextElementSibling;if(next){next.focus();next.click();}}
-        if(e.key==='ArrowUp'){e.preventDefault();const prev=node.previousElementSibling;if(prev){prev.focus();prev.click();}}
-      });
-
-      rail.appendChild(node);
-    });
-
-    /* Keyboard scroll on the rail container itself */
     if(railEl && !railEl._keysBound){
       railEl._keysBound=true;
       railEl.setAttribute('tabindex','0');
@@ -161,9 +122,7 @@
           const rect=g.getBoundingClientRect();
           if(rect.top<=scrollTop+100) activeYear=g.dataset.year;
         });
-        document.querySelectorAll('.gallery-rail-node').forEach(n=>{
-          n.classList.toggle('active',n.dataset.year===activeYear);
-        });
+        galleryVm.activeYear=activeYear;
       },{passive:true});
     }
   }

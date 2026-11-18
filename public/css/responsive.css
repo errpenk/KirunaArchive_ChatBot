@@ -87,7 +87,6 @@
   .tlp-controls{flex-wrap:wrap;gap:6px;}
   .phase-outer{padding:12px 16px 24px;}
   .peb-events{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))!important;}
-  #toc-tab,#toc-trigger,#toc-panel,#toc-edge-cue{display:none!important;}
 }
 
 /* ── 600px: Phone landscape / tablet portrait ── */

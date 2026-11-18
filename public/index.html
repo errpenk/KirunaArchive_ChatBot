@@ -12,7 +12,6 @@
 <link rel="stylesheet" href="./css/main.css?v=20261025-2">
 <link rel="stylesheet" href="./css/archive.css">
 <link rel="stylesheet" href="./css/responsive.css">
-<link rel="stylesheet" href="./css/report.css">
 <link rel="stylesheet" href="./css/discourse.css">
 <link rel="stylesheet" href="./css/compare.css">
 <link rel="stylesheet" href="./css/app-mode.css">
@@ -191,6 +190,16 @@ import { animate, svg, utils } from './vendor/anime.esm.min.js';
       <div class="nav-search-wrap">
         <input class="nav-search-input" id="nav-search" type="text" placeholder="Search events…" autocomplete="off">
         <span class="nav-search-icon">⌕</span>
+        <template id="search-results-template">
+          <div v-if="!items.length" class="srd-empty">No results for "{{ query }}"</div>
+          <button v-for="item in items" :key="item.key" type="button" class="srd-item" @click="openResult(item)">
+            <span class="srd-dot" :style="{background:item.color}"></span>
+            <span class="srd-copy">
+              <span class="srd-meta"><span class="srd-yr">{{ item.meta }}</span><span class="srd-source">{{ item.sourceLabel }}</span></span>
+              <span class="srd-title">{{ item.title }}</span>
+            </span>
+          </button>
+        </template>
         <div class="search-results-dropdown" id="search-dropdown"></div>
       </div>
       <a href="https://kiruna.se/" target="_blank" class="nbadge">kiruna.se ↗</a>
@@ -925,6 +934,16 @@ import { animate, svg, utils } from './vendor/anime.esm.min.js';
         </nav>
         <div class="gallery-scroll" id="gallery-scroll">
           <template id="gallery-grid-template">
+            <teleport to="#gallery-year-rail-nodes">
+              <div v-for="group in groups" :key="group.year" class="gallery-rail-node"
+                :class="{active:activeYear===group.year}" :data-year="group.year"
+                tabindex="0" role="button" :aria-label="'Jump to '+group.label"
+                @click="jumpYear(group.year)" @keydown.enter.prevent="jumpYear(group.year)"
+                @keydown.space.prevent="jumpYear(group.year)">
+                <div class="gallery-rail-dot"></div>
+                <div class="gallery-rail-year">{{ group.label }}</div>
+              </div>
+            </teleport>
             <div v-for="group in groups" :key="group.year" class="gallery-year-group" :data-year="group.year">
               <div class="gallery-year-label">{{ group.label }}</div>
               <div class="gallery-grid">
@@ -950,78 +969,6 @@ import { animate, svg, utils } from './vendor/anime.esm.min.js';
         </div>
       </div>
     </div>
-
-    <div id="toc-trigger"></div>
-    <div id="toc-panel">
-      <div class="toc-backdrop"></div>
-      <div class="toc-rail"></div>
-      <div class="toc-index-label">Index</div>
-      <div class="toc-items">
-        <div class="toc-item" data-target="hero" onclick="tocJump('hero')">
-          <span class="toc-item-label">Iron below, a city on the move</span>
-          <span class="toc-tick"><span class="toc-tick-line"></span><span class="toc-tick-dot"></span></span>
-          <span class="toc-connector"></span>
-        </div>
-        <div class="toc-item" data-target="sec1" onclick="tocJump('sec1')">
-          <span class="toc-item-label">Background</span>
-          <span class="toc-tick"><span class="toc-tick-line"></span><span class="toc-tick-dot"></span></span>
-          <span class="toc-connector"></span>
-        </div>
-        <div class="toc-item" data-target="scrolly1" onclick="tocJump('scrolly1')">
-          <span class="toc-item-label">City-level Maps</span>
-          <span class="toc-tick"><span class="toc-tick-line"></span><span class="toc-tick-dot"></span></span>
-          <span class="toc-connector"></span>
-        </div>
-        <div class="toc-item" data-target="sec2" onclick="tocJump('sec2')">
-          <span class="toc-item-label">History</span>
-          <span class="toc-tick"><span class="toc-tick-line"></span><span class="toc-tick-dot"></span></span>
-          <span class="toc-connector"></span>
-        </div>
-        <div class="toc-item" data-target="scrolly2" onclick="tocJump('scrolly2')">
-          <span class="toc-item-label">Regional Maps</span>
-          <span class="toc-tick"><span class="toc-tick-line"></span><span class="toc-tick-dot"></span></span>
-          <span class="toc-connector"></span>
-        </div>
-        <div class="toc-item" data-target="sec3" onclick="tocJump('sec3')">
-          <span class="toc-item-label">People &amp; Place</span>
-          <span class="toc-tick"><span class="toc-tick-line"></span><span class="toc-tick-dot"></span></span>
-          <span class="toc-connector"></span>
-        </div>
-        <div class="toc-item" data-target="sec4" onclick="tocJump('sec4')">
-          <span class="toc-item-label">Conclusion</span>
-          <span class="toc-tick"><span class="toc-tick-line"></span><span class="toc-tick-dot"></span></span>
-          <span class="toc-connector"></span>
-        </div>
-      </div>
-    </div>
-    <div class="toc-edge-cue" id="toc-edge-cue"><div class="toc-edge-cue-inner"></div></div>
-    <div id="toc-tab">
-      <div class="toc-tab-body">
-        <div class="toc-tab-ticks">
-          <div class="toc-tab-tick"></div>
-          <div class="toc-tab-tick"></div>
-          <div class="toc-tab-tick"></div>
-          <div class="toc-tab-tick"></div>
-          <div class="toc-tab-tick"></div>
-        </div>
-        <div class="toc-tab-label">Index</div>
-        <div class="toc-tab-icon">
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-            <path d="M7 5L3 2M7 5L3 8" stroke="rgba(255,255,255,.9)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-      </div>
-    </div>
-
-    <!-- REPORT SCROLL PROGRESS BAR -->
-    <div id="rpt-progress"><div id="rpt-progress-bar"></div></div>
-
-    <!-- BACK TO TOP -->
-    <button id="btn-top" aria-label="Back to top" onclick="reportScrollTop()">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-        <path d="M7 12V3M3 6l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </button>
 
     <!-- COMPARE BUTTON + PANEL (Discourse page) -->
     <button id="rpt-compare-btn" onclick="toggleCompare()">
@@ -1067,11 +1014,11 @@ import { animate, svg, utils } from './vendor/anime.esm.min.js';
 <script src="./js/outside-data.js"></script>
 <script src="./js/archive-data.js"></script>
 <script src="./js/routes.js"></script>
+<script src="./vendor/vue.global.prod.js"></script>
 <script src="./js/responsive-collisions.js"></script>
 <script src="./js/archive.js"></script>
 <script src="./js/map-ruler-input.js"></script>
 
-<script src="./js/report.js"></script>
 
 
 <script src="./js/hero-visualization.js"></script>
@@ -1180,7 +1127,6 @@ import { animate, svg, utils } from './vendor/anime.esm.min.js';
 
 <link rel="stylesheet" href="./css/gallery.css">
 
-<script src="./vendor/vue.global.prod.js"></script>
 <script src="./js/gallery.js"></script>
 <script>
 (function(){
