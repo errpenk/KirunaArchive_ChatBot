@@ -20,6 +20,11 @@ test("module URLs round-trip and reject unsupported route values", async()=>{
   assert.equal(format(parse(new URL('/map/event/not-a-number?type=invalid&details=oops','https://archive.test'))),'/map');
   assert.equal(format(parse(new URL('/time/inside/cards?year=nope','https://archive.test'))),'/time/inside/overview');
   assert.equal(format(parse(new URL('/discourse','https://archive.test'))),'/discourse/x/posts');
+  const pagesContext={URL,URLSearchParams,window:{addEventListener(){}},document:{baseURI:'https://errpenk.github.io/KirunaArchive_ChatBot/',addEventListener(){}}};
+  vm.runInNewContext(await readFile(new URL('../public/js/routes.js',import.meta.url),'utf8'),pagesContext);
+  for(const path of ['/KirunaArchive_ChatBot/','/KirunaArchive_ChatBot/map/event/42?details=1','/KirunaArchive_ChatBot/discourse/reddit/replies?compare=keywords']){
+    assert.equal(pagesContext.window.KirunaRoutes.format(pagesContext.window.KirunaRoutes.parse(new URL(path,'https://errpenk.github.io'))),path);
+  }
 });
 
 test("shared archive records keep fixed IDs across views", async()=>{

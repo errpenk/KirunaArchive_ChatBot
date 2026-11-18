@@ -1,9 +1,11 @@
 (function(){
+  const basePath=typeof document.baseURI==='string'?new URL(document.baseURI).pathname.replace(/\/$/,''):'';
   const paths={home:'/',archive:'/map',timeline2:'/time/inside/overview',gallery:'/gallery',discourse:'/discourse/x/posts',chat:'/chat'};
   const panels={xpost:'/discourse/x/posts',xreply:'/discourse/x/replies',rpost:'/discourse/reddit/posts',rreply:'/discourse/reddit/replies'};
   const types=['all','urban','mine','infra','social','env'];
   function parse(url){
-    const parts=url.pathname.split('/').filter(Boolean);
+    const pathname=url.pathname===basePath?'/':url.pathname.startsWith(basePath+'/')?url.pathname.slice(basePath.length):url.pathname;
+    const parts=pathname.split('/').filter(Boolean);
     const params=url.searchParams;
     const state={page:({map:'archive',time:'timeline2',gallery:'gallery',discourse:'discourse',chat:'chat'})[parts[0]]||'home'};
     if(state.page==='archive'){
@@ -21,7 +23,7 @@
       }
     }
     if(state.page==='discourse'){
-      state.panel=Object.keys(panels).find(key=>panels[key]===url.pathname.replace(/\/$/,''))||'xpost';
+      state.panel=Object.keys(panels).find(key=>panels[key]===pathname.replace(/\/$/,''))||'xpost';
       state.compare=['sentiment','keywords'].includes(params.get('compare'))?params.get('compare'):null;
     }
     if(state.page==='gallery'){
@@ -48,7 +50,7 @@
       if(['sentiment','keywords'].includes(state.compare))query.set('compare',state.compare);
     }
     if(state.page==='gallery'&&Number.isInteger(state.item))path+='/'+(state.source==='outside'?'outside':'inside')+'/'+state.item;
-    return path+(query.size?'?'+query:'');
+    return basePath+path+(query.size?'?'+query:'');
   }
   let restoring=false;
   let restoreToken=0;
