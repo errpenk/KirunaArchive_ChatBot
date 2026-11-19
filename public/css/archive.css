@@ -98,8 +98,7 @@
 .popup-yr{font-size:12px;color:var(--g3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em}
 .popup-title{font-size:15px;font-weight:600;line-height:1.35;margin-bottom:4px;letter-spacing:-.01em;color:var(--b)}
 .popup-cat{font-size:13px;color:var(--g3);margin-bottom:6px}
-.popup-short-desc{font-size:13px;color:var(--g2);line-height:1.55;padding-top:6px;border-top:.5px solid var(--g5);transition:max-height .32s ease,opacity .22s ease,padding .22s ease;max-height:none;overflow:visible;opacity:1}
-.popup-short-desc.hidden{max-height:0;opacity:0;padding-top:0;border-top:none}
+.popup-short-desc{font-size:13px;color:var(--g2);line-height:1.55;padding-top:6px;border-top:.5px solid var(--g5)}
 .popup-related{border-top:.5px solid var(--g5);margin-top:8px;padding-top:8px}
 .popup-related-heading{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g3);margin-bottom:4px}
 .popup-related-link{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;width:100%;padding:5px 0;border:0;background:none;text-align:left;color:var(--b);font:500 12px/1.4 var(--sans);cursor:pointer}
@@ -647,6 +646,7 @@
 
 /* Map year ruler */
 #map-ruler{position:absolute;bottom:0;left:0;right:0;height:62px;background:linear-gradient(to bottom,rgba(255,255,255,.28) 0%,rgba(255,255,255,.42) 100%);backdrop-filter:saturate(220%) blur(32px) brightness(1.08);-webkit-backdrop-filter:saturate(220%) blur(32px) brightness(1.08);border-top:.5px solid rgba(255,255,255,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 -1px 0 rgba(0,0,0,.06);z-index:1000;overflow:hidden}
+#leaflet-map .leaflet-bottom.leaflet-right{bottom:62px}
 #map-ruler-inner{display:flex;align-items:flex-end;height:100%;padding:0 24px 14px;overflow-x:auto;scrollbar-width:none;gap:0;position:relative}
 #map-ruler-inner::-webkit-scrollbar{display:none}
 /* Ruler baseline — extends beyond scroll width using a fixed element */

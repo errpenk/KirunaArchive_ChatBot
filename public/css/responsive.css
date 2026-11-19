@@ -69,6 +69,7 @@
   .legend{display:none;}
   /* Ruler stays visible */
   #map-ruler{height:56px;}
+  #leaflet-map .leaflet-bottom.leaflet-right{bottom:56px}
   .leaflet-control-zoom{margin-bottom:68px!important;}
   .legend{bottom:68px!important;}
 

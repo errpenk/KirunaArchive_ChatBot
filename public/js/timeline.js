@@ -501,6 +501,7 @@ function timelinePosToYear(pos){
 
 let lastTimelineActivationId = null;
 let lastTimelineActivationAt = 0;
+let popoverReturnView = null;
 
 function activateTimelineEvent(ev, e){
   const now = performance.now();
@@ -511,6 +512,7 @@ function activateTimelineEvent(ev, e){
   lastTimelineActivationId = ev.id;
   lastTimelineActivationAt = now;
   if(getMode() === 'overview'){
+    popoverReturnView = {centerYear, ypv};
     animateTo(evFractionalYear(ev), LEVELS[1].ypv, 500, () => openPopover(ev));
   } else {
     openPopover(ev);
@@ -2536,13 +2538,16 @@ function openPopover(ev){
   schedulePopoverFit();
 }
 function closePopover(restoreOverview = (getMode() !== 'calendar')){
-  window.parent.KirunaRoutes?.update('timeline2',{event:null});
   const pop = document.getElementById('popover');
+  if(!pop.classList.contains('show')) return;
+  window.parent.KirunaRoutes?.update('timeline2',{event:null});
   pop.classList.remove('show');
   fitPopoverCard();
   if(restoreOverview){
-    animateTo(centerYear, LEVELS[0].ypv, 500);
+    const view = popoverReturnView || {centerYear, ypv:LEVELS[0].ypv};
+    animateTo(view.centerYear, view.ypv, 500);
   }
+  popoverReturnView = null;
 }
 function getEventClientPoint(e){
   const touch = e.changedTouches?.[0] || e.touches?.[0];
@@ -2559,7 +2564,7 @@ function closePopoverFromControl(e){
   e.preventDefault();
   e.stopPropagation();
   if(typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
-  closePopover(false);
+  closePopover();
 }
 document.getElementById('pop-close').addEventListener('click', ()=>{
   closePopover();
@@ -2584,7 +2589,7 @@ function handlePopoverBackdropControl(e){
       setCpeFullscreen(false);
       return;
     }
-    closePopover(false);
+    closePopover();
   }
 }
 ['pointerdown','touchstart','click'].forEach(type => {

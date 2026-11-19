@@ -591,27 +591,17 @@ function showPage(p,fromPage){
 }
 window.showPage=showPage;
 
-/* MAP — CartoDB Voyager tiles */
+/* MAP */
 function initMap(){
   if(leafletMap)return;
   leafletMap=L.map('leaflet-map',{center:[67.857,20.26],zoom:13,zoomControl:false});
   leafletMap.on('move zoom resize',()=>requestAnimationFrame(centerMapPopupCard));
   if(window.ResizeObserver)new ResizeObserver(()=>requestAnimationFrame(centerMapPopupCard)).observe(leafletMap.getContainer());
 
-  const cartoLayer=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
-    attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>',
-    subdomains:'abcd',maxZoom:20
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom:19
   }).addTo(leafletMap);
-  let tileErrorCount=0;
-  cartoLayer.on('tileerror',()=>{
-    tileErrorCount+=1;
-    if(tileErrorCount<4||!leafletMap||leafletMap._kirunaFallbackTiles)return;
-    leafletMap._kirunaFallbackTiles=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-      attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      subdomains:'abc',maxZoom:19
-    }).addTo(leafletMap);
-    try{leafletMap.removeLayer(cartoLayer);}catch(e){}
-  });
 
   L.control.zoom({position:'bottomleft'}).addTo(leafletMap);
 
@@ -1140,7 +1130,7 @@ function buildMapPopupHtml(ev,filtered){
   </div>
 </div>
 <div class="popup-btn-row">
-  <button class="popup-btn" onclick="window._togglePopupDetail('${pid}',this,${ev.lat},${ev.lng})">View Details</button>
+  <button class="popup-btn" onclick="window._togglePopupDetail('${pid}',this)">View Details</button>
   <button class="popup-btn popup-btn-sec" onclick="window.openGalleryItem('inside',${ev.id})">View in Gallery</button>
 </div>`;
 }
@@ -1235,7 +1225,6 @@ function renderMarkers(){
   setTimeout(updateEdgeIndicators,100);
 }
 
-let _preDetailView=null;
 function fitMapPopupContent(card,mapWidth,visibleHeight){
   const content=card.querySelector('.leaflet-popup-content');
   const wrapper=card.querySelector('.leaflet-popup-content-wrapper');
@@ -1277,9 +1266,13 @@ function centerMapPopupCard(){
   mapEl.style.setProperty('--popup-center-x',`${x+mapRect.left+mapRect.width/2-cardRect.left-cardRect.width/2}px`);
   mapEl.style.setProperty('--popup-center-y',`${y+(visibleTop+visibleBottom)/2-cardRect.top-cardRect.height/2}px`);
 }
-window._togglePopupDetail=function(pid,btn,lat,lng){
+window._togglePopupDetail=function(pid,btn){
   const el=document.getElementById(pid);
   if(!el)return;
+  const content=el.closest('.leaflet-popup-content');
+  const wrapper=content?.closest('.leaflet-popup-content-wrapper');
+  wrapper?._detailAnimation?.cancel();
+  const before=wrapper?.getBoundingClientRect();
   const open=el.classList.toggle('open');
   const phoneMode=window.isPhoneAppMode&&window.isPhoneAppMode();
   btn.textContent=open?'Hide Details':'View Details';
@@ -1289,23 +1282,16 @@ window._togglePopupDetail=function(pid,btn,lat,lng){
   if(phoneMode) document.documentElement.classList.remove('map-sheet-collapsed');
   if(window._syncMapChromeState) window._syncMapChromeState();
   // hide short desc when details are open to avoid duplicate text
-  const popupInner=el.closest('.leaflet-popup-content')||el.parentElement;
-  popupInner.classList.toggle('details-open',open);
-  const shortDesc=popupInner?popupInner.querySelector('.popup-short-desc'):null;
-  if(shortDesc){
-    if(open){shortDesc.classList.add('hidden');}
-    else{shortDesc.classList.remove('hidden');}
-  }
-  requestAnimationFrame(centerMapPopupCard);
-  if(open){
-    _preDetailView={center:leafletMap.getCenter(),zoom:leafletMap.getZoom()};
-    const targetZoom=15;
-    leafletMap.flyTo([lat,lng],targetZoom,{animate:true,duration:.82,easeLinearity:.18});
-  } else {
-    if(_preDetailView){
-      leafletMap.flyTo(_preDetailView.center,_preDetailView.zoom,{animate:true,duration:.72,easeLinearity:.18});
-      _preDetailView=null;
-    }
+  content.classList.toggle('details-open',open);
+  const shortDesc=content.querySelector('.popup-short-desc');
+  if(shortDesc)shortDesc.hidden=open;
+  centerMapPopupCard();
+  if(wrapper&&before&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
+    const after=wrapper.getBoundingClientRect();
+    wrapper._detailAnimation=wrapper.animate([
+      {height:`${before.height}px`,width:`${before.width}px`},
+      {height:`${after.height}px`,width:`${after.width}px`}
+    ],{duration:360,easing:'cubic-bezier(.22,1,.36,1)'});
   }
 };
 
@@ -1816,7 +1802,7 @@ window.applyArchiveRoute=async function(state){
     marker?.once('popupopen',()=>{
       const button=document.querySelector('.popup-btn');
       const ev=EVS.find(ev=>ev.id===state.event);
-      if(button)window._togglePopupDetail('ppx-'+ev.id,button,ev.lat,ev.lng);
+      if(button)window._togglePopupDetail('ppx-'+ev.id,button);
     });
   }
 };

@@ -515,6 +515,9 @@ html.phone-app #map-ruler{
   height:var(--phone-ruler-h)!important;
   transition:transform .34s cubic-bezier(.22,1,.36,1), opacity .26s ease, box-shadow .3s ease!important;
 }
+html.phone-app #leaflet-map .leaflet-bottom.leaflet-right{
+  bottom:calc(var(--phone-ruler-h) + 20px + env(safe-area-inset-bottom));
+}
 html.phone-app #map-ruler-inner{
   padding:0 18px 12px!important;
 }
@@ -1373,6 +1376,9 @@ html.tablet-app #map-ruler{
   opacity:1!important;
   pointer-events:auto!important;
   transform:none!important;
+}
+html.tablet-app #leaflet-map .leaflet-bottom.leaflet-right{
+  bottom:calc(var(--tablet-phone-ruler-h) + 24px + env(safe-area-inset-bottom));
 }
 html.tablet-app #map-ruler-inner{
   padding:0 20px 12px!important;
