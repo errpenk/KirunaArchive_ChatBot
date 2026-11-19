@@ -1184,11 +1184,7 @@ function renderMarkers(){
     }).setContent(buildMapPopupHtml(ev,filtered)));
     m.on('popupopen',()=>{
       window.KirunaRoutes.update('archive',{event:ev.id});
-      const mapSize=leafletMap.getSize();
-      const mapEl=leafletMap.getContainer();
-      mapEl.style.setProperty('--popup-center-x',`${mapSize.x/2}px`);
-      mapEl.style.setProperty('--popup-center-y',`${mapSize.y/2}px`);
-      requestAnimationFrame(centerMapPopupCard);
+      centerMapPopupCard();
       window._mapPopupOpen=true;
       window._mapDetailOpen=false;
       updateEdgeIndicators();
@@ -1259,12 +1255,9 @@ function centerMapPopupCard(){
   const visibleBottom=bottom-12;
   mapEl.style.setProperty('--map-popup-max-height',`${Math.max(0,visibleBottom-visibleTop)}px`);
   fitMapPopupContent(card,mapRect.width,visibleBottom-visibleTop);
-  const cardRect=card.getBoundingClientRect();
-  const styles=getComputedStyle(mapEl);
-  const x=parseFloat(styles.getPropertyValue('--popup-center-x'))||leafletMap.getSize().x/2;
-  const y=parseFloat(styles.getPropertyValue('--popup-center-y'))||leafletMap.getSize().y/2;
-  mapEl.style.setProperty('--popup-center-x',`${x+mapRect.left+mapRect.width/2-cardRect.left-cardRect.width/2}px`);
-  mapEl.style.setProperty('--popup-center-y',`${y+(visibleTop+visibleBottom)/2-cardRect.top-cardRect.height/2}px`);
+  const paneRect=card.parentElement.getBoundingClientRect();
+  mapEl.style.setProperty('--popup-center-x',`${mapRect.left+mapRect.width/2-paneRect.left}px`);
+  mapEl.style.setProperty('--popup-center-y',`${(visibleTop+visibleBottom)/2-paneRect.top}px`);
 }
 window._togglePopupDetail=function(pid,btn){
   const el=document.getElementById(pid);
@@ -1273,7 +1266,7 @@ window._togglePopupDetail=function(pid,btn){
   const wrapper=content?.closest('.leaflet-popup-content-wrapper');
   wrapper?._detailAnimation?.cancel();
   const before=wrapper?.getBoundingClientRect();
-  const open=el.classList.toggle('open');
+  const open=!el.classList.contains('open');
   const phoneMode=window.isPhoneAppMode&&window.isPhoneAppMode();
   btn.textContent=open?'Hide Details':'View Details';
   window._mapDetailOpen=!!open;
@@ -1281,18 +1274,27 @@ window._togglePopupDetail=function(pid,btn){
 
   if(phoneMode) document.documentElement.classList.remove('map-sheet-collapsed');
   if(window._syncMapChromeState) window._syncMapChromeState();
-  // hide short desc when details are open to avoid duplicate text
-  content.classList.toggle('details-open',open);
   const shortDesc=content.querySelector('.popup-short-desc');
-  if(shortDesc)shortDesc.hidden=open;
-  centerMapPopupCard();
-  if(wrapper&&before&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
-    const after=wrapper.getBoundingClientRect();
-    wrapper._detailAnimation=wrapper.animate([
-      {height:`${before.height}px`,width:`${before.width}px`},
-      {height:`${after.height}px`,width:`${after.width}px`}
-    ],{duration:360,easing:'cubic-bezier(.22,1,.36,1)'});
-  }
+  const showDetails=value=>{
+    el.classList.toggle('open',value);
+    content.classList.toggle('details-open',value);
+    if(shortDesc)shortDesc.hidden=value;
+    centerMapPopupCard();
+  };
+  showDetails(open);
+  if(!wrapper||!before||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const after=wrapper.getBoundingClientRect();
+  if(!open)showDetails(true);
+  const animation=wrapper.animate([
+    {height:`${before.height}px`,width:`${before.width}px`},
+    {height:`${after.height}px`,width:`${after.width}px`}
+  ],{duration:360,easing:'cubic-bezier(.22,1,.36,1)'});
+  wrapper._detailAnimation=animation;
+  animation.onfinish=()=>{
+    if(wrapper._detailAnimation!==animation||!wrapper.isConnected)return;
+    if(!open)showDetails(false);
+    wrapper._detailAnimation=null;
+  };
 };
 
 window._selectEv=function(id){selectEvent(id);};
