@@ -99,6 +99,15 @@
       const activeYear = years[S.yIdx] || null;
       const docs = activeYear ? docsForYear(activeYear) : [];
 
+      // Synchronize user-driven year changes without overwriting a pending deep link on initialization.
+      if (_prevYear !== null) {
+        const routes = window.parent.parent.KirunaRoutes;
+        const route = routes?.parse(new URL(window.parent.parent.location.href));
+        if (route?.page === 'timeline2' && route.source === 'outside') {
+          routes.update('timeline2', {year: activeYear ? Number(activeYear) : null, event: S.activeDocIdx ?? null});
+        }
+      }
+
       // Reset field filter when year changes
       if (activeYear !== _prevYear) {
         S.ovField = null;

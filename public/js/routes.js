@@ -23,7 +23,7 @@
         const value=params.get(key);
         state[key]=value!==null&&/^\d+$/.test(value)?Number(value):null;
       }
-      if(state.source==='outside'||state.year<1900||state.year>2035) state.year=null;
+      if(state.year<1900||state.year>2035) state.year=null;
       if(state.source==='inside'&&state.view==='calendar')state.year=calendarPage!==null?1900+(calendarPage-1)*35:calendarStart(state.year??1935);
     }
     if(state.page==='discourse'){
@@ -51,7 +51,7 @@
         const start=calendarStart(Number.isInteger(state.year)&&state.year>=1900&&state.year<=2035?state.year:1935);
         path='/time/inside/calendar'+(1+(start-1900)/35);
       }
-      else if(state.source!=='outside'&&Number.isInteger(state.year)&&state.year>=1900&&state.year<=2035)query.set('year',state.year);
+      else if(Number.isInteger(state.year)&&state.year>=1900&&state.year<=2035)query.set('year',state.year);
       if(Number.isInteger(state.event))query.set('event',state.event);
     }
     if(state.page==='discourse'){
@@ -95,7 +95,7 @@
         if(!frame.contentWindow?.applyTimeRoute){
           await new Promise(resolve=>frame.addEventListener('load',resolve,{once:true}));
         }
-        if(token===restoreToken)frame.contentWindow?.applyTimeRoute?.(state);
+        if(token===restoreToken)await frame.contentWindow?.applyTimeRoute?.(state);
       }
     }finally{if(token===restoreToken)restoring=false;}
   }

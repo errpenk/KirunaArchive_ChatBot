@@ -399,20 +399,20 @@ window.forceTimelineLayout = function(){
   layout();
   alignHeaderCenterToParentTabs();
 };
-window.applyTimeRoute=function(state){
+window.applyTimeRoute=async function(state){
   document.getElementById('map-tab-'+state.source).click();
   if(state.source==='outside'){
     const frame=document.getElementById('outside-frame');
-    const apply=()=>state.view==='cards'
-      ?frame.contentWindow?.openOutsideDocFromGallery?.(state.event)
-      :frame.contentWindow?.openOutsideDocSearch?.(state.event);
+    if(!frame.contentWindow?.applyOutsideYearRoute){
+      await new Promise(resolve=>frame.addEventListener('load',resolve,{once:true}));
+    }
     if(state.event!==null){
-      if(frame.contentWindow?.openOutsideDocSearch)apply();
-      else frame.addEventListener('load',apply,{once:true});
+      if(state.view==='cards')frame.contentWindow?.openOutsideDocFromGallery?.(state.event);
+      else frame.contentWindow?.openOutsideDocSearch?.(state.event);
+    }else if(state.year!==null){
+      frame.contentWindow?.applyOutsideYearRoute?.(state.year,state.view);
     }else if(state.view==='cards'){
-      const open=()=>frame.contentWindow?.openOutsideCards?.();
-      if(frame.contentWindow?.openOutsideCards)open();
-      else frame.addEventListener('load',open,{once:true});
+      frame.contentWindow?.openOutsideCards?.();
     }
     return;
   }

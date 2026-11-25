@@ -153,6 +153,16 @@
       return true;
     };
 
+    window.applyOutsideYearRoute = function(year, view) {
+      S.filter = 'All';
+      const idx = filteredYears().indexOf(String(year));
+      if (idx >= 0) S.yIdx = idx;
+      S.activeDocIdx = null;
+      S.ovField = null;
+      setView(view === 'cards' ? 'expanded' : 'collapsed');
+      update();
+    };
+
     window.openOutsideCards = function() {
       setView("expanded");
       update();
