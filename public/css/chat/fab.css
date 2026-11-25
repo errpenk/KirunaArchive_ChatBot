@@ -1,0 +1,131 @@
+/* ═══════════════════════════════════════════
+   FAB — Floating Action Button
+═══════════════════════════════════════════ */
+#chat-fab{
+  position:fixed;left:calc(100vw - 42px);top:calc(100vh - 120px);
+  width:32px;height:32px;border-radius:50%;
+  background:var(--b);border:none;z-index:9806;cursor:grab;touch-action:none;
+  display:flex;align-items:center;justify-content:center;
+  animation:fabBreath 4s ease-in-out infinite;
+  transition:opacity .18s ease,transform .22s cubic-bezier(.22,1,.36,1);
+}
+@keyframes fabBreath{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.06)}
+}
+
+/* Chat bubble icon — closed state */
+#chat-fab::before{
+  content:'';
+  width:14px;height:14px;
+  background:url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 1C3.686 1 1 3.462 1 6.5c0 1.22.41 2.352 1.1 3.27L1.5 12.5l3.07-.86A6.18 6.18 0 0 0 7 12c3.314 0 6-2.462 6-5.5S10.314 1 7 1z' fill='white'/%3E%3C/svg%3E") center/14px no-repeat;
+  position:absolute;
+  transition:opacity .15s ease,transform .2s cubic-bezier(.22,1,.36,1);
+}
+
+/* Circle icon — open state */
+#chat-fab::after{
+  content:'';
+  width:13px;height:13px;
+  border:2px solid #fff;
+  border-radius:50%;
+  position:absolute;
+  opacity:0;
+  transition:opacity .15s ease,transform .2s cubic-bezier(.22,1,.36,1);
+  transform:scale(.6);
+}
+
+/* Open state — instant icon switch */
+#chat-fab.open{
+  animation:none;
+}
+#chat-fab.open::before{
+  opacity:0;
+  transform:scale(.5);
+}
+#chat-fab.open::after{
+  opacity:1;
+  transform:scale(1);
+}
+
+#chat-fab:hover:not(.dragging):not(.open){
+  animation:none;
+  transform:scale(1.14);
+}
+#chat-fab.activating{
+  animation:fabActivate .38s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes fabActivate{
+  0%{transform:scale(1)}
+  40%{transform:scale(1.22)}
+  70%{transform:scale(.9)}
+  100%{transform:scale(1)}
+}
+#chat-fab.dragging{cursor:grabbing;animation:none;transform:scale(1.08)}
+#chat-welcome{
+  position:fixed;left:16px;top:16px;z-index:9807;
+  width:min(340px,calc(100vw - 24px));font-family:var(--sans);
+  filter:drop-shadow(0 12px 28px rgba(20,35,48,.16));
+}
+#chat-welcome[hidden]{display:none}
+.chat-welcome-card{
+  display:flex;align-items:center;gap:14px;position:relative;
+  min-height:94px;padding:18px 38px 18px 18px;
+  border:1px solid #e7ebef;border-radius:20px;background:#fff;
+}
+.chat-welcome-wave{font-size:27px;flex:none}
+.chat-welcome-card p{margin:0;color:var(--b);font:400 clamp(19px,2vw,23px)/1.2 var(--chat-display,"Playfair Display",Georgia,serif)}
+.chat-welcome-close{
+  position:absolute;right:11px;top:8px;padding:2px 6px;border:0;background:transparent;
+  color:#7b858e;font:24px/1 var(--sans);cursor:pointer;
+}
+.chat-welcome-close:hover{color:var(--b)}
+.chat-welcome-actions{display:flex;gap:8px;margin-top:9px}
+.chat-welcome-actions button{
+  flex:1;min-width:0;padding:10px 8px;border:1px solid #b9c5ce;border-radius:12px;
+  background:#fff;color:#2e526d;font:600 11px/1.25 var(--sans);cursor:pointer;
+}
+.chat-welcome-actions button:hover,.chat-welcome-actions button:focus-visible{
+  background:var(--b);color:#fff;border-color:var(--b);outline:none;
+}
+.chat-fab-status{
+  position:absolute;
+  right:-1px;
+  top:-1px;
+  width:9px;
+  height:9px;
+  border-radius:999px;
+  opacity:0;
+  transform:scale(.72);
+  pointer-events:none;
+  border:1.5px solid #fff;
+  box-shadow:0 0 0 1px rgba(29,29,31,.08);
+  transition:opacity .18s ease,transform .22s cubic-bezier(.22,1,.36,1),background .18s ease;
+  z-index:2;
+}
+#chat-fab.fab-status-thinking .chat-fab-status{
+  opacity:1;
+  transform:scale(1);
+  background:#ffd60a;
+  background-color:#ffd60a!important;
+  box-shadow:0 0 0 1px rgba(29,29,31,.08),0 0 0 5px rgba(255,214,10,.36),0 0 18px rgba(255,214,10,.9);
+}
+#chat-fab.fab-status-success .chat-fab-status{
+  opacity:1;
+  transform:scale(1);
+  background:#30d158;
+}
+#chat-fab.fab-status-unread .chat-fab-status{
+  opacity:1;
+  transform:scale(1);
+  background:#ff3b30;
+  animation:chatFabStatusBreath 1.15s ease-in-out infinite;
+}
+@keyframes chatFabStatusBreath{
+  0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,59,48,.42),0 0 0 1px rgba(29,29,31,.08)}
+  50%{transform:scale(1.18);box-shadow:0 0 0 7px rgba(255,59,48,0),0 0 0 1px rgba(29,29,31,.08)}
+}
+body.on-chat #chat-fab,
+body.on-chat #chat-panel{opacity:0!important;pointer-events:none!important}
+body.on-gallery #chat-source-return-btn,
+body.on-chat #chat-source-return-btn{display:none!important}

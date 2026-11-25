@@ -1,0 +1,119 @@
+/* FINAL PHONE REQUESTED REFINEMENTS — stats bottom line + full-height event list */
+html.phone-app #page-home .stats-inner{
+  border-bottom:none!important;
+}
+
+html.phone-app #page-home .stats-wrapper{
+  border-bottom:1px solid rgba(15,23,42,.08)!important;
+}
+
+html.phone-app #page-home .stat-cell:nth-last-child(-n+3){
+  border-bottom:none!important;
+}
+
+html.phone-app #page-cal{
+  height:100%!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+
+html.phone-app #page-cal .cph{
+  flex:0 0 auto!important;
+}
+
+html.phone-app #page-cal .cpbody{
+  flex:1 1 auto!important;
+  height:auto!important;
+  min-height:0!important;
+  padding:0 16px 0!important;
+  gap:12px!important;
+}
+
+html.phone-app #page-cal .cpgrid-panel{
+  width:100%!important;
+  flex:0 0 auto!important;
+  max-height:46svh!important;
+}
+
+html.phone-app #page-cal .cpevs-panel,
+html.embedded-phone .cpevs-panel{
+  flex:1 1 0!important;
+  min-height:0!important;
+  height:auto!important;
+  max-height:none!important;
+  position:relative!important;
+}
+
+html.phone-app #page-cal .cpe-list,
+html.embedded-phone .cpe-list{
+  flex:1 1 0!important;
+  min-height:0!important;
+  height:auto!important;
+  max-height:none!important;
+  box-sizing:border-box!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  -webkit-overflow-scrolling:touch!important;
+  overscroll-behavior-y:contain!important;
+  touch-action:pan-y!important;
+  padding-bottom:0!important;
+}
+
+html.phone-app #page-cal .cpevs-panel::before,
+html.embedded-phone .cpevs-panel::before{
+  content:''!important;
+  position:absolute!important;
+  right:0!important;
+  top:var(--cpe-scroll-top,58px)!important;
+  width:5px!important;
+  height:var(--cpe-scroll-track-h,0px)!important;
+  border-radius:999px!important;
+  background:rgba(29,29,31,.08)!important;
+  opacity:var(--cpe-scroll-visible,0)!important;
+  pointer-events:none!important;
+  z-index:5!important;
+}
+
+html.phone-app #page-cal .cpevs-panel::after,
+html.embedded-phone .cpevs-panel::after{
+  content:''!important;
+  position:absolute!important;
+  right:0!important;
+  top:var(--cpe-scroll-top,58px)!important;
+  width:5px!important;
+  height:var(--cpe-scroll-thumb-h,36px)!important;
+  border-radius:999px!important;
+  background:rgba(29,29,31,.48)!important;
+  transform:translateY(var(--cpe-scroll-thumb-y,0px))!important;
+  opacity:var(--cpe-scroll-visible,0)!important;
+  pointer-events:none!important;
+  z-index:6!important;
+}
+
+#chat-source-return-btn .chat-source-return-touch{
+  display:none!important;
+}
+
+html:is(.phone-app,.tablet-app) #chat-source-return-btn .chat-source-return-desktop{
+  display:none!important;
+}
+
+html:is(.phone-app,.tablet-app) #chat-source-return-btn .chat-source-return-touch{
+  display:block!important;
+}
+
+html:is(.phone-app,.tablet-app) #page-discourse .dc-ptab{
+  border-bottom-color:transparent!important;
+}
+
+html:is(.phone-app,.tablet-app) #page-discourse .dc-ptab .dc-ptab-icon{
+  display:flex!important;
+}
+
+html:is(.phone-app,.tablet-app) #page-discourse .dc-nav-indicator{
+  display:block!important;
+  opacity:1!important;
+  height:2.5px!important;
+  background:var(--dp)!important;
+  transition:left .32s cubic-bezier(.4,0,.2,1),width .32s cubic-bezier(.4,0,.2,1)!important;
+}

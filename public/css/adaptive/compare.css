@@ -1,0 +1,222 @@
+/* Phone compare tweaks only: remove the bounce-like cue and module-tab shadows. */
+html.phone-app #rpt-compare-panel{
+  transition:transform .24s ease, box-shadow .24s ease, opacity .2s ease!important;
+}
+html.phone-app #cmp-fullscreen-btn,
+html.phone-app #cmp-fullscreen-btn:hover,
+html.phone-app #cmp-fullscreen-btn:active{
+  transform:none!important;
+}
+html.phone-app #cmp-fullscreen-btn::after,
+html.phone-app #cmp-fullscreen-btn svg{
+  animation:none!important;
+}
+html.phone-app .cmp-mtab,
+html.phone-app .cmp-mtab:hover,
+html.phone-app .cmp-mtab:active,
+html.phone-app .cmp-mtab.on{
+  box-shadow:none!important;
+}
+
+/* Final tablet/phone refinements requested on 2026-04-13 */
+html.tablet-app{
+  --tablet-map-gap:10px;
+  --tablet-map-zoom-bottom:102px;
+  --app-card:#fff;
+  --ui-fill:#fff;
+  --ui-fill-soft:#fff;
+  --ui-fill-muted:#fff;
+}
+html.tablet-app body,
+html.tablet-app #shell,
+html.tablet-app #content,
+html.tablet-app .page,
+html.tablet-app #nav,
+html.tablet-app #sidebar,
+html.tablet-app .era-panel,
+html.tablet-app .legend,
+html.tablet-app #map-ruler{
+  background:#fff!important;
+  background-image:none!important;
+}
+html.tablet-app body:has(#page-home:not(.off)) #nav{
+  border-radius:0!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+html.tablet-app #page-home,
+html.tablet-app #page-discourse{
+  background:#fff!important;
+}
+html.tablet-app #page-home .hero-outer,
+html.tablet-app #page-home .hero-inner,
+html.tablet-app #page-home .stats-wrapper,
+html.tablet-app #page-home .stats-inner,
+html.tablet-app #page-home .stat-cell,
+html.tablet-app #page-home .htl-section-outer,
+html.tablet-app #page-home .cards-section-outer,
+html.tablet-app #page-home .cards-grid,
+html.tablet-app #page-home .card,
+html.tablet-app #page-home .btn-dark,
+html.tablet-app #page-home .btn-outline{
+  background:#fff!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+html.tablet-app #page-home .btn-dark:hover,
+html.tablet-app #page-home .btn-outline:hover,
+html.tablet-app #page-home .btn-dark:active,
+html.tablet-app #page-home .btn-outline:active,
+html.tablet-app #page-home .card:hover{
+  box-shadow:none!important;
+}
+html.tablet-app #page-discourse{
+  border-radius:0!important;
+  box-shadow:none!important;
+  background:#fff!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+}
+html.tablet-app .leaflet-control-zoom{
+  margin-bottom:var(--tablet-map-zoom-bottom)!important;
+}
+html.tablet-app .map-home-btn{
+  bottom:calc(var(--tablet-map-zoom-bottom) + 68px + var(--tablet-map-gap))!important;
+}
+html.tablet-app #map-fs-btn{
+  bottom:calc(var(--tablet-map-zoom-bottom) + 68px + var(--tablet-map-gap) + 34px + var(--tablet-map-gap))!important;
+}
+html.tablet-app #page-timeline .dtl-body{
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+}
+html.tablet-app #page-timeline .phase-outer{
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+}
+html.tablet-app body.on-discourse #dc-btn-top{
+  display:flex!important;
+  pointer-events:none!important;
+}
+html.tablet-app body.on-discourse #dc-btn-top.dc-top-visible{
+  pointer-events:auto!important;
+}
+html.tablet-app body.on-discourse #dc-toc-trigger{
+  display:block!important;
+}
+html.tablet-app body.on-discourse #dc-toc-panel,
+html.tablet-app body.on-discourse #dc-toc-tab{
+  display:flex!important;
+}
+html.tablet-app body.on-discourse #dc-toc-edge{
+  display:block!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}
+html.tablet-app body.on-discourse #dc-toc-edge.show{
+  opacity:1!important;
+}
+html.tablet-app #page-discourse .dc-three-col-wrap{
+  position:relative!important;
+  overflow:hidden!important;
+}
+html.tablet-app #page-discourse .dc-three-col-wrap::after{
+  content:''!important;
+  position:absolute!important;
+  top:0!important;
+  right:0!important;
+  bottom:0!important;
+  width:72px!important;
+  background:linear-gradient(to right,transparent,rgba(255,255,255,.96))!important;
+  pointer-events:none!important;
+  z-index:2!important;
+}
+html.tablet-app #page-discourse .dc-three-col-wrap.scrolled-end::after{
+  opacity:0!important;
+}
+html.tablet-app #page-discourse .dc-three-col-inner{
+  display:block!important;
+  overflow-x:auto!important;
+  overflow-y:visible!important;
+  scrollbar-width:none!important;
+  -webkit-overflow-scrolling:touch!important;
+}
+html.tablet-app #page-discourse .dc-three-col-inner::-webkit-scrollbar{
+  display:none!important;
+}
+html.tablet-app #page-discourse .dc-three-col{
+  display:grid!important;
+  gap:0!important;
+  width:auto!important;
+  min-width:max-content!important;
+  grid-template-columns:repeat(3,minmax(280px,1fr))!important;
+  border:1px solid #eaecf0!important;
+}
+html.tablet-app #page-discourse .dc-three-col .dc-chart-card{
+  width:280px!important;
+  margin:0!important;
+  border-right:1px solid var(--db)!important;
+  border-bottom:none!important;
+}
+html.tablet-app #page-discourse .dc-three-col .dc-chart-card:last-child{
+  border-right:none!important;
+}
+html.tablet-app #page-discourse .dc-two-col,
+html.tablet-app #page-discourse .dc-two-col-chart-table{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  width:100%!important;
+  min-width:0!important;
+}
+html.tablet-app #page-discourse .dc-two-col .dc-chart-card,
+html.tablet-app #page-discourse .dc-two-col-chart-table .dc-chart-card,
+html.tablet-app #page-discourse .dc-grid-2 .dc-chart-card,
+html.tablet-app #page-discourse .dc-grid-3 .dc-chart-card{
+  margin:0!important;
+}
+html.tablet-app #page-discourse .dc-two-col .dc-chart-card{
+  border-bottom:none!important;
+  border-right:1px solid var(--db)!important;
+}
+html.tablet-app #page-discourse .dc-two-col .dc-chart-card:last-child,
+html.tablet-app #page-discourse .dc-two-col-chart-table .dc-chart-card:last-child{
+  border-right:none!important;
+}
+html.tablet-app #page-discourse .dc-two-col-chart-table .dc-chart-card{
+  border-bottom:none!important;
+}
+html.tablet-app #page-discourse .dc-two-col-chart-table .dc-chart-card:first-child{
+  border-right:1px solid var(--db)!important;
+}
+html.tablet-app #page-discourse .dc-grid-2{
+  display:grid!important;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr))!important;
+}
+html.tablet-app #page-discourse .dc-grid-3{
+  display:grid!important;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,310px),1fr))!important;
+}
+html.tablet-app #page-discourse .dc-chart-canvas{
+  min-width:0!important;
+}
+html.tablet-app #rpt-compare-btn{
+  height:52px!important;
+  width:auto!important;
+  min-width:unset!important;
+  padding:0 18px!important;
+  gap:7px!important;
+  font-size:13px!important;
+
+}
+html.phone-app #rpt-compare-panel{
+  transform:translateY(0)!important;
+  pointer-events:none!important;
+  transition:opacity .18s ease, box-shadow .24s ease!important;
+}
+html.phone-app #rpt-compare-panel.open{
+  transform:translateY(0)!important;
+  pointer-events:auto!important;
+}

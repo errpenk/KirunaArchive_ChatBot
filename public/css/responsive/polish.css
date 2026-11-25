@@ -1,0 +1,426 @@
+/* ════════════════════════════════════════════
+   COMPREHENSIVE RESPONSIVE REFINEMENTS
+   Phone · Tablet · Desktop — all widths
+   ════════════════════════════════════════════ */
+
+/* ── Back-pill: consistent flex layout across all sizes ── */
+.map-back-pill svg,
+.map-back-pill .back-geom-symbol{ flex-shrink:0; }
+.chat-page-back{ display:inline-flex; align-items:center; gap:6px; }
+.chat-page-back svg,
+.chat-page-back .back-geom-symbol{ flex-shrink:0; }
+.tlp-back{ display:inline-flex; align-items:center; gap:6px; }
+.tlp-back svg,
+.tlp-back .back-geom-symbol{ flex-shrink:0; }
+.cp-back{ display:inline-flex; align-items:center; gap:6px; }
+.cp-back svg,
+.cp-back .back-geom-symbol{ flex-shrink:0; }
+#chat-source-return-btn svg,
+#chat-source-return-btn .back-geom-symbol{ display:block; }
+.back-geom-symbol{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:1em;
+  height:1em;
+  min-width:1em;
+  min-height:1em;
+  font:400 1em/1 var(--serif);
+  line-height:1;
+  transform:none;
+}
+.map-back-pill .back-geom-symbol,
+.chat-page-back .back-geom-symbol,
+.tlp-back .back-geom-symbol,
+.cp-back .back-geom-symbol{ font-size:14px; }
+#chat-source-return-btn .back-geom-symbol{ font-size:18px; }
+
+/* ── Tablet (768–1024px): targeted fixes ── */
+@media(min-width:640px) and (max-width:1024px){
+  /* Nav: tighter but still full-featured */
+  #nav{ padding:0 clamp(10px,2vw,20px); column-gap:clamp(8px,1.2vw,16px); }
+  .ntab{ padding:0 clamp(6px,1vw,14px); font-size:clamp(11px,1.3vw,13px); }
+
+  /* Home hero: single column on narrow tablets */
+  .hero-inner{ padding:clamp(28px,4vw,48px) clamp(16px,3vw,36px) clamp(20px,3.5vw,40px); }
+
+  /* Archive sidebar: proportional width on tablet */
+  #page-archive{ flex-direction:row; }
+  #sidebar{ width:clamp(220px,30vw,320px); height:100%; max-height:none; border-right:.5px solid var(--g4); border-bottom:none; }
+  #mapwrap{ flex:1; }
+
+  /* Chat page: comfortable reading width */
+  .chat-page-shell{ padding:clamp(20px,3vw,36px) clamp(14px,2.5vw,32px) clamp(14px,2vw,24px); }
+  .chat-page-title{ font-size:clamp(1.8rem,5vw,2.8rem); }
+  .chat-page-board{ border-radius:clamp(16px,2.5vw,28px); }
+
+  /* Gallery grid: 3-col on medium tablets */
+  #page-gallery .gallery-grid{ grid-template-columns:repeat(3,minmax(0,1fr)); }
+}
+
+/* ── Tablet landscape & large phone (900–1024px) ── */
+@media(min-width:900px) and (max-width:1024px){
+  .hero-inner{ grid-template-columns:1fr 1fr; }
+  .hero-viz-col{ display:flex; }
+}
+
+/* ── Small tablet / large phone (600–768px) ── */
+@media(min-width:600px) and (max-width:768px){
+  /* Archive: sidebar stays on top but slightly taller */
+  #sidebar{ max-height:40vh; }
+
+  /* Home: 2-col stats */
+  .stat-cell{ min-width:25%; }
+
+  /* Chat: slightly more breathing room */
+  .chat-page-shell{ padding:22px 16px 14px; }
+}
+
+/* ── Phone-app class: portrait phone specific ── */
+html.phone-app{
+  /* Prevent horizontal overflow everywhere */
+  overflow-x:hidden;
+}
+html.phone-app #shell,
+html.phone-app #content{
+  overflow:hidden;
+}
+
+/* ── Home page on phones ── */
+html.phone-app #page-home .hero-outer{
+  padding:0;
+}
+html.phone-app #page-home .hero-inner{
+  padding:20px 14px 16px!important;
+  grid-template-columns:1fr!important;
+  gap:0!important;
+}
+html.phone-app #page-home .hero-viz-col{
+  display:none!important;
+}
+html.phone-app #page-home .h1{
+  font-size:clamp(24px,8vw,38px)!important;
+  margin-bottom:10px!important;
+}
+html.phone-app #page-home .sub{
+  font-size:13px!important;
+  margin-bottom:18px!important;
+}
+html.phone-app #page-home .btn-row{
+  flex-wrap:wrap;gap:8px;
+}
+html.phone-app #page-home .btn-dark,
+html.phone-app #page-home .btn-outline{
+  padding:9px 16px!important;font-size:13px!important;
+}
+html.phone-app #page-home .stats-inner{
+  flex-wrap:wrap!important;
+}
+html.phone-app #page-home .stat-cell{
+  min-width:50%!important;flex:0 0 50%!important;
+  padding:12px 8px!important;
+  border-bottom:.5px solid var(--g5)!important;
+}
+html.phone-app #page-home .stat-cell:nth-child(2n){
+  border-right:none!important;
+}
+html.phone-app #page-home .stat-n{
+  font-size:19px!important;
+}
+html.phone-app #page-home .section-inner{
+  padding:0 14px!important;
+}
+html.phone-app #page-home .sec-header{
+  padding:22px 0 12px!important;
+}
+html.phone-app #page-home .cards-grid{
+  grid-template-columns:1fr!important;
+}
+html.phone-app #page-home .card{
+  padding:14px 12px!important;
+  display:grid!important;
+  grid-template-columns:auto 1fr!important;
+  column-gap:10px!important;
+}
+html.phone-app #page-home .card-yr{
+  grid-column:1!important;grid-row:1/4!important;
+  align-self:center!important;
+  font-size:26px!important;
+  writing-mode:vertical-rl!important;transform:rotate(180deg)!important;
+  letter-spacing:-.04em!important;border-right:.5px solid var(--g5)!important;
+  padding-right:10px!important;margin-bottom:0!important;
+}
+html.phone-app #page-home .card-era{ grid-column:2!important;grid-row:1!important; }
+html.phone-app #page-home .card-title{ grid-column:2!important;grid-row:2!important;font-size:12px!important; }
+html.phone-app #page-home .card-desc{ grid-column:2!important;grid-row:3!important;font-size:11px!important; }
+html.phone-app #page-home .card-arr{ display:none!important; }
+
+/* ── Archive (Map) on phones ── */
+html.phone-app #page-archive{
+  flex-direction:column!important;
+}
+html.phone-app #sidebar{
+  width:100%!important;
+  height:auto!important;
+  max-height:30vh!important;
+  border-right:none!important;
+  border-bottom:.5px solid var(--g4)!important;
+}
+html.phone-app #mapwrap{
+  flex:1!important;min-height:0!important;
+}
+html.phone-app .leaflet-popup-content-wrapper{
+  max-width:calc(100vw - 20px)!important;
+  border-radius:12px!important;
+}
+html.phone-app .leaflet-popup-content{
+  width:min(290px,calc(100vw - 36px))!important;
+}
+
+/* ── Timeline page on phones ── */
+html.phone-app #page-timeline2 .tl2-back-floating{
+  top:8px!important;left:8px!important;
+  padding:6px 12px 6px 8px!important;
+  font-size:11px!important;
+}
+
+/* ── Gallery on phones ── */
+html.phone-app #page-gallery .gallery-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:6px!important;
+}
+html.phone-app #page-gallery .gallery-scroll{
+  padding:16px 10px calc(40px + env(safe-area-inset-bottom)) 8px!important;
+}
+@media(max-width:540px){
+  .gallery-year-rail{width:64px}
+  .gallery-scroll{padding:16px 10px calc(40px + env(safe-area-inset-bottom)) 8px}
+  .gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+}
+
+/* ── Discourse on phones: full-width content, properly centered tabs ── */
+html.phone-app #page-discourse .dc-nav-inner{
+  justify-content:center!important;
+  overflow-x:auto!important;
+}
+html.phone-app #page-discourse .dc-ptab{
+  flex:0 0 auto!important;
+  padding:12px 14px!important;
+  font-size:11px!important;
+  white-space:nowrap!important;
+}
+html.phone-app #page-discourse .dc-section{
+  max-width:100%!important;
+  padding:28px 14px 0!important;
+  box-sizing:border-box!important;
+}
+html.phone-app #page-discourse .dc-section:last-of-type{
+  padding-bottom:48px!important;
+}
+html.phone-app #page-discourse .dc-p{
+  font-size:.88rem!important;
+  line-height:1.72!important;
+  max-width:100%!important;
+}
+html.phone-app #page-discourse .dc-h2{
+  font-size:clamp(1.05rem,5.5vw,1.4rem)!important;
+  max-width:100%!important;
+}
+html.phone-app #page-discourse .dc-platform-panel{
+  width:100%!important;
+  overflow:visible!important;
+}
+html.phone-app #page-discourse .dc-rank-grid{
+  width:100%!important;
+  min-width:0!important;
+}
+html.phone-app #page-discourse .dc-rank-row{
+  width:100%!important;
+}
+html.phone-app #page-discourse .dc-pill-wrap{
+  padding:12px 14px!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+html.phone-app #page-discourse .dc-two-col-chart-table{
+  align-items:start!important;
+}
+html.phone-app #page-discourse .dc-two-col-chart-table .dc-chart-card{
+  padding:18px 14px 14px!important;
+}
+html.phone-app #page-discourse .dc-two-col-chart-table .dc-chart-title,
+html.phone-app #page-discourse .dc-two-col-chart-table .dc-chart-desc{
+  min-height:0!important;
+}
+html.phone-app #page-discourse .dc-two-col-chart-table .dc-chart-canvas{
+  margin-top:12px!important;
+  margin-bottom:0!important;
+}
+html.phone-app #page-discourse .dc-two-col-chart-table .dc-tbl-wrap{
+  display:block!important;
+  margin-top:12px!important;
+  margin-bottom:0!important;
+  max-height:min(52svh,420px)!important;
+  overflow:auto!important;
+  -webkit-overflow-scrolling:touch!important;
+}
+html.phone-app #page-discourse .dc-two-col-chart-table .dc-tbl-wrap table{
+  width:max(560px,100%)!important;
+}
+html.phone-app #page-discourse .dc-rv,
+html.phone-app #page-discourse .dc-rv.in,
+html.phone-app #page-discourse .dc-rv.dc-rv-exit-up,
+html.phone-app #page-discourse .dc-rv.dc-rv-exit-down,
+html.phone-app #page-discourse .dc-chart-card,
+html.phone-app #page-discourse .dc-chart-card.dc-card-in{
+  opacity:1!important;
+  transform:none!important;
+  filter:none!important;
+  transition:none!important;
+}
+html.tablet-app #page-discourse .dc-section{
+  max-width:100%!important;
+  padding:36px 20px 0!important;
+  box-sizing:border-box!important;
+}
+html.tablet-app #page-discourse .dc-ptab{
+  padding:14px 18px!important;
+  font-size:12px!important;
+}
+
+/* ── Tablet-app class: portrait tablet ── */
+html.tablet-app #sidebar{
+  width:clamp(240px,34vw,340px)!important;
+  max-height:none!important;
+  border-right:.5px solid var(--g4)!important;
+  border-bottom:none!important;
+}
+html.tablet-app #page-archive{
+  flex-direction:row!important;
+}
+html.tablet-app #page-gallery .gallery-grid{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+}
+html.tablet-app #page-home .hero-inner{
+  padding:clamp(32px,4vw,56px) clamp(20px,3vw,40px) clamp(24px,3.5vw,44px)!important;
+}
+html.tablet-app #page-home .h1{
+  font-size:clamp(36px,6vw,64px)!important;
+}
+html.tablet-app #page-home .cards-grid{
+  grid-template-columns:repeat(2,1fr)!important;
+}
+
+/* ── Safe-area insets applied consistently ── */
+html.phone-app #nav{
+  padding-left:max(12px,env(safe-area-inset-left))!important;
+  padding-right:max(12px,env(safe-area-inset-right))!important;
+}
+html.tablet-app #nav{
+  padding-left:max(16px,env(safe-area-inset-left))!important;
+  padding-right:max(16px,env(safe-area-inset-right))!important;
+}
+
+/* ── Fluid typography: clamp everywhere ── */
+@media(max-width:480px){
+  :root{
+    --fs-h1:clamp(22px,8.5vw,34px);
+    --fs-body:13px;
+    --fs-small:11px;
+  }
+}
+
+/* ── Prevent text overflow on small screens ── */
+html.phone-app .ntab{
+  font-size:10.5px!important;
+  padding:0 clamp(4px,1.5vw,8px)!important;
+}
+html.phone-app .nav-tabs{
+  justify-content:space-evenly!important;
+  overflow-x:hidden!important;
+}
+html:is(.phone-app,.tablet-app) .nav-tabs{
+  position:static!important;
+  left:auto!important;
+  top:auto!important;
+  height:auto!important;
+  width:min(100%,760px)!important;
+  max-width:100%!important;
+  transform:none!important;
+}
+
+/* ── Timeline back button: no overlap with content ── */
+.tl2-back-floating{
+  top:12px;left:12px;
+}
+@media(max-width:600px){
+  .tl2-back-floating,
+  .chat-page-back{ top:8px!important;left:8px!important; }
+}
+
+/* ── Chat source return btn: consistent sizing ── */
+#chat-source-return-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+}
+
+/* FIX: mobile Discourse bottom white page */
+html.phone-app #page-discourse .dc-platform-panel:not(.on){
+  display:none!important;
+  height:0!important;
+  overflow:hidden!important;
+  opacity:0!important;
+  pointer-events:none!important;
+  margin:0!important;
+  padding:0!important;
+}
+
+html.phone-app #page-discourse .dc-platform-panel.on{
+  display:block!important;
+  height:auto!important;
+  overflow:visible!important;
+}
+
+html.phone-app #page-discourse .dc-dash,
+html.phone-app #page-discourse .dc-section:last-of-type{
+  padding-bottom:24px!important;
+}
+
+/* keyboard avoid overlap */
+.chat-widget-thread,
+.chat-page-thread{
+ padding-bottom:140px;
+ scroll-padding-bottom:140px;
+}
+
+html.phone-app .chat-widget-thread,
+html.phone-app .chat-page-thread{
+ padding-bottom:calc(170px + env(safe-area-inset-bottom))!important;
+ scroll-padding-bottom:calc(170px + env(safe-area-inset-bottom))!important;
+}
+
+.chat-turn:last-child{
+ margin-bottom:24px;
+}
+
+html.phone-app #chat-panel{
+display:flex;
+flex-direction:column;
+overflow:hidden;
+}
+
+html.phone-app .chat-widget-scroll-shell{
+flex:1 1 auto;
+min-height:0;
+overflow-y:auto;
+}
+
+html.phone-app .chat-widget-compose{
+flex:0 0 auto;
+position:relative; /* 不要fixed/absolute */
+z-index:20;
+}
+
+html.phone-app .chat-input{
+max-height:84px; /* 限制输入框别无限长 */
+overflow-y:auto;
+}

@@ -1,0 +1,297 @@
+/* Map year ruler */
+#map-ruler{position:absolute;bottom:0;left:0;right:0;height:62px;background:linear-gradient(to bottom,rgba(255,255,255,.28) 0%,rgba(255,255,255,.42) 100%);backdrop-filter:saturate(220%) blur(32px) brightness(1.08);-webkit-backdrop-filter:saturate(220%) blur(32px) brightness(1.08);border-top:.5px solid rgba(255,255,255,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 -1px 0 rgba(0,0,0,.06);z-index:1000;overflow:hidden}
+#leaflet-map .leaflet-bottom.leaflet-right{bottom:62px}
+#map-ruler-inner{display:flex;align-items:flex-end;height:100%;padding:0 24px 14px;overflow-x:auto;scrollbar-width:none;gap:0;position:relative}
+#map-ruler-inner::-webkit-scrollbar{display:none}
+/* Ruler baseline — extends beyond scroll width using a fixed element */
+/* ruler baseline */
+#map-ruler::before{content:'';position:absolute;left:0;right:0;bottom:18px;height:1.5px;background:rgba(29,29,31,.55);pointer-events:none;z-index:0;}
+.ruler-tick{display:flex;flex-direction:column;align-items:center;min-width:70px;flex:1;padding-bottom:0;transition:opacity .22s ease,transform .22s cubic-bezier(.4,0,.2,1)}
+/* Expanded hit area */
+.ruler-tick::before{content:'';position:absolute;inset:-12px -8px;z-index:0}
+.ruler-tick:hover{opacity:.8}
+.ruler-tick-line{width:2px;height:12px;background:rgba(29,29,31,.6);margin-bottom:5px;transition:height .2s;border-radius:1px}
+.ruler-tick.active .ruler-tick-line{height:18px;}
+.ruler-yr{font-size:10px;font-weight:600;color:rgba(66,66,69,.75);letter-spacing:-.01em;font-variant-numeric:tabular-nums;transition:all .2s;position:absolute;bottom:26px;left:50%;transform:translateX(-50%);white-space:nowrap}
+.ruler-dot{width:9px;height:9px;border-radius:50%;transition:all .2s;position:absolute;bottom:0;left:50%;transform:translateX(-50%);box-shadow:0 0 0 2px rgba(255,255,255,.95),0 1px 4px rgba(0,0,0,.18)}
+.ruler-tick.active .ruler-dot{width:10px;height:10px;bottom:-1.5px}
+.ruler-tick.ruler-dim{opacity:.3;transition:opacity .4s ease}
+.ruler-tick.ruler-dim:hover{opacity:.7}
+.ruler-tick:hover .ruler-yr{color:var(--b)}
+
+.legend{bottom:80px!important;right:14px}
+/* All 3 custom buttons: same size 34×34, same border-radius 8px, same border style, left:14px */
+.map-home-btn{bottom:159px!important;left:14px!important;width:34px!important;height:34px!important}
+#map-fs-btn{bottom:201px!important;left:14px!important;width:34px!important;height:34px!important}
+/* Leaflet zoom: pill style matching reference image */
+.leaflet-bottom.leaflet-left{padding:0 0 0 0!important;}
+.leaflet-control-zoom{
+  margin-bottom:80px!important;margin-left:14px!important;
+  border-radius:14px!important;
+  overflow:hidden!important;
+  border:none!important;
+  box-shadow:0 2px 12px rgba(0,0,0,.10)!important;
+  background:#ffffff!important;
+  width:34px!important;
+  display:flex!important;
+  flex-direction:column!important;
+}
+.leaflet-control-zoom a{
+  border-radius:0!important;
+  width:34px!important;height:34px!important;line-height:1!important;
+  border:none!important;
+  background:transparent!important;
+  transition:background .15s,transform .12s cubic-bezier(.4,0,.2,1) !important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  box-sizing:border-box!important;
+  font-size:0!important;
+  text-indent:0!important;
+  padding:0!important;
+  text-align:center!important;
+  position:relative!important;
+  overflow:visible!important;
+}
+/* Divider line between + and − */
+.leaflet-control-zoom-out{
+  border-top:none!important;
+  border-bottom:none!important;
+  position:relative!important;
+}
+.leaflet-control-zoom-out::after{
+  content:'';
+  position:absolute!important;
+  top:0!important;left:25%!important;right:25%!important;
+  height:1px!important;
+  background:rgba(0,0,0,.18)!important;
+}
+.leaflet-control-zoom-in::before{
+  content:'';
+  position:absolute!important;
+  top:50%!important;left:50%!important;
+  transform:translate(-50%,-50%)!important;
+  width:13px!important;height:13px!important;
+  background:var(--b)!important;
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M7 1v12M1 7h12' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")!important;
+  mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M7 1v12M1 7h12' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")!important;
+  -webkit-mask-size:contain!important;
+  mask-size:contain!important;
+  -webkit-mask-repeat:no-repeat!important;
+  mask-repeat:no-repeat!important;
+  -webkit-mask-position:center!important;
+  mask-position:center!important;
+}
+.leaflet-control-zoom-out::before{
+  content:'';
+  position:absolute!important;
+  top:50%!important;left:50%!important;
+  transform:translate(-50%,-50%)!important;
+  width:13px!important;height:2px!important;
+  background:var(--b)!important;
+  border-radius:1px!important;
+}
+.leaflet-control-zoom a:hover{
+  background:rgba(0,0,0,.06)!important;
+}
+.leaflet-control-zoom a:active{
+  transform:scale(.88)!important;
+  background:rgba(0,0,0,.10)!important;
+}
+.map-edge-indicator[style*="bottom"]{bottom:74px!important}
+
+/* ── Collapsible map panels ── */
+.panel-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:0;cursor:pointer;
+}
+.panel-header-label{
+  font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--g3);
+}
+.panel-chevron-btn{
+  width:20px;height:20px;border-radius:5px;border:none;background:transparent;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:opacity .15s;
+  flex-shrink:0;margin-left:8px;padding:0;opacity:.5;
+}
+.panel-chevron-btn:hover{background:transparent;opacity:1}
+.panel-chevron-btn svg{display:block;transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.panel-collapsed .panel-chevron-btn svg{transform:rotate(-90deg)}
+.map-ctrl{transition:box-shadow .22s ease;}
+.panel-body{
+  overflow:visible;max-height:none;
+  transition:max-height .38s cubic-bezier(.22,1,.36,1),opacity .28s ease,margin-top .28s cubic-bezier(.22,1,.36,1),transform .32s cubic-bezier(.22,1,.36,1);
+  opacity:1;margin-top:8px;transform:translateY(0) scaleY(1);transform-origin:top center;
+}
+.panel-body.is-animating{overflow:hidden}
+.panel-body.skip-height-transition{
+  transition:opacity .34s cubic-bezier(.22,1,.36,1),margin-top .34s cubic-bezier(.22,1,.36,1),transform .36s cubic-bezier(.22,1,.36,1);
+}
+.panel-body.collapsed{overflow:hidden;max-height:0;opacity:0;margin-top:0;transform:translateY(-4px) scaleY(0.97)}
+@keyframes legendPanelIn{
+  0%{opacity:0;transform:translateY(8px);}
+  100%{opacity:1;transform:translateY(0);}
+}
+#legend-panel{animation:legendPanelIn .38s cubic-bezier(.22,1,.36,1) both;}
+#era-panel{animation:legendPanelIn .34s cubic-bezier(.22,1,.36,1) both;}
+@keyframes ping{0%{transform:scale(1);opacity:.5}100%{transform:scale(2.6);opacity:0}}
+@keyframes markerGrow{from{transform:scale(0.6);opacity:.6}to{transform:scale(1);opacity:1}}
+@keyframes markerPulse{0%{transform:translate(-50%,-50%) scale(0.6);opacity:.7}70%{transform:translate(-50%,-50%) scale(1.1);opacity:0}100%{transform:translate(-50%,-50%) scale(1.1);opacity:0}}
+@keyframes galleryMapMarkerArrival{0%{transform:scale(1.55)}42%{transform:scale(2.08)}100%{transform:scale(1.55)}}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes popupSlideUp{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes cardPop{from{opacity:0;transform:translateY(20px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes htlNodeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rulerTickIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes dtlColIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+@keyframes underlineExpand{from{left:50%;right:50%}to{left:18px;right:18px}}
+@keyframes calCellSelectIn{
+  0%{opacity:.7;box-shadow:0 0 0 0 rgba(26,58,110,0)}
+  100%{opacity:1;box-shadow:0 4px 14px rgba(26,58,110,.14)}
+}
+@keyframes cpCellPulse{
+  0%{
+    box-shadow:
+      inset 0 0 0 0 rgba(103,72,48,0),
+      0 0 0 0 rgba(103,72,48,0),
+      0 0 0 0 rgba(103,72,48,0);
+    filter:brightness(1);
+  }
+  34%{
+    box-shadow:
+      inset 0 0 0 1.5px rgba(103,72,48,.34),
+      0 0 0 4px rgba(103,72,48,.12),
+      0 10px 22px rgba(103,72,48,.16);
+    filter:brightness(1.015);
+  }
+  100%{
+    box-shadow:
+      inset 0 0 0 0 rgba(103,72,48,0),
+      0 0 0 0 rgba(103,72,48,0),
+      0 0 0 0 rgba(103,72,48,0);
+    filter:brightness(1);
+  }
+}
+@keyframes calRowSelectIn{
+  0%{transform:translateX(0);opacity:.8}
+  100%{transform:translateX(4px);opacity:1}
+}
+
+/* cards */
+.card{transition:background .15s,box-shadow .2s;opacity:0;transform:translateY(20px) scale(.97)}
+.card.in-view{opacity:1;transform:translateY(0) scale(1)}
+.card:hover{background:var(--g6)}
+/* era-opt transitions handled in base rule */
+/* popup */
+.popup-btn:active,.popup-btn-sec:active{transform:scale(1.03)}
+/* day-cell */
+.day-cell:active{transform:scale(.97)}
+/* badges / nav */
+.nbadge{transition:border-color .15s,background .15s,color .15s}
+.btn-dark{transition:background .18s,box-shadow .2s}
+.btn-dark:hover{box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.btn-dark:active{transform:scale(.97)}
+.btn-outline{transition:all .18s cubic-bezier(.4,0,.2,1)}
+.map-edge-indicator{transition:opacity .25s,transform .2s}
+.srd-item{transition:background .12s}
+.srd-item:hover{background:var(--g6)}
+.cpe-ev{transition:background .12s}
+.peb-event{transition:background .14s}
+/* htl nodes */
+.htl-node{opacity:0;transform:translateY(10px) scale(.97);transition:opacity .32s cubic-bezier(.22,1,.36,1),transform .32s cubic-bezier(.22,1,.36,1)}
+.htl-node.in-view{opacity:1;transform:translateY(0) scale(1)}
+.htl-dot{transition:transform .22s cubic-bezier(.4,0,.2,1),box-shadow .2s}
+.htl-node:hover .htl-dot{transform:scale(1.3);box-shadow:0 0 0 5px rgba(0,0,0,.06)}
+/* dtl cards — enhanced enter/exit */
+.dtl-col{
+  opacity:0;
+  transform:translateY(20px) scale(.98);
+  transition:opacity .4s cubic-bezier(.22,1,.36,1),
+             transform .4s cubic-bezier(.22,1,.36,1);
+}
+.dtl-col.in-view{opacity:1;transform:translateY(0) scale(1);}
+.dtl-col.out-view{
+  opacity:0;transform:translateY(-14px) scale(.98);
+  transition:opacity .25s cubic-bezier(.4,0,.2,1),transform .25s cubic-bezier(.4,0,.2,1);
+}
+.dtl-dot{transition:transform .22s cubic-bezier(.4,0,.2,1),box-shadow .2s}
+.dtl-col:hover .dtl-dot{transform:translate(-50%,-50%) scale(1.3);box-shadow:0 0 0 6px rgba(0,0,0,.06)}
+.dtl-card{transition:box-shadow .25s,transform .25s cubic-bezier(.4,0,.2,1)}
+.dtl-col:hover .dtl-card{box-shadow:0 8px 24px rgba(0,0,0,.12);transform:translateX(-50%) translateY(-3px)}
+/* ruler ticks — enhanced hover, click, damping scroll */
+.ruler-tick{
+  opacity:0;transform:translateY(5px);
+  transition:opacity .24s ease,transform .24s cubic-bezier(.22,1,.36,1);
+  cursor:pointer;position:relative;
+}
+.ruler-tick.in-view{opacity:1;transform:translateY(0);}
+.ruler-tick.era-hidden{
+  opacity:0!important;transform:translateY(8px)!important;
+  pointer-events:none;max-width:0;min-width:0;overflow:hidden;
+  padding:0;margin:0;flex:0!important;
+  transition:opacity .3s ease,transform .3s ease,max-width .4s ease,flex .4s ease;
+}
+.ruler-tick:not(.era-hidden):hover{opacity:1;}
+/* Tick line grows on hover */
+.ruler-tick:not(.era-hidden):hover .ruler-tick-line{height:16px!important;}
+/* Year label enlarges on hover */
+.ruler-tick:not(.era-hidden):hover .ruler-yr{
+  color:var(--b)!important;font-weight:700!important;
+  transform:translateX(-50%) scale(1.1);
+}
+/* Dot pops on hover */
+.ruler-tick:not(.era-hidden):hover .ruler-dot{
+  width:10px!important;height:10px!important;
+  bottom:-1.5px!important;
+  box-shadow:0 0 0 3px rgba(29,29,31,.15);
+}
+/* Click press */
+.ruler-tick:active .ruler-tick-line{height:22px!important;transition:height .08s!important;}
+.ruler-tick:active .ruler-dot{transform:translateX(-50%) scale(1.4)!important;}
+.ruler-tick.hover-near .ruler-tick-line{height:14px;transition:height .15s;}
+.ruler-tick.hover-near .ruler-dot{width:9px;height:9px;}
+/* Active selected state */
+.ruler-tick.active .ruler-tick-line{height:20px;background:var(--b);}
+.ruler-tick.active .ruler-yr{color:var(--b)!important;font-weight:700;font-size:12px;}
+.ruler-tick.active .ruler-dot{background:var(--b)!important;width:13px!important;height:13px!important;box-shadow:0 0 0 3px rgba(0,0,0,.15);bottom:-2px!important;}
+/* Ruler inner — damping scroll via JS */
+#map-ruler-inner{
+  transition:none;/* scroll position controlled by JS */
+  scroll-behavior:auto;/* disable native smooth, we do it manually */
+}
+/* popup animation */
+.leaflet-popup-content-wrapper{animation:popupSlideUp .26s cubic-bezier(.22,1,.36,1) both}
+/* tlp-vbtn — rich interactive */
+.tlp-vbtn{
+  transition:all .22s cubic-bezier(.4,0,.2,1);
+  display:flex;align-items:center;gap:5px;
+  position:relative;overflow:hidden;
+}
+.tlp-vbtn::before{
+  content:'';position:absolute;inset:0;border-radius:6px;
+  background:radial-gradient(circle at center,rgba(255,255,255,.6) 0%,transparent 70%);
+  opacity:0;transition:opacity .18s;pointer-events:none;
+}
+.tlp-vbtn:hover::before{opacity:1;}
+.tlp-vbtn:not(.on):hover{
+  background:rgba(0,0,0,.04);color:var(--b);
+  box-shadow:0 1px 4px rgba(0,0,0,.05);
+}
+.tlp-vbtn.on{
+  background:var(--w);color:var(--b);
+  box-shadow:0 1px 4px rgba(0,0,0,.08);
+}
+.tlp-vbtn:active{transform:scale(.95)!important;}
+/* Icon animations inside buttons */
+.tlp-vbtn svg{transition:transform .22s cubic-bezier(.4,0,.2,1);}
+.tlp-vbtn:hover svg{transform:scale(1.15);}
+.tlp-vbtn.on svg{transform:scale(1.05);}
+/* Label pop */
+.tlpv-label{transition:letter-spacing .2s;display:inline-block;min-width:5.5em;}
+.tlp-vbtn.on .tlpv-label{letter-spacing:-.015em;}
+.tlp-back{border-radius:980px;transition:background .15s,opacity .15s}
+.tlp-back:hover{opacity:.82}
+.tlp-back:active{transform:scale(.94);opacity:1}
+/* Gray image shimmer placeholder */
+.dtl-card-img{background:var(--g5);background-image:linear-gradient(90deg,var(--g5) 0%,var(--g4) 45%,var(--g5) 100%);background-size:600px 100%;animation:shimmer 2s infinite linear}

@@ -1,0 +1,435 @@
+/* ════════════════════════════════════════════
+   CHART LIGHTBOX — click to expand any chart
+   ════════════════════════════════════════════ */
+
+/* Expand cursor hint on hoverable chart elements */
+.dc-chart-card:not([data-no-zoom]),
+.dc-chart-card:not([data-no-zoom]) canvas,
+.dc-rank-grid,
+.dc-spoke-wrap,
+.dc-tbl-wrap table{
+  cursor:zoom-in;
+}
+/* Keyword bubble cloud — no zoom cursor, no lightbox */
+.dc-kw-wrap,
+.dc-kw-wrap *{
+  cursor:default!important;
+}
+
+/* Backdrop overlay */
+#dc-lightbox{
+  position:fixed;inset:0;z-index:9800;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  background:rgba(18,20,26,0);
+  backdrop-filter:blur(0px) saturate(1);
+  -webkit-backdrop-filter:blur(0px) saturate(1);
+  transition:
+    opacity .32s cubic-bezier(.4,0,.2,1),
+    background .32s cubic-bezier(.4,0,.2,1),
+    backdrop-filter .36s ease,
+    -webkit-backdrop-filter .36s ease;
+}
+#dc-lightbox.lb-open{
+  opacity:1;pointer-events:auto;
+  background:rgba(18,20,26,.52);
+  backdrop-filter:blur(18px) saturate(1.4);
+  -webkit-backdrop-filter:blur(18px) saturate(1.4);
+}
+
+/* Inner container — the zoomed card */
+#dc-lightbox-inner{
+
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 32px 80px rgba(0,0,0,.22), 0 0 0 1px rgba(0,0,0,.06);
+  max-width:min(88vw, 960px);
+  max-height:86vh;
+  overflow:auto;
+  padding:36px 36px 48px;
+  transform:scale(.93) translateY(14px);
+  opacity:0;
+  transition:
+    transform .32s cubic-bezier(.4,0,.2,1),
+    opacity .28s ease;
+  scrollbar-width:none;
+  scrollbar-color:transparent transparent;
+}
+#dc-lightbox-inner::-webkit-scrollbar{display:none;}
+#dc-lightbox-inner::-webkit-scrollbar-thumb{background:transparent;border-radius:2px;}
+#dc-lightbox.lb-open #dc-lightbox-inner{
+  transform:scale(1) translateY(0);
+  opacity:1;
+}
+/* Closing animation */
+#dc-lightbox.lb-closing #dc-lightbox-inner{
+  transform:scale(.92) translateY(10px);
+  opacity:0;
+  transition:transform .22s cubic-bezier(.4,0,.2,1),opacity .2s ease;
+}
+#dc-lightbox.lb-closing{
+  opacity:0;
+  transition:opacity .26s ease,backdrop-filter .26s ease,-webkit-backdrop-filter .26s ease;
+}
+
+/* Close button */
+#dc-lightbox-close{
+  position:absolute;top:14px;right:14px;
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(0,0,0,.06);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  color:#606878;font-size:15px;line-height:1;
+  transition:background .15s,transform .15s,color .15s;
+  z-index:2;flex-shrink:0;
+}
+#dc-lightbox-close:hover{background:rgba(0,0,0,.12);color:#1c2028;}
+#dc-lightbox-close:active{transform:scale(.93);}
+
+/* Lightbox title strip */
+#dc-lightbox-title{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;
+  font-size:13px;font-weight:600;letter-spacing:-.01em;color:#1c2028;
+  margin-bottom:6px;padding-right:40px;
+}
+#dc-lightbox-desc{
+  font-family:var(--sans);
+  font-size:9px;color:#96a0aa;letter-spacing:.03em;
+  margin-bottom:24px;line-height:1.6;
+}
+
+/* The cloned content inside the lightbox */
+#dc-lightbox-content{
+  min-width:min(64vw, 640px);
+  min-height:180px;
+}
+/* Canvas inside lightbox: fixed height so it renders properly */
+#dc-lightbox-content canvas{
+  width:100%!important;
+  height:auto!important;
+  min-height:260px;
+  max-height:64vh;
+}
+/* SVG spoke charts — fill lightbox generously */
+#dc-lightbox-content svg{
+  width:100%!important;
+  height:auto!important;
+  max-height:80vh;
+  min-height:500px;
+}
+#dc-lightbox-content .dc-spoke-wrap,
+#dc-lightbox-content [class*="spoke"]{
+  width:100%;
+  min-height:500px;
+  max-height:72vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+#dc-lightbox-content svg{
+  overflow:visible!important;
+}
+#dc-lightbox-content .dc-spoke-wrap svg,
+#dc-lightbox-content svg{
+  width:min(700px,92%)!important;
+  height:auto!important;
+  max-height:72vh;
+}
+/* When lightbox contains a spoke chart, title is prominent at top */
+#dc-lightbox.lb-spoke #dc-lightbox-title{
+  font-size:15px;font-weight:700;margin-bottom:4px;
+}
+#dc-lightbox.lb-spoke #dc-lightbox-desc{
+  margin-bottom:8px;
+}
+#dc-lightbox.lb-spoke #dc-lightbox-inner{
+  display:flex;flex-direction:column;
+  max-width:min(96vw, 1120px);
+  max-height:92vh;
+  padding:20px 14px 14px;
+}
+#dc-lightbox.lb-spoke #dc-lightbox-content{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  width:100%;
+  min-width:0;
+  min-height:0;
+}
+#dc-lightbox.lb-spoke #dc-lightbox-content .dc-spoke-wrap{
+  width:100%!important;
+  max-width:none!important;
+  aspect-ratio:auto;
+  margin:0 auto;
+  min-height:0;
+}
+#dc-lightbox.lb-spoke #dc-lightbox-content .dc-spoke-wrap svg{
+  width:100%!important;
+  max-width:none!important;
+  min-height:0!important;
+  max-height:calc(92vh - 120px)!important;
+}
+/* kw-wrap (bubble frequency cloud) in lightbox */
+#dc-lightbox-content .dc-kw-wrap{
+  cursor:default!important;
+  width:100%;
+}
+#dc-lightbox-content .dc-wf-bubbles{
+  justify-content:center;
+  gap:16px 14px;
+  margin-bottom:28px;
+  flex-wrap:wrap;
+  overflow:visible;
+}
+#dc-lightbox-content .dc-wf-bubbles::-webkit-scrollbar{display:none;}
+#dc-lightbox-content .dc-wf-bubble-item{
+  flex-shrink:0;
+}
+#dc-lightbox-content .dc-kw-tabs{
+  pointer-events:none;
+  margin-bottom:24px;
+}
+#dc-lightbox-content .dc-wf-rows-wrap{
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+}
+#dc-lightbox-content .dc-wf-label{font-size:12px;}
+#dc-lightbox-content .dc-wf-count{font-size:11px;}
+/* Rank grid & pill grid in lightbox */
+#dc-lightbox-content .dc-rank-grid,
+#dc-lightbox-content .xr-vt-row{pointer-events:none;}
+#dc-lightbox-content .dc-pill-wrap,
+#dc-lightbox-content .dc-wf-bubbles .dc-wf-bubble{cursor:default!important;}
+
+/* Press effect on zoomable items */
+.dc-chart-card canvas,
+.dc-chart-canvas,
+.dc-rank-grid,
+.dc-spoke-wrap,
+.dc-tbl-wrap table{
+  cursor:zoom-in;
+}
+/* No zoom cursor on keyword cloud — entire section excluded from lightbox */
+.dc-kw-wrap,
+.dc-kw-wrap .dc-wf-bubbles,
+.dc-kw-wrap .dc-spoke-wrap,
+.dc-kw-wrap *{ cursor:default !important; }
+/* No zoom cursor on remaining-keyword bar rows */
+.dc-wf-row,
+.dc-wf-rows-wrap,
+.dc-wf-rest-label,
+.dc-wf-divider{
+  cursor:default !important;
+}
+/* No zoom cursor inside the already-open lightbox */
+#dc-lightbox-content,
+#dc-lightbox-content *{
+  cursor:default !important;
+}
+/* Lightbox inner relative for close btn */
+#dc-lightbox-inner{ position:relative; }
+/* Nav arrow hover state — buttons are on body */
+body > button[aria-label="Previous chart"]:hover,
+body > button[aria-label="Next chart"]:hover{
+  background:rgba(255,255,255,1)!important;
+  transform:translateY(-50%) scale(1.1)!important;
+  box-shadow:0 6px 24px rgba(0,0,0,.22)!important;
+}
+
+/* ── Fix 3: Top-bars pill section — no border, mouse-parallax highlight ── */
+.dc-pill-wrap{
+  margin:24px 0;padding:20px 24px;
+  background:transparent;
+  border:none;
+  position:relative;overflow:hidden;
+}
+/* Spotlight removed */
+.dc-pill-wrap::before{display:none;}
+.dc-pill-card-title{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
+  font-size:12px;font-weight:600;letter-spacing:-.01em;color:var(--dp);
+  margin-bottom:4px;
+}
+.dc-pill-card-desc{
+  font-family:var(--mono-d);font-size:9.5px;color:var(--dp3);
+  letter-spacing:.03em;line-height:1.6;margin-bottom:18px;
+}
+
+/* ── Fix 6: Enhanced scroll-reveal — sections slide up, charts scale in ── */
+.dc-rv{
+  opacity:0;transform:translateY(28px);
+  transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1);
+}
+.dc-rv.in{opacity:1;transform:translateY(0);}
+
+/* Section containers: animate immediately (children handle their own stagger) */
+.dc-section.dc-rv{opacity:1;transform:none;transition:none;}
+.dc-section.dc-rv.in{opacity:1;transform:none;}
+
+/* EXIT upward — when element scrolls past top of viewport */
+.dc-rv.dc-rv-exit-up{
+  opacity:0 !important;
+  transform:translateY(-18px) !important;
+  transition:opacity .28s cubic-bezier(.4,0,.2,1) !important,
+             transform .28s cubic-bezier(.4,0,.2,1) !important;
+  transition-delay:0s !important;
+}
+
+/* Heading: larger translate + slight blur */
+.dc-rv.dc-rv-heading{
+  opacity:0;transform:translateY(22px);
+  filter:blur(1px);
+  transition:opacity .65s cubic-bezier(.22,1,.36,1),
+             transform .65s cubic-bezier(.22,1,.36,1),
+             filter .55s ease;
+}
+.dc-rv.dc-rv-heading.in{opacity:1;transform:translateY(0);filter:blur(0);}
+.dc-rv.dc-rv-heading.dc-rv-exit-up{
+  opacity:0!important;transform:translateY(-14px)!important;filter:blur(2px)!important;
+  transition:opacity .24s ease!important,transform .24s ease!important,filter .2s ease!important;
+  transition-delay:0s!important;
+}
+
+/* Paragraph: gentler, slightly longer */
+.dc-rv.dc-rv-para{
+  opacity:0;transform:translateY(18px);
+  transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1);
+}
+.dc-rv.dc-rv-para.in{opacity:1;transform:translateY(0);}
+.dc-rv.dc-rv-para.dc-rv-exit-up{
+  opacity:0!important;transform:translateY(-12px)!important;
+  transition:opacity .22s ease!important,transform .22s ease!important;
+  transition-delay:0s!important;
+}
+
+/* Stat cards: fade+slide in from below */
+.dc-rv.dc-rv-cards{
+  opacity:0;transform:translateY(20px);
+  transition:opacity .45s cubic-bezier(.4,0,.2,1),
+             transform .45s cubic-bezier(.4,0,.2,1);
+}
+.dc-rv.dc-rv-cards.in{opacity:1;transform:translateY(0);}
+
+/* Individual chart card: slide in */
+.dc-rv.dc-rv-card{
+  opacity:0;transform:translateY(18px);
+  transition:opacity .45s cubic-bezier(.4,0,.2,1),
+             transform .45s cubic-bezier(.4,0,.2,1);
+}
+.dc-rv.dc-rv-card.in{opacity:1;transform:translateY(0);}
+
+/* Chart cards entrance animation */
+.dc-chart-card{
+  background:#fff;border:1px solid #eaecf0;
+  padding:28px 28px 24px;margin:24px 0;
+  border-radius:6px;
+  transition:box-shadow .28s ease,
+             opacity .5s ease,
+             transform .4s cubic-bezier(.22,1,.36,1);
+  will-change:transform,opacity;
+  opacity:0;transform:translateY(16px);
+}
+.dc-chart-card.dc-card-in{opacity:1;transform:translateY(0);}
+.dc-chart-card:hover{box-shadow:0 6px 22px rgba(0,0,0,.07);}
+.dc-chart-card[data-no-zoom]:hover{box-shadow:none;cursor:default;}
+/* ── Issue 1: kill hover shadow on the lollipop (avg-views) card ── */
+.dc-chart-card:has(#xr-view-tag):hover{box-shadow:none;cursor:default;}
+
+/* Three-col cards inside scroll containers — no individual animation needed */
+.dc-three-col .dc-chart-card{
+  opacity:1;transform:none;
+  border:none;border-right:1px solid var(--db);margin:0;
+  display:flex;flex-direction:column;width:280px;
+}
+.dc-three-col .dc-chart-card:last-child{border-right:none;}
+
+/* Two-col cards */
+.dc-two-col .dc-chart-card{
+  opacity:1;transform:none;
+  border:none;border-right:1px solid var(--db);margin:0;
+  display:flex;flex-direction:column;justify-content:center;
+}
+.dc-two-col .dc-chart-card:last-child{border-right:none;}
+.dc-two-col .dc-tbl-wrap{margin-top:auto;margin-bottom:auto;}
+/* chart-table variant */
+
+/* Two-col: chart-left + table-right — titles align via matching min-heights */
+.dc-two-col-chart-table{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:0;
+  border:1px solid #eaecf0;
+  align-items:stretch;
+}
+.dc-two-col-chart-table .dc-chart-card{
+  opacity:1;transform:none;margin:0;
+  border:none;
+  display:flex;flex-direction:column;
+  justify-content:flex-start;
+  padding:28px 28px 24px;
+}
+.dc-two-col-chart-table .dc-chart-card:first-child{
+  border-right:1px solid var(--db);
+}
+/* Lock title and desc to same min-height in both cards so they align */
+.dc-two-col-chart-table .dc-chart-title{
+  min-height:2.2em;
+  display:flex;align-items:flex-start;
+}
+.dc-two-col-chart-table .dc-chart-desc{
+  min-height:3.6em;
+  display:flex;align-items:flex-start;
+}
+/* Chart area fills remaining space */
+.dc-two-col-chart-table .dc-chart-canvas{
+  position:relative;
+  width:100%;
+  flex:0 0 auto;
+  margin-top:auto;
+  margin-bottom:auto;
+}
+.dc-two-col-chart-table .dc-chart-canvas canvas{
+  display:block;
+  width:100%!important;
+}
+/* Table card: after title+desc, center the table in remaining space */
+.dc-two-col-chart-table .dc-chart-card:last-child{
+  justify-content:flex-start;
+}
+.dc-two-col-chart-table .dc-tbl-wrap{
+  flex:0 1 auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow-x:auto;
+  width:100%;
+  margin-top:auto;
+  margin-bottom:auto;
+  padding-top:4px;
+}
+.dc-two-col-chart-table .dc-tbl-wrap table{width:100%;}
+
+@media(max-width:900px){
+  .dc-two-col-chart-table{grid-template-columns:1fr;}
+  .dc-two-col-chart-table .dc-chart-card:first-child{
+    border-right:none;border-bottom:1px solid var(--db);
+  }
+  .dc-two-col .dc-chart-card:has(.dc-spoke-wrap) .dc-chart-title,
+  .dc-two-col .dc-chart-card:has(.dc-spoke-wrap) .dc-chart-desc,
+  .dc-two-col-chart-table .dc-chart-title,
+  .dc-two-col-chart-table .dc-chart-desc,
+  .dc-three-col .dc-chart-card:has(.dc-spoke-wrap) .dc-chart-title,
+  .dc-three-col .dc-chart-card:has(.dc-spoke-wrap) .dc-chart-desc{min-height:auto;}
+}
+
+/* Aligned top variant — titles and descs align, charts remain flexible */
+.dc-two-col.dc-two-col-align-top .dc-chart-card{
+  justify-content:flex-start;
+}
+.dc-two-col.dc-two-col-align-top .dc-chart-title{
+  min-height:2.4em;
+}
+.dc-two-col.dc-two-col-align-top .dc-chart-desc{
+  min-height:3.2em;
+}
+/* Right card in align-top: after title+desc, center the bar list */
+.dc-two-col.dc-two-col-align-top .dc-chart-card:last-child .dc-bar-grid,
+.dc-two-col.dc-two-col-align-top .dc-chart-card:last-child .dc-rank-grid{
+  margin-top:auto;margin-bottom:auto;
+}

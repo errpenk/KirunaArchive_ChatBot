@@ -1,0 +1,453 @@
+/* Final phone-only refinement patch */
+html.phone-app{
+  --phone-sheet-h:clamp(252px,41svh,360px);
+  --phone-sheet-peek:76px;
+  --phone-ruler-h:58px;
+  --phone-ruler-gap:12px;
+}
+html.phone-app .cards-section-outer .section-inner{
+  background:transparent!important;
+  border:none!important;
+  box-shadow:none!important;
+  padding:18px 0 0!important;
+}
+html.phone-app .card{
+  background:var(--g6)!important;
+  border:1px solid rgba(15,23,42,.08)!important;
+  box-shadow:none!important;
+}
+html.phone-app #page-discourse .dc-hero-stats,
+html.phone-app #page-discourse .dc-cards{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:0!important;
+  margin:18px 0 0!important;
+  background:transparent!important;
+  border:none!important;
+}
+html.phone-app #page-discourse .dc-hs:nth-child(5),
+html.phone-app #page-discourse .dc-card-stat:last-child:nth-child(odd){
+  grid-column:1 / -1!important;
+}
+html.phone-app #page-discourse .dc-hs,
+html.phone-app #page-discourse .dc-card-stat{
+
+  border-top:1px solid rgba(15,23,42,.08)!important;
+  padding:12px 0 10px!important;
+  text-align:left!important;
+}
+html.phone-app #page-discourse .dc-hs:nth-child(odd),
+html.phone-app #page-discourse .dc-card-stat:nth-child(odd){
+  padding-right:12px!important;
+  border-right:1px solid rgba(15,23,42,.08)!important;
+}
+html.phone-app #page-discourse .dc-hs:last-child,
+html.phone-app #page-discourse .dc-card-stat:last-child:nth-child(odd){
+  border-right:none!important;
+  padding-right:0!important;
+}
+html.phone-app #page-discourse .dc-hs-n,
+html.phone-app #page-discourse .dc-card-n{
+  font-size:clamp(1.05rem,5vw,1.45rem)!important;
+  line-height:1.08!important;
+}
+html.phone-app #page-discourse .dc-hs-l,
+html.phone-app #page-discourse .dc-card-l{
+  font-size:8.5px!important;
+  line-height:1.45!important;
+}
+html.phone-app #page-discourse .dc-three-col-wrap{
+  overflow:visible!important;
+}
+html.phone-app #page-discourse .dc-three-col-wrap::after{
+  content:none!important;
+}
+html.phone-app #page-discourse .dc-three-col-inner{
+  display:block!important;
+  overflow:visible!important;
+}
+html.phone-app #page-discourse .dc-three-col,
+html.phone-app #page-discourse .dc-grid-2,
+html.phone-app #page-discourse .dc-grid-3,
+html.phone-app #page-discourse .dc-two-col,
+html.phone-app #page-discourse .dc-two-col-chart-table{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  width:100%!important;
+  min-width:0!important;
+}
+html.phone-app #page-discourse .dc-three-col .dc-chart-card{
+  width:100%!important;
+  border-right:none!important;
+}
+html.phone-app #page-discourse .dc-two-col-chart-table .dc-chart-card{
+  border-right:none!important;
+  border-bottom:1px solid var(--db)!important;
+}
+html.phone-app #page-discourse .dc-two-col-chart-table .dc-chart-card:last-child{
+  border-bottom:none!important;
+}
+html.phone-app #page-discourse .dc-chart-card{
+  margin:12px 0!important;
+}
+html.phone-app #page-discourse .dc-chart-canvas{
+  min-width:0!important;
+}
+html.phone-app #page-discourse .dc-chart-canvas canvas,
+html.phone-app #dc-lightbox-content canvas,
+html.phone-app #dc-lightbox-content img{
+  max-width:100%!important;
+}
+html.phone-app body.on-discourse #dc-btn-top{
+  display:flex!important;
+}
+html.phone-app #dc-btn-top{
+  right:16px!important;
+  bottom:calc(16px + env(safe-area-inset-bottom))!important;
+}
+html.phone-app #sidebar::before{
+  display:none!important;
+}
+html.phone-app #sidebar{
+  left:10px!important;
+  right:10px!important;
+  bottom:calc(var(--phone-ruler-h) + var(--phone-ruler-gap) + env(safe-area-inset-bottom))!important;
+  height:var(--phone-sheet-h)!important;
+  max-height:var(--phone-sheet-h)!important;
+  overflow:hidden!important;
+  transition:transform .42s cubic-bezier(.22,1,.36,1), opacity .28s ease, box-shadow .3s ease!important;
+  will-change:transform;
+  touch-action:pan-y;
+}
+html.phone-app #sidebar.phone-sheet-hint{
+  animation:phoneSheetNudge 1.15s cubic-bezier(.22,1,.36,1) 1 both;
+}
+html.phone-app #sidebar.is-dragging{
+  transition:none!important;
+}
+html.phone-app.map-sheet-collapsed #sidebar{
+  transform:translateY(calc(var(--phone-sheet-h) - var(--phone-sheet-peek)))!important;
+}
+html.phone-app .sb-tabs{
+  display:none!important;
+}
+html.phone-app #pane-tl{
+  padding:0 0 14px!important;
+  overscroll-behavior:contain;
+}
+html.phone-app .era-head{
+  top:0!important;
+  padding:16px 18px 8px!important;
+  background:#fff!important;
+  backdrop-filter:none!important;
+}
+html.phone-app .tl-row{
+  padding:12px 18px!important;
+}
+html.phone-app .tl-row::before{
+  left:18px!important;
+  right:12px!important;
+  border-radius:14px!important;
+}
+html.phone-app .tl-row.on::before{
+  background:#f0f0f2!important;
+  box-shadow:none!important;
+}
+html.phone-app #map-ruler{
+  left:10px!important;
+  right:10px!important;
+  bottom:calc(10px + env(safe-area-inset-bottom))!important;
+  height:var(--phone-ruler-h)!important;
+  transition:transform .34s cubic-bezier(.22,1,.36,1), opacity .26s ease, box-shadow .3s ease!important;
+}
+html.phone-app #leaflet-map .leaflet-bottom.leaflet-right{
+  bottom:calc(var(--phone-ruler-h) + 20px + env(safe-area-inset-bottom));
+}
+html.phone-app #map-ruler-inner{
+  padding:0 18px 12px!important;
+}
+html.phone-app .leaflet-control-zoom{
+  margin-bottom:calc(var(--phone-sheet-h) + var(--phone-ruler-h) + var(--phone-ruler-gap) + 96px + env(safe-area-inset-bottom))!important;
+}
+html.phone-app .map-home-btn{
+  bottom:calc(var(--phone-sheet-h) + var(--phone-ruler-h) + var(--phone-ruler-gap) + 170px + env(safe-area-inset-bottom))!important;
+}
+html.phone-app #map-fs-btn{
+  bottom:calc(var(--phone-sheet-h) + var(--phone-ruler-h) + var(--phone-ruler-gap) + 214px + env(safe-area-inset-bottom))!important;
+}
+html.phone-app .map-edge-indicator[style*="bottom"]{
+  bottom:calc(var(--phone-sheet-h) + var(--phone-ruler-h) + var(--phone-ruler-gap) + 78px + env(safe-area-inset-bottom))!important;
+}
+html.phone-app.map-popup-open #sidebar{
+  display:block!important;
+}
+html.phone-app.map-popup-open #map-ruler{
+  opacity:1!important;
+  pointer-events:auto!important;
+  transform:none!important;
+}
+html.phone-app.map-popup-open .map-home-btn,
+html.phone-app.map-popup-open #map-fs-btn,
+html.phone-app.map-popup-open .leaflet-control-zoom{
+  opacity:1!important;
+  pointer-events:auto!important;
+}
+html.phone-app .leaflet-popup-pane,
+html.phone-app .leaflet-popup-content-wrapper,
+html.phone-app .map-home-btn,
+html.phone-app #map-fs-btn,
+html.phone-app .leaflet-control-zoom{
+  transition:transform .32s cubic-bezier(.22,1,.36,1), opacity .24s ease, box-shadow .28s ease!important;
+}
+html.phone-app .leaflet-marker-pane,
+html.phone-app .leaflet-shadow-pane,
+html.phone-app .leaflet-marker-icon,
+html.phone-app .map-ev-marker{
+  visibility:visible!important;
+  transition:opacity .28s cubic-bezier(.22,1,.36,1), transform .28s cubic-bezier(.22,1,.36,1), visibility .01s linear .28s!important;
+}
+html.phone-app.map-detail-open .leaflet-marker-pane,
+html.phone-app.map-detail-open .leaflet-shadow-pane,
+html.phone-app.map-detail-open .leaflet-marker-icon,
+html.phone-app.map-detail-open .map-ev-marker{
+  opacity:0!important;
+  visibility:hidden!important;
+  transform:scale(.82)!important;
+  pointer-events:none!important;
+}
+html.phone-app .tlp-controls{
+  align-items:center!important;
+  gap:10px!important;
+  flex-wrap:wrap!important;
+}
+html.phone-app .tlp-view-toggle{
+  gap:8px!important;
+  padding:4px!important;
+  border-radius:18px!important;
+}
+html.phone-app .tlp-vbtn,
+html.phone-app .tlp-back{
+  min-height:42px!important;
+  height:42px!important;
+  padding:0 14px!important;
+  border-radius:14px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+html.phone-app .tlp-vbtn{
+  min-width:96px!important;
+}
+html.phone-app #dtl-text-body .txt-stage{
+  padding:10px 0 28px 0!important;
+}
+html.phone-app #dtl-text-body .txt-center-line,
+html.phone-app #dtl-text-body .txt-dot,
+html.phone-app #dtl-text-body .txt-connector{
+  left:24px!important;
+}
+html.phone-app #dtl-text-body .txt-col{
+
+  padding:0 0 16px 52px!important;
+}
+
+@keyframes phoneSheetNudge{
+  0%,100%{transform:translateY(0);}
+  38%{transform:translateY(14px);}
+  70%{transform:translateY(6px);}
+}
+
+/* ===== MOBILE-ONLY FIXES (phone-app) ===== */
+
+/* 1. Map: hide edge indicators when popup or detail card is open */
+html.phone-app.map-popup-open .map-edge-indicator,
+html.phone-app.map-detail-open .map-edge-indicator {
+  opacity:0!important; pointer-events:none!important;
+}
+
+/* 2. Timeline: align by-time leftmost content with by-phase leftmost content */
+/* by-phase text starts at 58px (40px padding + 8px dot + 10px gap) */
+/* txt-dot is 10px wide, translate(-50%) centers it on left value → left:45px = left-edge at 40px */
+html.phone-app #dtl-text-body .txt-center-line,
+html.phone-app #dtl-text-body .txt-connector,
+html.phone-app #dtl-text-body .txt-dot{ left:45px!important; }
+html.phone-app #dtl-text-body .txt-col { min-height:82px!important; padding:0 0 16px 58px!important; }
+
+/* 3. Calendar: fix scrollable events list (flex min-height:auto bug) */
+html.phone-app #page-cal .cpe-list { min-height:0!important; }
+
+/* 4. Discourse: hide drag hint animation */
+html.phone-app .dc-drag-hint { display:none!important; }
+
+/* 5. Mobile map floating search bar */
+#mobile-map-search-wrap { display:none; }
+html.phone-app #mobile-map-search-wrap {
+  display:block; position:absolute;
+  top:calc(14px + env(safe-area-inset-top));
+  left:12px; right:12px; z-index:1003;
+}
+#mobile-map-search-bar {
+  display:flex; align-items:center; gap:8px;
+  background:rgba(255,255,255,.97); border-radius:24px;
+  padding:9px 16px;
+  box-shadow:0 2px 12px rgba(0,0,0,.18);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+#mobile-map-search-bar svg { flex-shrink:0; color:#888; }
+#mobile-map-search-input {
+  flex:1; border:none; outline:none; background:transparent;
+  font-size:16px; color:var(--b,#111); min-width:0;
+}
+#mobile-map-search-input::placeholder { color:#aaa; }
+#mobile-map-search-results {
+  margin-top:6px; background:rgba(255,255,255,.97);
+  border-radius:16px; overflow:hidden;
+  box-shadow:0 2px 12px rgba(0,0,0,.15);
+  max-height:260px; overflow-y:auto; -webkit-overflow-scrolling:touch;
+}
+#mobile-map-search-results:empty { display:none; }
+.mmsr-item {
+  padding:11px 16px; font-size:14px; cursor:pointer;
+  border-bottom:.5px solid rgba(0,0,0,.07); color:var(--b,#111);
+}
+.mmsr-item:last-child { border-bottom:none; }
+.mmsr-item:active { background:rgba(0,0,0,.05); }
+.mmsr-item-title { font-weight:500; line-height:1.3; }
+.mmsr-item-meta { font-size:12px; color:#888; margin-top:2px; }
+
+/* 6. Map: completely hide sidebar (event list container) on phone map page */
+html.phone-app #sidebar,
+html.phone-app.map-popup-open #sidebar {
+  display:none!important;
+}
+/* Reposition map controls now that sidebar height is removed */
+html.phone-app .leaflet-control-zoom {
+  margin-bottom:calc(var(--phone-ruler-h) + 20px + env(safe-area-inset-bottom))!important;
+}
+html.phone-app .map-home-btn {
+  bottom:calc(var(--phone-ruler-h) + 94px + env(safe-area-inset-bottom))!important;
+}
+html.phone-app #map-fs-btn {
+  bottom:calc(var(--phone-ruler-h) + 138px + env(safe-area-inset-bottom))!important;
+}
+html.phone-app .map-edge-indicator[style*="bottom"] {
+  bottom:calc(var(--phone-ruler-h) + 16px + env(safe-area-inset-bottom))!important;
+}
+/* Move back-btn below the search bar */
+html.phone-app #map-back-btn {
+  top:calc(72px + env(safe-area-inset-top))!important;
+  left:12px!important;
+}
+
+/* 7. Popup pane: CSS transition for fade-out animation */
+html.phone-app .leaflet-popup-pane {
+  transition:opacity 0.28s ease!important;
+}
+
+/* 8. Discourse stats: match stat-cell / image-3 design (serif, normal weight, centered, neutral) */
+html.phone-app #page-discourse .dc-hero-stats,
+html.phone-app #page-discourse .dc-cards {
+  border-radius:18px!important;
+  overflow:hidden!important;
+  background:rgba(245,245,247,.96)!important;
+  border:.5px solid rgba(0,0,0,.09)!important;
+  margin:16px 0 0!important;
+}
+html.phone-app #page-discourse .dc-hs,
+html.phone-app #page-discourse .dc-card-stat {
+  background:transparent!important;
+  border:none!important;
+  border-top:.5px solid rgba(0,0,0,.08)!important;
+  padding:18px 10px!important;
+  text-align:center!important;
+}
+/* No top border for first row */
+html.phone-app #page-discourse .dc-hs:nth-child(-n+2),
+html.phone-app #page-discourse .dc-card-stat:nth-child(-n+2) {
+  border-top:none!important;
+}
+/* Right divider for odd cells */
+html.phone-app #page-discourse .dc-hs:nth-child(odd),
+html.phone-app #page-discourse .dc-card-stat:nth-child(odd) {
+  border-right:.5px solid rgba(0,0,0,.08)!important;
+  padding-right:10px!important;
+}
+/* Last odd cell (full-width) needs no right border */
+html.phone-app #page-discourse .dc-hs:last-child:nth-child(odd),
+html.phone-app #page-discourse .dc-card-stat:last-child:nth-child(odd) {
+  border-right:none!important;
+  grid-column:1/-1!important;
+}
+/* Numbers: serif, normal weight, larger, neutral color (like stat-n) */
+html.phone-app #page-discourse .dc-hs-n,
+html.phone-app #page-discourse .dc-card-n,
+html.phone-app #page-discourse .dc-card-n.orange,
+html.phone-app #page-discourse .dc-card-n.red,
+html.phone-app #page-discourse .dc-card-n.green {
+  font-family:var(--serif)!important;
+  font-size:clamp(1.45rem,7.5vw,2.1rem)!important;
+  font-weight:400!important;
+  letter-spacing:-.04em!important;
+  color:var(--b,#111)!important;
+  line-height:1!important;
+  display:block!important;
+  margin-bottom:7px!important;
+}
+/* Labels: small all-caps, centered, gray */
+html.phone-app #page-discourse .dc-hs-l,
+html.phone-app #page-discourse .dc-card-l {
+  font-size:9px!important;
+  color:var(--g3,#888)!important;
+  letter-spacing:.07em!important;
+  text-transform:uppercase!important;
+  text-align:center!important;
+  line-height:1.5!important;
+}
+
+/* 9. Discourse lightbox: center vertically (override max-width:540px flex-start) */
+html.phone-app #dc-lightbox {
+  align-items:center!important;
+  padding-top:0!important;
+}
+html.phone-app #dc-lightbox-inner {
+  max-height:min(82vh, 82dvh)!important;
+  margin:auto!important;
+}
+
+/* 10. Discourse numbers: match home stat-n size (16px on phone) */
+html.phone-app #page-discourse .dc-hs-n,
+html.phone-app #page-discourse .dc-card-n,
+html.phone-app #page-discourse .dc-card-n.orange,
+html.phone-app #page-discourse .dc-card-n.red,
+html.phone-app #page-discourse .dc-card-n.green {
+  font-size:16px!important;
+}
+
+/* 11. Map search bar: removed */
+html.phone-app #mobile-map-search-wrap { display:none!important; }
+/* Move back-btn to top (search bar no longer occupies top space) */
+html.phone-app #map-back-btn { top:calc(16px + env(safe-area-inset-top))!important; }
+
+/* 12. Map buttons: keep visible and at consistent positions in all states */
+html.phone-app.map-fs-active .map-home-btn {
+  opacity:1!important; pointer-events:auto!important;
+}
+html.phone-app.map-fs-active .leaflet-control-zoom,
+html.phone-app.map-popup-open .leaflet-control-zoom {
+  margin-bottom:calc(var(--phone-ruler-h) + 20px + env(safe-area-inset-bottom))!important;
+}
+html.phone-app.map-fs-active .map-home-btn {
+  bottom:calc(var(--phone-ruler-h) + 94px + env(safe-area-inset-bottom))!important;
+}
+html.phone-app.map-fs-active #map-fs-btn {
+  bottom:calc(var(--phone-ruler-h) + 138px + env(safe-area-inset-bottom))!important;
+}
+
+/* 13. Map popup: auto-show expanded content; hide location box and toggle button */
+html.phone-app .popup-expand {
+  display:block!important;
+}
+html.phone-app .popup-expand-loc,
+html.phone-app .popup-short-desc,
+html.phone-app .popup-btn-row{ display:none!important; }

@@ -13,12 +13,13 @@ Minimal Railway-ready version of the Kiruna Archive with a real chat backend.
 ## Frontend files
 
 - `public/index.html` contains the main page markup and intro scripts.
-- `public/timeline.html` and `public/outside-map.html` contain the timeline and Outside views.
-- `public/css/` and `public/js/` contain each page's styles and scripts. Main-page CSS is loaded in cascade order: base, archive, responsive, discourse, compare, app mode, and adaptive overrides.
-- The gallery card grid and year rail use Vue in `public/index.html` and `public/js/gallery.js`; the gallery lightbox remains in `gallery.js`. The main search results use a small Vue view in `public/index.html` and `public/js/archive.js`. The pinned Vue runtime and license are in `public/vendor/`.
-- Map ruler wheel, drag, and touch input lives in `public/js/map-ruler-input.js`; map rendering and event selection remain in `public/js/archive.js`.
+- `public/timeline.html` and `public/outside-map.html` contain the timeline and Outside views. Timeline code is grouped by function in `src/js/timeline/`.
+- Main-page CSS is grouped by feature in `public/css/archive/`, `chat/`, `discourse/`, `app/`, `adaptive/`, `gallery/`, and `responsive/`. The links in `index.html` preserve the cascade order.
+- The gallery card grid and year rail use Vue in `public/index.html` and `public/js/gallery.js`; the gallery lightbox remains in `gallery.js`. The main search results use a small Vue view in `public/index.html` and `src/js/archive/`. The pinned Vue runtime and license are in `public/vendor/`.
+- Map ruler wheel, drag, and touch input lives in `public/js/map-ruler-input.js`; map rendering and event selection are in `src/js/archive/`.
 - `public/js/responsive-collisions.js` keeps navigation and map-sidebar overlap checks out of the archive view logic.
 - `public/js/outside-data.js` supplies the same document data to the main search and Outside view.
+- Large browser scripts are edited as numbered, ordered fragments in `src/js/`; each feature's fragments share the original script scope and are checked together through the generated file. `npm run build:js` writes ignored `public/js/generated/` files. `npm start`, `npm test`, and Netlify preparation run this build automatically. Build before serving `public/` directly.
 
 ## Adding archive events
 
@@ -96,7 +97,7 @@ After deploy, requests to `/api/*` on the Netlify site will be proxied to the Ra
 
 - Netlify serves the static archive UI from `public/`
 - Railway serves the Express API from `server.js`
-- Netlify proxies `/api/chat`, `/api/weak-web-search`, and `/api/health` to Railway
+- Netlify proxies `/api/chat`, `/api/archive-answer`, `/api/weak-web-search`, and `/api/health` to Railway
 
 ## Useful endpoints
 

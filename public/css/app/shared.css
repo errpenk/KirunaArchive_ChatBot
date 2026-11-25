@@ -1,0 +1,296 @@
+/* Adaptive app refinement — flatter surfaces, tighter radii, denser map fallback */
+html:is(.phone-app,.tablet-app){
+  --ui-radius-xs:10px;
+  --ui-radius-sm:14px;
+  --ui-radius-md:18px;
+  --ui-radius-lg:24px;
+  --ui-stroke:rgba(15,23,42,.08);
+  --ui-stroke-strong:rgba(15,23,42,.12);
+  --ui-fill:#ffffff;
+  --ui-fill-soft:rgba(250,251,253,.92);
+  --ui-fill-muted:rgba(244,246,249,.82);
+  --ui-shadow-soft:0 10px 24px rgba(15,23,42,.06);
+  --ui-shadow-medium:0 14px 30px rgba(15,23,42,.08);
+}
+html:is(.phone-app,.tablet-app) .nav-tabs{
+  border-radius:16px;
+  box-shadow:none;
+}
+html:is(.phone-app,.tablet-app) .ntab{
+  border-radius:12px;
+}
+html:is(.phone-app,.tablet-app) .ntab.on{
+  box-shadow:none;
+}
+html.phone-app .btn-dark,
+html.phone-app .btn-outline,
+html.phone-app .nbadge,
+html.phone-app .popup-btn,
+html.phone-app .popup-btn-sec,
+html.phone-app .tlp-back,
+html.phone-app .cp-back,
+html.phone-app .cpn-btn,
+html.phone-app .cal-btn,
+html.phone-app .cal-expand,
+html.phone-app .tlp-vbtn,
+html.phone-app .era-opt,
+html.tablet-app .btn-dark,
+html.tablet-app .btn-outline,
+html.tablet-app .nbadge,
+html.tablet-app .popup-btn,
+html.tablet-app .popup-btn-sec,
+html.tablet-app .tlp-back,
+html.tablet-app .cp-back,
+html.tablet-app .cpn-btn,
+html.tablet-app .cal-btn,
+html.tablet-app .cal-expand,
+html.tablet-app .tlp-vbtn,
+html.tablet-app .era-opt{
+  border-radius:var(--ui-radius-sm)!important;
+}
+html:is(.phone-app,.tablet-app) .btn-dark{
+  box-shadow:none;
+}
+html:is(.phone-app,.tablet-app) .btn-outline{
+  border-color:var(--ui-stroke-strong);
+}
+html:is(.phone-app,.tablet-app) .nav-search-input,
+html:is(.phone-app,.tablet-app) .search-results-dropdown{
+  border-radius:var(--ui-radius-sm);
+}
+html:is(.phone-app,.tablet-app) .search-results-dropdown{
+  border:1px solid var(--ui-stroke);
+  box-shadow:var(--ui-shadow-medium);
+}
+html.phone-app .hero-inner{
+  border-radius:24px;
+  box-shadow:var(--ui-shadow-medium);
+}
+html.tablet-app .hero-inner{
+  border-radius:28px;
+  box-shadow:var(--ui-shadow-medium);
+}
+html:is(.phone-app,.tablet-app) .stats-inner{
+  background:rgba(255,255,255,.76);
+  box-shadow:none;
+}
+html.phone-app .htl-section-outer .section-inner,
+html.phone-app .htl-scroll-area,
+html.phone-app .htl-drag-hint-row,
+html.phone-app .cards-section-outer .section-inner,
+html.tablet-app .htl-section-outer,
+html.tablet-app .cards-section-outer .section-inner{
+  background:var(--ui-fill-soft);
+  box-shadow:none;
+}
+html.phone-app .htl-section-outer .section-inner,
+html.phone-app .htl-scroll-area,
+html.phone-app .htl-drag-hint-row,
+html.phone-app .cards-section-outer .section-inner,
+html.tablet-app .htl-section-outer,
+html.tablet-app .cards-section-outer .section-inner{
+  border-color:var(--ui-stroke);
+}
+html.phone-app .cards-grid{
+  gap:1px;
+  background:rgba(15,23,42,.08);
+  border:1px solid rgba(15,23,42,.08);
+  border-radius:20px;
+  overflow:hidden;
+}
+html.tablet-app .cards-grid{
+  gap:1px;
+  background:rgba(15,23,42,.08);
+  border:1px solid rgba(15,23,42,.08);
+  border-radius:22px;
+  overflow:hidden;
+}
+html:is(.phone-app,.tablet-app) .card{
+  background:#fff;
+  border:none;
+  border-radius:0;
+  box-shadow:none;
+}
+html:is(.phone-app,.tablet-app) .card:hover{
+  box-shadow:none;
+  transform:none;
+}
+html.phone-app #sidebar,
+html.phone-app #map-ruler,
+html.phone-app .tlp-header,
+html.phone-app .cph,
+html.phone-app .cpgrid-panel,
+html.phone-app .cpevs-panel,
+html.phone-app .phase-era-block,
+html.phone-app .era-panel,
+html.phone-app .legend,
+html.tablet-app #sidebar,
+html.tablet-app #map-ruler,
+html.tablet-app .tlp-header,
+html.tablet-app .cph,
+html.tablet-app .cpgrid-panel,
+html.tablet-app .cpevs-panel,
+html.tablet-app .phase-era-block,
+html.tablet-app .era-panel,
+html.tablet-app .legend,
+html.tablet-app #page-discourse{
+  border:1px solid var(--ui-stroke);
+  box-shadow:var(--ui-shadow-soft);
+}
+html.phone-app #sidebar,
+html.phone-app #map-ruler,
+html.phone-app .tlp-header,
+html.phone-app .cph,
+html.phone-app .cpgrid-panel,
+html.phone-app .cpevs-panel,
+html.phone-app .phase-era-block,
+html.phone-app .era-panel,
+html.phone-app .legend,
+html.tablet-app #sidebar,
+html.tablet-app #map-ruler,
+html.tablet-app .tlp-header,
+html.tablet-app .cph,
+html.tablet-app .cpgrid-panel,
+html.tablet-app .cpevs-panel,
+html.tablet-app .phase-era-block,
+html.tablet-app .era-panel,
+html.tablet-app .legend{
+  background:var(--ui-fill-soft);
+}
+html.phone-app #sidebar,
+html.phone-app .tlp-header,
+html.phone-app .cph,
+html.phone-app .cpgrid-panel,
+html.phone-app .cpevs-panel,
+html.phone-app .phase-era-block{
+  border-radius:22px;
+}
+html.tablet-app #sidebar,
+html.tablet-app .tlp-header,
+html.tablet-app .cph,
+html.tablet-app .cpgrid-panel,
+html.tablet-app .cpevs-panel,
+html.tablet-app .phase-era-block{
+  border-radius:24px;
+}
+html:is(.phone-app,.tablet-app) #map-ruler{
+  background:rgba(248,249,252,.82);
+  box-shadow:0 10px 24px rgba(15,23,42,.09);
+}
+html:is(.phone-app,.tablet-app) .sb-tabs::after{
+  box-shadow:none;
+}
+html:is(.phone-app,.tablet-app) .tlp-view-toggle{
+  border:1px solid var(--ui-stroke);
+  box-shadow:none;
+}
+html:is(.phone-app,.tablet-app) .tl-row{
+  transform:none;
+}
+html:is(.phone-app,.tablet-app) .tl-row::before{
+  left:12px;
+  right:10px;
+  border-radius:12px;
+}
+html.phone-app .tl-row:hover,
+html.phone-app .tl-row.on,
+html.tablet-app .tl-row:hover,
+html.tablet-app .tl-row.on{
+  transform:none;
+}
+html:is(.phone-app,.tablet-app) .tl-row:hover::before{
+  background:rgba(15,23,42,.04);
+}
+html:is(.phone-app,.tablet-app) .tl-row.on::before{
+  background:#f0f0f2;
+  box-shadow:none;
+}
+html:is(.phone-app,.tablet-app) .peb-events{
+  background:rgba(15,23,42,.08);
+}
+html:is(.phone-app,.tablet-app) .peb-event{
+  background:#fff;
+}
+html:is(.phone-app,.tablet-app) .peb-event:hover{
+  background:rgba(244,247,251,.96);
+  transform:none!important;
+}
+html:is(.phone-app,.tablet-app) .popup-btn-row{
+  gap:8px;
+}
+html.phone-app .popup-btn,
+html.phone-app .popup-btn-sec,
+html.tablet-app .popup-btn,
+html.tablet-app .popup-btn-sec{
+  min-height:36px;
+  padding:9px 12px;
+}
+html.phone-app .popup-expand-loc,
+html.phone-app .dp-loc,
+html.tablet-app .popup-expand-loc,
+html.tablet-app .dp-loc{
+  background:var(--ui-fill-muted);
+  border-radius:12px;
+}
+html.phone-app .srd-empty,
+html.phone-app .cpe-empty,
+html.tablet-app .srd-empty,
+html.tablet-app .cpe-empty{
+  background:rgba(250,251,253,.9);
+}
+html:is(.phone-app,.tablet-app) .leaflet-popup-content-wrapper{
+  border-radius:18px!important;
+  border:1px solid var(--ui-stroke)!important;
+  box-shadow:var(--ui-shadow-medium)!important;
+}
+html:is(.phone-app,.tablet-app) .leaflet-control-zoom{
+  border-radius:16px!important;
+  box-shadow:0 8px 20px rgba(15,23,42,.12)!important;
+}
+html:is(.phone-app,.tablet-app) #map-back-btn{
+  border-radius:14px!important;
+  box-shadow:0 10px 22px rgba(15,23,42,.1)!important;
+}
+
+/* Small-screen map fallback: keep markers + ruler, remove secondary chrome */
+html.phone-app.map-density-compact #sidebar,
+html.phone-app.map-density-compact .era-panel,
+html.phone-app.map-density-compact .legend,
+html.phone-app.map-density-compact .map-home-btn,
+html.phone-app.map-density-compact #map-fs-btn,
+html.phone-app.map-density-compact .map-edge-indicator,
+html.tablet-app.map-density-compact #sidebar,
+html.tablet-app.map-density-compact .era-panel,
+html.tablet-app.map-density-compact .legend,
+html.tablet-app.map-density-compact .map-home-btn,
+html.tablet-app.map-density-compact #map-fs-btn,
+html.tablet-app.map-density-compact .map-edge-indicator{
+  display:none!important;
+}
+html.phone-app.map-density-compact #map-ruler{
+  left:10px;
+  right:10px;
+  bottom:calc(10px + env(safe-area-inset-bottom));
+  height:58px;
+  border-radius:18px;
+}
+html.tablet-app.map-density-compact #map-ruler{
+  left:18px;
+  right:18px;
+  bottom:18px;
+  height:60px;
+  border-radius:20px;
+}
+html.phone-app.map-density-compact .leaflet-control-zoom{
+  margin-bottom:calc(86px + env(safe-area-inset-bottom))!important;
+}
+html.tablet-app.map-density-compact .leaflet-control-zoom{
+  margin-left:18px!important;
+  margin-bottom:96px!important;
+}
+html.tablet-app.map-density-compact #map-back-btn{
+  left:18px!important;
+}
+html:is(.phone-app,.tablet-app).map-density-compact #map-ruler-inner{
+  padding-bottom:12px;
+}

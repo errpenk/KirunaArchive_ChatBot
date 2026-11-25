@@ -1,0 +1,232 @@
+/* ── Keyword frequency visualisation ── */
+.dc-kw-wrap{margin:24px 0;}
+.dc-kw-tabs,
+.dc-pill-wrap{ cursor:default; }
+.dc-kw-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;justify-content:center;}
+.dc-kw-tab{
+  font-family:var(--mono-d);font-size:10px;letter-spacing:.05em;text-transform:uppercase;
+  padding:8px 20px;border:1.5px solid #cdd1d9;cursor:pointer;
+  color:#4a5568;background:#f0f2f5;
+  border-radius:980px;
+  font-weight:600;
+  transition:background .14s,color .14s,border-color .14s;
+}
+.dc-kw-tab:hover{border-color:#8a9ab0;color:#1c2a3a;background:#e4e8ee;}
+.dc-kw-tab.on{background:var(--dp);color:#fff;border-color:var(--dp);}
+
+/* Bubble tier */
+.dc-wf-bubbles{
+  display:flex;flex-wrap:wrap;gap:10px 8px;
+  align-items:flex-end;margin-bottom:22px;
+  justify-content:center;
+  overflow:visible;
+}
+.dc-wf-bubbles::-webkit-scrollbar{display:none;}
+.dc-wf-bubble-item{
+  display:flex;flex-direction:column;align-items:center;gap:5px;cursor:default;
+}
+.dc-wf-bubble{
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  transition:width .45s cubic-bezier(.22,1,.36,1),height .45s cubic-bezier(.22,1,.36,1);
+  flex-shrink:0;
+}
+.dc-wf-bubble-count{
+  color:#fff;font-weight:500;line-height:1;font-family:var(--mono-d);
+  transition:font-size .4s;
+}
+.dc-wf-bubble-word{
+  font-size:11px;color:var(--dp3);letter-spacing:-.01em;text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:72px;
+}
+
+/* Section divider */
+.dc-wf-divider{height:1px;background:var(--db);margin:4px 0 16px;}
+.dc-wf-rest-label{
+  font-family:var(--mono-d);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--dp3);margin-bottom:10px;
+}
+
+/* Bar rows for remaining words */
+.dc-wf-row{
+  display:flex;align-items:center;gap:0;margin-bottom:3px;
+  transition:opacity .18s;
+}
+.dc-wf-row:hover{opacity:.75;}
+.dc-wf-label{
+  font-size:11px;color:var(--dp3);text-align:right;flex-shrink:0;
+  font-family:var(--mono-d);letter-spacing:-.01em;
+  width:86px;padding-right:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.dc-wf-track{flex:1;height:3px;background:var(--dgrid);position:relative;}
+.dc-wf-fill{
+  position:absolute;top:0;left:0;height:100%;
+  transition:width .55s cubic-bezier(.22,1,.36,1);
+}
+.dc-wf-count{
+  width:28px;font-size:10px;color:var(--dp3);text-align:left;
+  padding-left:10px;font-family:var(--mono-d);flex-shrink:0;
+}
+
+/* ── Redesigned ranked bar chart — auto-balance columns when >5 rows ── */
+.dc-rank-grid{
+  display:grid;
+  grid-template-columns:1fr;   /* default single column, JS overrides when >5 items */
+  column-gap:40px;
+  column-fill:balance;         /* equal items per column */
+}
+.dc-rank-grid.dc-rank-multi{
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));
+}
+.dc-rank-row{
+  display:flex;align-items:center;gap:0;
+  padding:7px 0;border-bottom:1px solid var(--dgrid);
+  break-inside:avoid;
+  transition:background .12s;
+}
+.dc-rank-row:last-child{border-bottom:none;}
+.dc-rank-row:hover .dc-rank-word{color:var(--dp);}
+.dc-rank-n{
+  font-family:var(--mono-d);font-size:9px;color:var(--dgrid);
+  width:18px;flex-shrink:0;text-align:right;margin-right:8px;
+  font-variant-numeric:tabular-nums;
+}
+.dc-rank-word{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
+  font-size:11.5px;color:var(--dp2);letter-spacing:-.01em;
+  width:80px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  transition:color .12s;
+}
+.dc-rank-track{flex:1;height:4px;background:var(--dgrid);position:relative;border-radius:2px;}
+.dc-rank-fill{
+  position:absolute;top:0;left:0;height:100%;border-radius:2px;
+  transition:width .6s cubic-bezier(.22,1,.36,1);
+}
+.dc-rank-val{
+  width:26px;font-family:var(--mono-d);font-size:9.5px;color:var(--dp3);
+  text-align:right;padding-left:8px;flex-shrink:0;
+}
+
+/* Fix 4: wf-row remaining bars — also auto multi-column */
+.dc-wf-rows-wrap{
+
+  column-fill:balance;
+}
+
+/* ── Horizontal bar rows (existing simpler style for subreddits) ── */
+.dc-bar-section{margin:24px 0;}
+.dc-bar-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));column-gap:32px;}
+
+/* Radial spoke charts — fixed square, identical in every panel */
+.dc-spoke-wrap{
+  width:100%;
+  max-width:440px;
+  aspect-ratio:1/1;
+  margin:0 auto;
+  display:flex;align-items:center;justify-content:center;
+  overflow:visible;
+}
+.dc-bar-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--dgrid);}
+.dc-bar-row:last-child{border-bottom:none;}
+.dc-bar-label{width:90px;font-family:var(--mono-d);font-size:9.5px;color:var(--dp3);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;letter-spacing:.02em;}
+.dc-bar-track{flex:1;height:5px;background:var(--dgrid);overflow:hidden;border-radius:2px;}
+.dc-bar-fill{height:100%;border-radius:2px;transition:width .5s cubic-bezier(.22,1,.36,1);}
+.dc-bar-val{width:28px;font-family:var(--mono-d);font-size:9px;color:var(--dp3);text-align:left;}
+
+/* ── Table ── */
+.dc-tbl-wrap{overflow-x:auto;margin:16px 0;}
+.dc-tbl{width:100%;border-collapse:collapse;font-size:11.5px;}
+.dc-tbl th{
+  font-family:var(--mono-d);font-size:9px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--dp3);
+  padding:8px 12px;border-bottom:1.5px solid var(--dp);text-align:left;
+}
+.dc-tbl td{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
+  padding:9px 12px;border-bottom:1px solid var(--db);color:var(--dp);
+  transition:background .1s;
+}
+.dc-tbl tr:hover td{background:#f8f9fa;}
+.dc-tbl tr:last-child td{border-bottom:none;}
+
+/* ── Quote / callout ── */
+.dc-bq{
+  border-left:3px solid var(--dblue);padding:14px 0 14px 22px;
+  margin:28px 0;
+}
+.dc-bq p{
+  font-family:var(--display);font-size:1.15rem;font-style:italic;
+  line-height:1.6;color:var(--dp);margin-bottom:4px;
+}
+.dc-bq cite{font-family:var(--mono-d);font-size:9.5px;color:var(--dp3);font-style:normal;}
+.dc-bq cite::before{content:'— ';}
+
+/* ── Word wall (top keywords) — typographic layout ── */
+.dc-word-wall{
+  display:flex;flex-wrap:wrap;align-items:baseline;
+  gap:6px 10px;padding:20px 0 8px;
+}
+.dc-ww-item{
+  display:inline-flex;align-items:baseline;gap:4px;
+  cursor:default;transition:opacity .15s;
+}
+.dc-ww-item:hover{opacity:.7;}
+.dc-ww-word{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
+  font-weight:400;color:var(--dp);letter-spacing:-.02em;line-height:1;
+}
+.dc-ww-count{
+  font-family:var(--mono-d);font-size:9px;color:var(--dp3);
+  line-height:1;opacity:.65;
+}
+
+/* ── Bubble matrix (pos/neg keywords) — dot grid ── */
+.dc-bubble-matrix{
+  display:flex;flex-direction:column;gap:0;padding:4px 0;
+}
+.dc-bm-row{
+  display:flex;align-items:center;gap:10px;
+  padding:5px 0;border-bottom:1px solid var(--dgrid);
+  transition:opacity .15s;
+}
+.dc-bm-row:last-child{border-bottom:none;}
+.dc-bm-row:hover{opacity:.75;}
+.dc-bm-dots{
+  display:flex;align-items:center;gap:2px;flex-wrap:wrap;
+  flex:1;
+}
+.dc-bm-dot{
+  border-radius:50%;flex-shrink:0;
+  transition:transform .2s;
+}
+.dc-bm-row:hover .dc-bm-dot{transform:scale(1.15);}
+.dc-bm-word{
+  font-family:var(--mono-d);font-size:10px;color:var(--dp3);
+  width:72px;flex-shrink:0;text-align:right;letter-spacing:-.01em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.dc-bm-val{
+  font-family:var(--mono-d);font-size:10px;color:var(--dp3);
+  width:18px;flex-shrink:0;text-align:left;
+}
+
+/* Fix 4: wf-row remaining bars — also auto multi-column */
+.dc-wf-rows-wrap{
+  display:grid;
+  grid-template-columns:1fr;
+  column-gap:32px;
+  width:100%;
+}
+.dc-wf-rows-wrap.dc-wf-multi{
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));
+}
+
+/* ── Tilt-card JS interaction ── */
+@media(hover:hover){
+  .dc-chart-card{cursor:default;}
+}
+
+/* ── Scroll-reveal for dc sections ── */
+.dc-rv{
+  transform:translateY(20px);
+  transition:opacity .55s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.22,1,.36,1);
+}

@@ -10,12 +10,27 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <link rel="stylesheet" href="./css/main.css?v=20261025-2">
-<link rel="stylesheet" href="./css/archive.css">
+<link rel="stylesheet" href="./css/archive/base.css">
+<link rel="stylesheet" href="./css/archive/views.css">
+<link rel="stylesheet" href="./css/archive/ruler.css">
 <link rel="stylesheet" href="./css/responsive.css">
-<link rel="stylesheet" href="./css/discourse.css">
+<link rel="stylesheet" href="./css/discourse/base.css">
+<link rel="stylesheet" href="./css/discourse/report.css">
+<link rel="stylesheet" href="./css/discourse/keywords.css">
+<link rel="stylesheet" href="./css/discourse/toc.css">
+<link rel="stylesheet" href="./css/discourse/adaptive.css">
+<link rel="stylesheet" href="./css/discourse/lightbox.css">
 <link rel="stylesheet" href="./css/compare.css">
-<link rel="stylesheet" href="./css/app-mode.css">
-<link rel="stylesheet" href="./css/adaptive-overrides.css">
+<link rel="stylesheet" href="./css/app/phone.css">
+<link rel="stylesheet" href="./css/app/tablet.css">
+<link rel="stylesheet" href="./css/app/shared.css">
+<link rel="stylesheet" href="./css/adaptive/base.css">
+<link rel="stylesheet" href="./css/adaptive/phone.css">
+<link rel="stylesheet" href="./css/adaptive/tablet-timeline.css">
+<link rel="stylesheet" href="./css/adaptive/tablet.css">
+<link rel="stylesheet" href="./css/adaptive/compare.css">
+<link rel="stylesheet" href="./css/adaptive/tablet-polish.css">
+<link rel="stylesheet" href="./css/adaptive/final.css">
 </head>
 <body>
 <script>
@@ -1016,7 +1031,7 @@ import { animate, svg, utils } from './vendor/anime.esm.min.js';
 <script src="./js/routes.js"></script>
 <script src="./vendor/vue.global.prod.js"></script>
 <script src="./js/responsive-collisions.js"></script>
-<script src="./js/archive.js"></script>
+<script src="./js/generated/archive.js"></script>
 <script src="./js/map-ruler-input.js"></script>
 
 
@@ -1027,7 +1042,7 @@ import { animate, svg, utils } from './vendor/anime.esm.min.js';
 <script src="./js/compare.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="./js/chart-plugin.js"></script>
-<script src="./js/discourse.js"></script>
+<script src="./js/generated/discourse.js"></script>
 <!-- ════════════════════════════════════════
      COMPARE FULLSCREEN JS
 ════════════════════════════════════════ -->
@@ -1087,7 +1102,9 @@ import { animate, svg, utils } from './vendor/anime.esm.min.js';
 </div>
 <button id="chat-source-return-btn" type="button" hidden aria-label="Back to chat" title="Back to chat"><span class="chat-source-return-desktop back-geom-symbol" aria-hidden="true">↩</span><svg class="chat-source-return-touch" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0" aria-hidden="true"><path d="M8.5 2.5L4 7L8.5 11.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
 <script src="./js/adaptive-ui.js"></script>
-<link rel="stylesheet" href="./css/chat.css?v=20261025-4" id="chat-ui-styles">
+<link rel="stylesheet" href="./css/chat/base.css">
+<link rel="stylesheet" href="./css/chat/fab.css">
+<link rel="stylesheet" href="./css/chat/panel.css">
 <link rel="stylesheet" href="./css/mobile-layout.css" id="mobile-layout-fixes">
 <button id="chat-fab" type="button" aria-label="Open chat" title="Open chat"><span class="chat-fab-status" aria-hidden="true"></span></button>
 <aside id="chat-welcome" aria-label="Chat introduction" hidden>
@@ -1123,9 +1140,13 @@ import { animate, svg, utils } from './vendor/anime.esm.min.js';
     <button class="chat-send" id="chat-widget-send" type="submit" aria-label="Send" title="Send"></button>
   </form>
 </div>
-<script src="./js/chat.js"></script>
+<script src="./js/generated/chat.js"></script>
 
-<link rel="stylesheet" href="./css/gallery.css">
+<link rel="stylesheet" href="./css/gallery/base.css">
+<link rel="stylesheet" href="./css/responsive/polish.css">
+<link rel="stylesheet" href="./css/responsive/calendar.css">
+<link rel="stylesheet" href="./css/responsive/device.css">
+<link rel="stylesheet" href="./css/responsive/calendar-final.css">
 
 <script src="./js/gallery.js"></script>
 <script>

@@ -1,0 +1,248 @@
+/* Tablet keeps the phone-side refinements elsewhere, but timeline follows the desktop/web layout. */
+html.tablet-app #page-timeline{
+  background:var(--g6)!important;
+  overflow:hidden!important;
+}
+html.tablet-app .tlp-header{
+  padding:32px 40px 20px!important;
+  align-items:flex-start!important;
+  justify-content:space-between!important;
+  gap:16px!important;
+  background:var(--w)!important;
+  border-bottom:.5px solid var(--g5)!important;
+}
+html.tablet-app .tlp-title{
+  font-family:var(--serif)!important;
+  font-size:clamp(22px,3vw,36px)!important;
+  letter-spacing:-.025em!important;
+  font-weight:400!important;
+  line-height:1.15!important;
+}
+html.tablet-app .tlp-hint{
+  font-size:12px!important;
+  margin-top:10px!important;
+  line-height:1.5!important;
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+}
+html.tablet-app .tlp-controls{
+  align-items:center!important;
+  gap:10px!important;
+  flex-wrap:nowrap!important;
+  justify-content:flex-start!important;
+}
+html.tablet-app .tlp-controls > span{
+  display:inline!important;
+}
+html.tablet-app #tlpv-combined{
+  display:flex!important;
+}
+html.tablet-app .tlp-view-toggle{
+  display:flex!important;
+  background:var(--g5)!important;
+  border-radius:8px!important;
+  overflow:hidden!important;
+  padding:3px!important;
+  gap:2px!important;
+  box-shadow:none!important;
+}
+html.tablet-app .tlp-vbtn{
+  min-width:0!important;
+  min-height:0!important;
+  height:auto!important;
+  padding:7px 14px!important;
+  border:none!important;
+  border-radius:6px!important;
+  background:transparent!important;
+  color:var(--g3)!important;
+  font-size:12px!important;
+  box-shadow:none!important;
+}
+html.tablet-app .tlp-vbtn.on{
+  background:var(--w)!important;
+  color:var(--b)!important;
+  box-shadow:0 1px 4px rgba(0,0,0,.08)!important;
+}
+html.tablet-app .tlp-vbtn svg{
+  display:block!important;
+}
+html.tablet-app .tlp-back{
+  min-height:0!important;
+  height:auto!important;
+  padding:6px 16px!important;
+  border-radius:980px!important;
+}
+html.tablet-app #page-timeline #dtl-body,
+html.tablet-app #page-timeline #dtl-text-body{
+  background:transparent!important;
+  border:none!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+
+}
+html.tablet-app #page-timeline #dtl-body{
+  display:block!important;
+}
+html.tablet-app #page-timeline #dtl-body[style*="display: none"]{
+  display:none!important;
+}
+html.tablet-app #page-timeline #dtl-text-body{
+  display:block!important;
+}
+html.tablet-app #page-timeline #dtl-text-body[style*="display: none"]{
+  display:none!important;
+}
+html.tablet-app #page-timeline #phase-outer{
+
+  padding:24px 40px 48px!important;
+  gap:20px!important;
+  background:transparent!important;
+}
+html.tablet-app #page-timeline #phase-outer[style*="display: none"]{
+  display:none!important;
+}
+html.tablet-app #page-timeline .dtl-stage{
+  display:inline-flex!important;
+  align-items:center!important;
+  min-width:max-content!important;
+  height:100%!important;
+  padding:0 60px!important;
+}
+html.tablet-app #page-timeline .txt-stage{
+  display:inline-flex!important;
+  align-items:stretch!important;
+  width:auto!important;
+  min-width:max-content!important;
+  height:100%!important;
+  padding:0 60px!important;
+}
+html.tablet-app #page-timeline #dtl-text-body .txt-center-line{
+  top:50%!important;
+  bottom:auto!important;
+  left:0!important;
+  right:0!important;
+  width:auto!important;
+  height:2px!important;
+  transform:translateY(-50%)!important;
+  background:var(--b)!important;
+}
+html.tablet-app #page-timeline #dtl-text-body .txt-col{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  width:200px!important;
+  min-height:0!important;
+  height:100%!important;
+  padding:0!important;
+  opacity:0!important;
+  transform:translateY(16px)!important;
+}
+html.tablet-app #page-timeline #dtl-text-body .txt-col.in-view{
+  opacity:1!important;
+  transform:translateY(0)!important;
+}
+html.tablet-app #page-timeline #dtl-text-body .txt-col.out-view{
+  opacity:0!important;
+  transform:translateY(-12px)!important;
+}
+html.tablet-app #page-timeline #dtl-text-body .txt-col::before{
+  inset:-20px -14px!important;
+}
+html.tablet-app #page-timeline #dtl-text-body .txt-dot{
+  top:50%!important;
+  left:50%!important;
+  transform:translate(-50%,-50%)!important;
+}
+html.tablet-app #page-timeline #dtl-text-body .txt-connector{
+  left:50%!important;
+  width:1px!important;
+  top:auto!important;
+  bottom:auto!important;
+}
+html.tablet-app #page-timeline #dtl-text-body .txt-label{
+  position:absolute!important;
+  left:50%!important;
+  width:130px!important;
+  align-items:center!important;
+  text-align:center!important;
+  gap:2px!important;
+  top:auto!important;
+  bottom:auto!important;
+  transform:translateX(-50%)!important;
+}
+html.tablet-app #page-timeline #dtl-text-body .txt-stage > .txt-col:nth-child(even) .txt-connector{
+  top:0!important;
+  bottom:50%!important;
+}
+html.tablet-app #page-timeline #dtl-text-body .txt-stage > .txt-col:nth-child(odd) .txt-connector{
+  top:50%!important;
+  bottom:0!important;
+}
+html.tablet-app #page-timeline #dtl-text-body .txt-stage > .txt-col:nth-child(even) .txt-label{
+  top:auto!important;
+  bottom:calc(50% + 22px)!important;
+  transform-origin:bottom center!important;
+}
+html.tablet-app #page-timeline #dtl-text-body .txt-stage > .txt-col:nth-child(odd) .txt-label{
+  top:calc(50% + 22px)!important;
+  bottom:auto!important;
+  transform-origin:top center!important;
+}
+html.tablet-app #page-timeline #dtl-text-body .txt-col:hover .txt-label{
+  transform:translateX(-50%) scale(1.06)!important;
+}
+html.tablet-app #page-timeline #dtl-text-body .txt-yr{
+  font-family:var(--serif)!important;
+  font-size:12px!important;
+  font-weight:700!important;
+  line-height:1!important;
+}
+html.tablet-app #page-timeline #dtl-text-body .txt-title{
+  font-size:10px!important;
+  line-height:1.3!important;
+}
+html.tablet-app #page-timeline #dtl-text-body .txt-cat{
+  font-size:9px!important;
+  margin-top:1px!important;
+}
+html.tablet-app #page-timeline .phase-era-block{
+  background:var(--w)!important;
+  border:.5px solid var(--g5)!important;
+  border-radius:20px!important;
+  box-shadow:0 1px 8px rgba(0,0,0,.05)!important;
+  overflow:visible!important;
+}
+html.tablet-app #page-timeline .peb-head{
+  padding:20px 24px!important;
+  border-bottom:.5px solid var(--g5)!important;
+}
+html.tablet-app #page-timeline .peb-era-name{
+  font-size:22px!important;
+}
+html.tablet-app #page-timeline .peb-era-range{
+  font-size:12px!important;
+}
+html.tablet-app #page-timeline .peb-events{
+  display:grid!important;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr))!important;
+  background:var(--g5)!important;
+  border-radius:0 0 20px 20px!important;
+  overflow:hidden!important;
+}
+html.tablet-app #page-timeline .peb-event{
+  padding:14px 18px!important;
+  border-top:none!important;
+  background:var(--w)!important;
+}
+html.tablet-app #page-timeline .peb-event:hover{
+  background:var(--g6)!important;
+  transform:translateY(0) translateX(3px)!important;
+}
+html.tablet-app #page-timeline .peb-evt-title{
+  font-size:12px!important;
+}
+html.tablet-app #page-discourse{
+
+  -webkit-overflow-scrolling:touch!important;
+}

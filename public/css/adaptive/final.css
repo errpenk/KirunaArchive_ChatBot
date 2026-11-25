@@ -1,0 +1,176 @@
+/* Final map control spacing + tablet home CTA corners */
+html:not(.phone-app):not(.tablet-app) .map-home-btn{
+  bottom:156px!important;
+}
+html:not(.phone-app):not(.tablet-app) #map-fs-btn{
+  bottom:198px!important;
+}
+html.phone-app .leaflet-control-zoom,
+html.phone-app.map-fs-active .leaflet-control-zoom,
+html.phone-app.map-popup-open .leaflet-control-zoom{
+  margin-bottom:calc(var(--phone-ruler-h) + 20px + env(safe-area-inset-bottom))!important;
+}
+html.phone-app .map-home-btn,
+html.phone-app.map-fs-active .map-home-btn{
+  bottom:calc(var(--phone-ruler-h) + 96px + env(safe-area-inset-bottom))!important;
+}
+html.phone-app #map-fs-btn,
+html.phone-app.map-fs-active #map-fs-btn{
+  bottom:calc(var(--phone-ruler-h) + 138px + env(safe-area-inset-bottom))!important;
+}
+html.tablet-app .leaflet-control-zoom,
+html.tablet-app.map-fs-active .leaflet-control-zoom,
+html.tablet-app.map-popup-open .leaflet-control-zoom{
+  margin-bottom:var(--tablet-map-zoom-fixed)!important;
+}
+html.tablet-app .map-home-btn,
+html.tablet-app.map-fs-active .map-home-btn{
+  bottom:calc(var(--tablet-map-zoom-fixed) + 76px)!important;
+}
+html.tablet-app #map-fs-btn,
+html.tablet-app.map-fs-active #map-fs-btn{
+  bottom:calc(var(--tablet-map-zoom-fixed) + 118px)!important;
+}
+html.tablet-app #page-home .btn-dark,
+html.tablet-app #page-home .btn-outline{
+  border-radius:980px!important;
+}
+
+/* Tablet final fixes: fullscreen map chrome + home sources divider */
+html.tablet-app.map-fs-active #map-ruler,
+html.tablet-app.map-fs-active .map-edge-indicator{
+  display:none!important;
+}
+html.tablet-app #page-home .sources-line{
+  border-top:none!important;
+}
+
+/* Phone map fullscreen: keep ruler and edge indicators hidden */
+html.phone-app.map-fs-active #map-ruler,
+html.phone-app.map-fs-active .map-edge-indicator{
+  display:none!important;
+}
+
+/* Responsive polish: center Discourse rows and prevent phone chat zoom */
+#page-discourse .dc-ptab{
+  justify-content:center;
+}
+html.phone-app #page-discourse .dc-hs,
+html.phone-app #page-discourse .dc-card-stat,
+html.tablet-app #page-discourse .dc-hs,
+html.tablet-app #page-discourse .dc-card-stat{
+  text-align:center!important;
+  padding-left:12px!important;
+  padding-right:12px!important;
+}
+html.phone-app #page-discourse .dc-hs:nth-child(odd),
+html.phone-app #page-discourse .dc-card-stat:nth-child(odd),
+html.phone-app #page-discourse .dc-hs:last-child,
+html.phone-app #page-discourse .dc-card-stat:last-child:nth-child(odd){
+  padding-right:12px!important;
+}
+html.phone-app,
+html.phone-app body{
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+html:is(.phone-app,.tablet-app) .logo{
+  display:none!important;
+}
+html.phone-app .chat-input,
+html.phone-app #chat-widget-input,
+html.phone-app #chat-page-input{
+  font-size:16px!important;
+  line-height:1.55!important;
+}
+html:is(.phone-app,.tablet-app) #nav{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  justify-items:center!important;
+  align-items:center!important;
+}
+html:is(.phone-app,.tablet-app) .nav-tabs{
+  position:static!important;
+  left:auto!important;
+  top:auto!important;
+  height:auto!important;
+  transform:none!important;
+  width:min(100%,760px)!important;
+  margin:0 auto!important;
+}
+html.phone-app,
+html.phone-app body,
+html.phone-app *{
+  scrollbar-width:none!important;
+}
+html.phone-app *::-webkit-scrollbar{
+  display:none!important;
+  width:0!important;
+  height:0!important;
+}
+html.phone-app body.on-home #nav{
+  gap:6px!important;
+}
+html.phone-app #page-discourse .dc-nav-inner{
+  justify-content:center!important;
+}
+html.phone-app #page-discourse .dc-ptab{
+  justify-content:center!important;
+  text-align:center!important;
+}
+html.phone-app #page-gallery .gallery-year-rail{
+  width:64px!important;
+}
+html.phone-app #page-gallery .gallery-year-rail-nodes{
+  padding-left:2px!important;
+}
+html.phone-app #page-gallery .gallery-rail-dot{
+  margin-left:8px!important;
+}
+html:is(.phone-app,.tablet-app) #page-chat{
+  height:var(--chat-page-visible-height,100%)!important;
+  max-height:var(--chat-page-visible-height,100%)!important;
+  transition:height .38s cubic-bezier(.32,.72,0,1) !important;
+}
+html:is(.phone-app,.tablet-app) #page-chat .chat-page-shell{
+  padding-bottom:max(12px, env(safe-area-inset-bottom))!important;
+}
+html:is(.phone-app,.tablet-app) #page-chat .chat-page-compose{
+  padding-bottom:max(12px, calc(10px + env(safe-area-inset-bottom)))!important;
+}
+html:is(.phone-app,.tablet-app) #chat-panel{
+  max-height:var(--chat-floating-visible-height,calc(100vh - 24px))!important;
+}
+html:is(.phone-app,.tablet-app) #chat-panel .chat-widget-compose{
+  margin-bottom:max(12px, env(safe-area-inset-bottom))!important;
+}
+
+/* ── Chat compose textarea: smooth auto-resize ── */
+html.phone-app .chat-input,
+html.phone-app #chat-widget-input,
+html.phone-app #chat-page-input,
+html.tablet-app .chat-input,
+html.tablet-app #chat-widget-input,
+html.tablet-app #chat-page-input{
+  transition:height .22s cubic-bezier(.32,.72,0,1) !important;
+}
+
+/* ── Compose area: fade+slide in on keyboard appear ── */
+html.phone-app.chat-compose-active .chat-widget-compose,
+html.phone-app.chat-compose-active .chat-page-compose,
+html.tablet-app.chat-compose-active .chat-widget-compose,
+html.tablet-app.chat-compose-active .chat-page-compose{
+  animation:composeSlideUp .32s cubic-bezier(.32,.72,0,1) both;
+}
+@keyframes composeSlideUp{
+  from{opacity:.7;transform:translateY(10px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* ── Chat thread: smooth resize when keyboard opens/closes ── */
+html.phone-app .chat-widget-scroll-shell,
+html.phone-app .chat-page-scroll-shell,
+html.tablet-app .chat-widget-scroll-shell,
+html.tablet-app .chat-page-scroll-shell{
+  transition:flex .38s cubic-bezier(.32,.72,0,1) !important;
+}

@@ -7,10 +7,14 @@
     "node": ">=20"
   },
   "scripts": {
+    "build:js": "node scripts/build-js.mjs",
+    "prestart": "npm run build:js",
     "start": "node server.js",
+    "predev": "npm run build:js",
     "dev": "node server.js",
+    "pretest": "npm run build:js",
     "test": "node --test tests/archive.test.mjs",
-    "netlify:prepare": "node scripts/build-netlify-redirects.mjs"
+    "netlify:prepare": "npm run build:js && node scripts/build-netlify-redirects.mjs"
   },
   "dependencies": {
     "@volcengine/ark-runtime": "1.0.5",
