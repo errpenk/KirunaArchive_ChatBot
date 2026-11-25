@@ -97,6 +97,19 @@ test("split archive data is available to chat", async () => {
     assert.equal(insideResponse.status,200);
     assert.equal(inside.sources[0]?.locator?.type,"event");
     assert.equal(inside.sources[0]?.locator?.eventId,11);
+
+    const archiveAnswerResponse=await fetch(`http://127.0.0.1:${port}/api/archive-answer`,{
+      method:"POST",
+      headers:{"content-type":"application/json"},
+      body:JSON.stringify({
+        question:"What is Vision 2099?",
+        sources:[{title:"Vision 2099",snippet:"Vision 2099 is a plan for Kiruna's relocation."}]
+      })
+    });
+    const archiveAnswer=await archiveAnswerResponse.json();
+    assert.equal(archiveAnswerResponse.status,200);
+    assert.equal(archiveAnswer.mode,"archive-only");
+    assert.equal(archiveAnswer.sources[0]?.title,"Vision 2099");
   } finally {
     server.kill();
   }
