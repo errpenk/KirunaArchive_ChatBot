@@ -69,7 +69,7 @@ html.phone-app #page-chat .chat-page-board{
 }
 
 html.phone-app #page-chat .chat-source-rail{display:none!important}
-html.phone-app #page-chat .chat-page-guide{width:40%;max-width:40%}
+html.phone-app #page-chat .chat-page-guide{width:min(80%,36svh,320px)}
 
 html.phone-app .ntab::after{
   transition:left .3s cubic-bezier(.4,0,.2,1),right .3s cubic-bezier(.4,0,.2,1),opacity .12s ease!important;

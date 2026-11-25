@@ -61,7 +61,7 @@ function schedulePopoverFit(){
   });
 }
 function openPopover(ev){
-  window.parent.KirunaRoutes?.update('timeline2',{event:ev.id,year:ev.year});
+  window.parent.KirunaRoutes?.update('timeline2',{event:ev.id,year:getMode()==='calendar'?cpBlock(cpYear).start:ev.year});
   const pop = document.getElementById('popover');
   const mapBtn = document.getElementById('pop-map-link');
   const hero = document.getElementById('pop-hero');
@@ -96,12 +96,14 @@ function openPopover(ev){
 function closePopover(restoreOverview = (getMode() !== 'calendar')){
   const pop = document.getElementById('popover');
   if(!pop.classList.contains('show')) return;
-  window.parent.KirunaRoutes?.update('timeline2',{event:null});
+  const returnView=restoreOverview?(popoverReturnView||{centerYear,ypv:LEVELS[0].ypv}):null;
+  const view=returnView?(returnView.ypv<=3?'calendar':returnView.ypv<=24?'year':'overview'):getMode();
+  const year=view==='calendar'?cpBlock(cpYear).start:view==='year'?Math.round(returnView?.centerYear??centerYear):null;
+  window.parent.KirunaRoutes?.update('timeline2',{view,year,event:null});
   pop.classList.remove('show');
   fitPopoverCard();
   if(restoreOverview){
-    const view = popoverReturnView || {centerYear, ypv:LEVELS[0].ypv};
-    animateTo(view.centerYear, view.ypv, 500);
+    animateTo(returnView.centerYear, returnView.ypv, 500);
   }
   popoverReturnView = null;
 }

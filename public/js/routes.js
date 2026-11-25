@@ -3,6 +3,7 @@
   const paths={home:'/',archive:'/map',timeline2:'/time/inside/overview',gallery:'/gallery',discourse:'/discourse/x/posts',chat:'/chat'};
   const panels={xpost:'/discourse/x/posts',xreply:'/discourse/x/replies',rpost:'/discourse/reddit/posts',rreply:'/discourse/reddit/replies'};
   const types=['all','urban','mine','infra','social','env'];
+  const calendarStart=year=>1900+Math.floor((year-1900)/35)*35;
   function parse(url){
     const pathname=url.pathname===basePath?'/':url.pathname.startsWith(basePath+'/')?url.pathname.slice(basePath.length):url.pathname;
     const parts=pathname.split('/').filter(Boolean);
@@ -22,6 +23,7 @@
         state[key]=value!==null&&/^\d+$/.test(value)?Number(value):null;
       }
       if(state.source==='outside'||state.year<1900||state.year>2035) state.year=null;
+      if(state.source==='inside'&&state.view==='calendar')state.year=calendarStart(state.year??1935);
     }
     if(state.page==='discourse'){
       state.panel=Object.keys(panels).find(key=>panels[key]===pathname.replace(/\/$/,''))||'xpost';
@@ -44,7 +46,8 @@
     }
     if(state.page==='timeline2'){
       path='/time/'+(state.source==='outside'?'outside':'inside')+'/'+(['overview','year','calendar',...(state.source==='outside'?['cards']:[])].includes(state.view)?state.view:'overview');
-      if(state.source!=='outside'&&Number.isInteger(state.year)&&state.year>=1900&&state.year<=2035)query.set('year',state.year);
+      if(state.source==='inside'&&state.view==='calendar')query.set('year',calendarStart(Number.isInteger(state.year)&&state.year>=1900&&state.year<=2035?state.year:1935));
+      else if(state.source!=='outside'&&Number.isInteger(state.year)&&state.year>=1900&&state.year<=2035)query.set('year',state.year);
       if(Number.isInteger(state.event))query.set('event',state.event);
     }
     if(state.page==='discourse'){

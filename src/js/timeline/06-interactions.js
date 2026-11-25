@@ -352,7 +352,10 @@ zoomBtns.forEach(b=>{
   b.addEventListener('click', ()=>{
     const lvl = parseInt(b.dataset.lvl);
     const route=window.parent.KirunaRoutes?.parse(new URL(window.parent.location.href));
-    window.parent.KirunaRoutes?.update('timeline2',{source:'inside',view:['overview','year','calendar'][lvl],year:route?.year===null?null:Math.round(centerYear),event:null});
+    window.parent.KirunaRoutes?.update('timeline2',{
+      source:'inside',view:['overview','year','calendar'][lvl],
+      year:lvl===2?cpBlock(centerYear).start:lvl===0?null:route?.year===null?null:Math.round(centerYear),event:null
+    });
     // Smooth tween to target zoom level
     animateTo(centerYear, LEVELS[lvl].ypv, 500);
     hideHint();

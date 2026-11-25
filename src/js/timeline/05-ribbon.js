@@ -43,7 +43,7 @@ function updateZoomButtons(){
     const eventYear=route?.event?EV_BY_ID.get(route.event)?.year:null;
     window.parent.KirunaRoutes?.update('timeline2',{
       source:'inside',view,
-      year:eventYear??(route?.year===null?null:view==='calendar'?(cpSel??cpBlock(cpYear).start):Math.round(centerYear))
+      year:view==='calendar'?cpBlock(cpYear).start:eventYear??(route?.year===null?null:Math.round(centerYear))
     },true);
   },600);
 }

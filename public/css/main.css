@@ -181,6 +181,12 @@ body.kiruna-intro-logo-ready #kiruna-intro-logo{
   transform:scaleX(0);
   transform-origin:left center;
 }
+@media(max-width:540px){
+  #kiruna-intro-video{width:40vw}
+  #mobile-intro-logo-frame{width:40vw;max-width:40vw}
+  #kiruna-title{font-size:3.7vw}
+  #mobile-intro-progress{width:40vw}
+}
 body.kiruna-intro-pending #shell,
 body.kiruna-intro-active #shell{
   opacity:0;

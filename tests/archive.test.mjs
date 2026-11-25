@@ -19,6 +19,10 @@ test("module URLs round-trip and reject unsupported route values", async()=>{
   ])assert.equal(format(parse(new URL(path,'https://archive.test'))),path);
   assert.equal(format(parse(new URL('/map/event/not-a-number?type=invalid&details=oops','https://archive.test'))),'/map');
   assert.equal(format(parse(new URL('/time/inside/cards?year=nope','https://archive.test'))),'/time/inside/overview');
+  assert.equal(format(parse(new URL('/time/inside/calendar','https://archive.test'))),'/time/inside/calendar?year=1935');
+  assert.equal(format(parse(new URL('/time/inside/calendar?year=1966','https://archive.test'))),'/time/inside/calendar?year=1935');
+  assert.equal(format(parse(new URL('/time/inside/calendar?year=1970','https://archive.test'))),'/time/inside/calendar?year=1970');
+  assert.equal(format(parse(new URL('/time/outside/overview?year=1966','https://archive.test'))),'/time/outside/overview');
   assert.equal(format(parse(new URL('/discourse','https://archive.test'))),'/discourse/x/posts');
   const pagesContext={URL,URLSearchParams,window:{addEventListener(){}},document:{baseURI:'https://errpenk.github.io/KirunaArchive_ChatBot/',addEventListener(){}}};
   vm.runInNewContext(await readFile(new URL('../public/js/routes.js',import.meta.url),'utf8'),pagesContext);
