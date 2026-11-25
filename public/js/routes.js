@@ -17,13 +17,14 @@
     }
     if(state.page==='timeline2'){
       state.source=parts[1]==='outside'?'outside':'inside';
-      state.view=['overview','year','calendar',...(state.source==='outside'?['cards']:[])].includes(parts[2])?parts[2]:'overview';
+      const calendarPage=state.source==='inside'&&/^calendar[1-4]$/.test(parts[2]||'')?Number(parts[2].slice(-1)):null;
+      state.view=calendarPage!==null?'calendar':['overview','year','calendar',...(state.source==='outside'?['cards']:[])].includes(parts[2])?parts[2]:'overview';
       for(const key of ['year','event']){
         const value=params.get(key);
         state[key]=value!==null&&/^\d+$/.test(value)?Number(value):null;
       }
       if(state.source==='outside'||state.year<1900||state.year>2035) state.year=null;
-      if(state.source==='inside'&&state.view==='calendar')state.year=calendarStart(state.year??1935);
+      if(state.source==='inside'&&state.view==='calendar')state.year=calendarPage!==null?1900+(calendarPage-1)*35:calendarStart(state.year??1935);
     }
     if(state.page==='discourse'){
       state.panel=Object.keys(panels).find(key=>panels[key]===pathname.replace(/\/$/,''))||'xpost';
@@ -46,7 +47,10 @@
     }
     if(state.page==='timeline2'){
       path='/time/'+(state.source==='outside'?'outside':'inside')+'/'+(['overview','year','calendar',...(state.source==='outside'?['cards']:[])].includes(state.view)?state.view:'overview');
-      if(state.source==='inside'&&state.view==='calendar')query.set('year',calendarStart(Number.isInteger(state.year)&&state.year>=1900&&state.year<=2035?state.year:1935));
+      if(state.source!=='outside'&&state.view==='calendar'){
+        const start=calendarStart(Number.isInteger(state.year)&&state.year>=1900&&state.year<=2035?state.year:1935);
+        path='/time/inside/calendar'+(1+(start-1900)/35);
+      }
       else if(state.source!=='outside'&&Number.isInteger(state.year)&&state.year>=1900&&state.year<=2035)query.set('year',state.year);
       if(Number.isInteger(state.event))query.set('event',state.event);
     }
