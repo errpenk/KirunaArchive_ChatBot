@@ -350,7 +350,7 @@
       S.prevView = S.view;
       S.view = view;
       window.parent.parent.KirunaRoutes?.update('timeline2',{
-        source:'outside',view:view==='expanded'?'cards':'overview',event:S.activeDocIdx??null
+        source:'outside',view:view==='expanded'?'cards':'overview',year:null,event:S.activeDocIdx??null
       });
       syncControls();
     }

@@ -15,11 +15,12 @@ Minimal Railway-ready version of the Kiruna Archive with a real chat backend.
 - `public/index.html` contains the main page markup and intro scripts.
 - `public/timeline.html` and `public/outside-map.html` contain the timeline and Outside views. Timeline code is grouped by function in `src/js/timeline/`.
 - Main-page CSS is grouped by feature in `public/css/archive/`, `chat/`, `discourse/`, `app/`, `adaptive/`, `gallery/`, and `responsive/`. The links in `index.html` preserve the cascade order.
-- The gallery card grid and year rail use Vue in `public/index.html` and `public/js/gallery.js`; the gallery lightbox remains in `gallery.js`. The main search results use a small Vue view in `public/index.html` and `src/js/archive/`. The pinned Vue runtime and license are in `public/vendor/`.
+- The gallery card grid and year rail use Vue in `public/index.html` and `src/js/gallery/`; the gallery lightbox lives in the same source folder. The main search results use a small Vue view in `public/index.html` and `src/js/archive/`. The pinned Vue runtime and license are in `public/vendor/`.
 - Map ruler wheel, drag, and touch input lives in `public/js/map-ruler-input.js`; map rendering and event selection are in `src/js/archive/`.
 - `public/js/responsive-collisions.js` keeps navigation and map-sidebar overlap checks out of the archive view logic.
 - `public/js/outside-data.js` supplies the same document data to the main search and Outside view.
 - Large browser scripts are edited as numbered, ordered fragments in `src/js/`; each feature's fragments share the original script scope and are checked together through the generated file. `npm run build:js` writes ignored `public/js/generated/` files. `npm start`, `npm test`, and Netlify preparation run this build automatically. Build before serving `public/` directly.
+- Timeline and Outside Map styles are grouped by view under `public/css/timeline/`, `public/css/timeline-adaptive/`, and `public/css/outside-map/`. Their link order in the two iframe HTML files preserves the cascade.
 
 ## Adding archive events
 

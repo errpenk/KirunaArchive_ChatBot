@@ -1,0 +1,203 @@
+/* ═══════════════════════════════════════════════════════
+   CALENDAR OVERLAY — replicates the original Kiruna Archive
+   Calendar page. It's a year-block grid (7 cols × 5 rows = 35
+   cells), each cell is ONE YEAR showing events in that year.
+   Ranges: 1900–1934, 1935–1969, 1970–2004, 2005–2035.
+   Sits full-bleed over the canvas when user zooms past ~3 ypv.
+════════════════════════════════════════════════════════*/
+#cal-overlay{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  background:var(--w);pointer-events:none;opacity:0;z-index:4;
+  transition:opacity .45s cubic-bezier(.22,1,.36,1);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+#cal-overlay.show{opacity:1;pointer-events:auto}
+
+/* Header */
+.cph{
+  padding:0 28px 12px;display:flex;justify-content:center;align-items:center;
+  flex-shrink:0;height:96px;
+  transform:translateY(-10px);opacity:0;
+  transition:transform .5s cubic-bezier(.22,1,.36,1) .05s,opacity .4s ease .05s;
+  position:relative;z-index:10;pointer-events:auto;
+}
+#cal-overlay.show .cph{transform:translateY(0);opacity:1}
+.cph-nav{
+  width:min(100%, 500px);display:grid;grid-template-columns:64px 1fr 64px;
+  align-items:center;gap:16px;
+  transform:translateX(var(--parent-nav-offset,0px));
+  transition:none;
+}
+.cph-left{min-width:0}
+.cph-title{
+  font-family:-apple-system-ui-serif,'New York','Georgia',serif;
+  font-size:clamp(28px,3.4vw,42px);
+  letter-spacing:-.03em;font-weight:400;line-height:1.05;
+  font-variant-numeric:tabular-nums;
+  color:var(--g2);text-align:center;
+}
+.cph-sub{
+  display:none;
+}
+.cph-center{
+  min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.cpn-btn{
+  width:56px;height:56px;border-radius:50%;background:transparent;
+  border:none;display:flex;align-items:center;
+  justify-content:center;cursor:pointer;font-size:16px;
+  transition:transform .18s cubic-bezier(.22,1,.36,1),color .18s ease,opacity .2s;
+  color:var(--g3);line-height:1;position:relative;z-index:9;
+  pointer-events:auto;touch-action:manipulation;user-select:none;
+  box-shadow:none;
+}
+.cpn-btn .cpn-icon{
+  font-size:34px;font-weight:300;transform:translateY(-1px);
+}
+.cpn-btn:hover:not(:disabled){
+  background:transparent;box-shadow:none;transform:translateY(0);
+  color:var(--b);
+}
+.cpn-btn:active:not(:disabled){transform:translateY(0) scale(.98)}
+.cpn-btn:disabled{opacity:.25;cursor:default;pointer-events:none}
+
+/* Body: year grid + side panel */
+.cpbody{display:flex;flex:1;overflow:hidden;min-height:0;position:relative;z-index:1;padding:0}
+.cpgrid-panel{
+  flex:1;overflow:hidden;display:flex;flex-direction:column;
+  border-top:1px solid var(--g4);border-right:1px solid var(--g5);box-shadow:none;
+  background:var(--w);min-height:0;
+}
+.cpdow-row{display:none}
+#cal-grid-wrap{flex:1;display:flex;flex-direction:column;background:var(--w);min-height:0}
+#cpdays{
+  display:grid;grid-template-columns:repeat(7,1fr);grid-auto-rows:1fr;
+  width:100%;height:100%;
+}
+.cp-day-empty{
+  border-right:.5px solid var(--g5);border-bottom:.5px solid var(--g5);
+  background:var(--w);min-height:80px;
+}
+.cp-day-empty.no-border-right{border-right:none}
+.cpgrid-panel::-webkit-scrollbar{width:5px}
+.cpgrid-panel::-webkit-scrollbar-thumb{background:var(--g4);border-radius:3px}
+.cpdow-cell{display:none}
+
+/* Year cell */
+.cp-day{
+  padding:10px 9px 7px;min-height:80px;display:flex;flex-direction:column;gap:3px;
+  cursor:pointer;transition:background .12s,box-shadow .22s ease,border-color .22s ease;
+  border-right:.5px solid var(--g5);border-bottom:.5px solid var(--g5);
+  background:var(--w);position:relative;overflow:visible;isolation:isolate;
+}
+.cp-day.cp-milestone.cp-click-anim{
+  animation:cpCellPulse .52s cubic-bezier(.22,1,.36,1);
+}
+.cp-day:nth-child(7n){border-right:none}
+.cp-day:hover{background:var(--g6)}
+.cp-day:hover .cp-yr-label{color:#0055b3;transition:color .15s ease}
+.cp-day.cp-selected{background:#ebebed}
+.cp-day.cp-milestone .cp-yr-label{color:var(--featured)}
+.cp-day.cp-dim{opacity:.3;pointer-events:none}
+.cp-day.is-hover-linked{
+  background:#f4f7fb;
+  box-shadow:inset 0 0 0 1px rgba(0,102,204,.16);
+}
+
+.cp-bar{
+  position:absolute;top:0;left:0;right:0;height:5px;
+  display:flex;z-index:10;pointer-events:none;
+}
+.cp-bar span{flex:1;height:100%}
+
+.cp-yr-label{
+  font-size:15px;font-weight:400;color:var(--b);
+  font-family:var(--serif);letter-spacing:-.03em;
+  line-height:1;margin-bottom:2px;transition:color .15s ease;
+}
+.cp-feat-star{font-size:8px;color:var(--featured);margin-left:3px;vertical-align:top;line-height:1.8}
+.cp-ev-tag{
+  font-size:9.5px;padding:1px 0;font-weight:500;line-height:1.24;
+  display:block;white-space:normal;overflow:visible;word-break:break-word;
+}
+.cp-more{font-size:9px;color:var(--g3);font-weight:500;margin-top:1px;display:block}
+.cp-dots{display:flex;flex-wrap:wrap;gap:2px;margin-top:auto;padding-top:4px}
+.cp-dot{display:inline-block;width:7px;height:7px;border-radius:50%;flex-shrink:0;opacity:.9}
+
+/* Side panel: events list for selected year (or range) */
+.cpevs-panel{
+  width:240px;flex-shrink:0;display:flex;flex-direction:column;
+  border-top:1px solid var(--g4);border-left:.5px solid var(--g5);box-shadow:none;min-height:0;
+}
+.cpe-head{
+  padding:16px 18px 12px;border-bottom:.5px solid var(--g5);flex-shrink:0;
+}
+.cpe-yr{
+  font-family:var(--serif);font-size:22px;letter-spacing:-.04em;
+  font-weight:400;margin-bottom:2px;line-height:1.05;
+}
+.cpe-count{font-size:11px;color:var(--g3)}
+.cpe-empty{padding:24px 18px;color:var(--g3);font-size:12px;text-align:center;line-height:1.6}
+.cpe-list{
+  overflow-y:auto;flex:1;min-height:0;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-y:contain;
+  touch-action:pan-y;
+  padding-bottom:8px;
+}
+.cpe-list::-webkit-scrollbar{width:4px}
+.cpe-list::-webkit-scrollbar-thumb{background:var(--g4);border-radius:2px}
+.cpe-ev{
+  padding:12px 18px;border-bottom:none;cursor:pointer;transition:background .1s;
+}
+.cpe-ev:hover{background:var(--g6)}
+.cpe-ev.is-active,
+.cpe-ev.is-active:hover{background:#eef1f6}
+.cpe-ev.is-hover-linked{background:#f4f7fb}
+.cpe-ev:hover .cpe-ev-title{color:var(--accent)}
+.cpe-ev-row{display:flex;gap:9px;align-items:flex-start}
+.cpe-ev-d{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.cpe-ev-main{flex:1;min-width:0}
+.cpe-ev-title{font-size:12px;font-weight:500;line-height:1.35;letter-spacing:-.01em;color:var(--b)}
+.cpe-ev-meta{font-size:10px;color:var(--g3);margin-top:2px}
+.cpe-ev-feat{
+  font-size:9px;background:#f2ecfd;color:#6b2fa0;padding:1px 6px;
+  border-radius:100px;margin-left:4px;font-weight:500;vertical-align:middle;
+}
+.cpe-ev-desc{
+  font-size:10.5px;color:var(--g2);line-height:1.6;margin-top:4px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+@keyframes calCellSelectIn{
+  0%{opacity:.7;box-shadow:0 0 0 0 rgba(26,58,110,0)}
+  100%{opacity:1;box-shadow:0 4px 14px rgba(26,58,110,.14)}
+}
+@keyframes cpCellPulse{
+  0%{
+    box-shadow:
+      inset 0 0 0 0 rgba(103,72,48,0),
+      0 0 0 0 rgba(103,72,48,0),
+      0 0 0 0 rgba(103,72,48,0);
+    filter:brightness(1);
+  }
+  34%{
+    box-shadow:
+      inset 0 0 0 1.5px rgba(103,72,48,.34),
+      0 0 0 4px rgba(103,72,48,.12),
+      0 10px 22px rgba(103,72,48,.16);
+    filter:brightness(1.015);
+  }
+  100%{
+    box-shadow:
+      inset 0 0 0 0 rgba(103,72,48,0),
+      0 0 0 0 rgba(103,72,48,0),
+      0 0 0 0 rgba(103,72,48,0);
+    filter:brightness(1);
+  }
+}
+@keyframes calRowSelectIn{
+  0%{transform:translateX(0);opacity:.8}
+  100%{transform:translateX(4px);opacity:1}
+}

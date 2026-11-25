@@ -1,0 +1,14 @@
+/* ── Tablet popup: slightly compact ── */
+html.embedded-tablet #popover{
+  padding:16px!important;
+}
+html.embedded-tablet .pop-card{
+  --pop-fit-scale:0.88!important;
+  --pop-pad:28px!important;
+  max-height:min(85svh,680px)!important;
+}
+html.embedded-tablet .pop-hero{
+  height:110px!important;
+}
+/* ── tablet portrait: hide view/events counter ── */
+html.embedded-tablet.embedded-portrait .hdr-r{display:none!important;}

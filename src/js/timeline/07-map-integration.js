@@ -5,7 +5,7 @@
   const mapTabs = document.querySelectorAll('.map-tab');
 
   function setMapView(view){
-    window.parent.KirunaRoutes?.update('timeline2',{source:view,view:'overview',event:null});
+    window.parent.KirunaRoutes?.update('timeline2',{source:view,view:'overview',year:null,event:null});
     // Toggle parent tab active state
     mapTabs.forEach(t => t.classList.toggle('on', t.dataset.view === view));
     shell.dataset.mapView = view;

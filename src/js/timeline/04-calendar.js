@@ -47,6 +47,7 @@ function formatEventDate(ev){
 }
 
 const BLOCK_SIZE = 35;
+const DEFAULT_CALENDAR_BLOCK_START = 1935;
 let cpYear = 1900;
 let cpSel = null;
 let cpActiveId = null;
@@ -151,6 +152,7 @@ function renderCalPage(dir){
     if(y <= YR_MAX){
       cell.onclick = () => {
         cpSel = y;
+        window.parent.KirunaRoutes?.update('timeline2',{source:'inside',view:'calendar',year:y,event:null});
         renderCalPage();
         renderCpeList(EVS.filter(e => e.year === y), y);
         if(evs.length > 0) triggerCalDayInteraction(cell);
@@ -304,6 +306,9 @@ function navigateCalendarBy(dir){
   clampCenter();
   renderCalPage(pageDir);
   layout();
+  window.parent.KirunaRoutes?.update('timeline2',{
+    source:'inside',view:'calendar',year:nextStart===DEFAULT_CALENDAR_BLOCK_START?null:nextStart,event:null
+  });
   return true;
 }
 

@@ -378,6 +378,7 @@ function openTimeline2View(view='overview', year=null, originPage=null, eventId=
 
   ensureTimeline2FrameLoaded(targetView, targetYear);
   showPage('timeline2', timelineOrigin);
+  window.KirunaRoutes.update('timeline2',{source:'inside',view:targetView,year:targetYear,event:eventId});
   if(applyState()) return;
   setTimeout(applyState, 80);
   setTimeout(applyState, 220);

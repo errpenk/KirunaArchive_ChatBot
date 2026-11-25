@@ -1,0 +1,113 @@
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --w:#ffffff;--b:#1d1d1f;--g6:#f5f5f7;--g5:#e8e8ed;--g4:#d2d2d7;--g3:#86868b;--g2:#424245;
+  --accent:#0066cc;--featured:#bf5af2;
+  --era-industrial:#8b6f47;
+  --era-growth:#c97b4a;
+  --era-relocation:#7a3f9e;
+  --serif:'Source Serif 4',-apple-system-ui-serif,'New York','Georgia',serif;
+  --display:'Playfair Display','New York',serif;
+  --sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;
+  --mono:var(--sans);
+}
+html,body{height:100%;overflow:hidden;font-family:var(--sans);color:var(--b);background:var(--w);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+button{border:none;background:none;cursor:pointer;font-family:inherit;color:inherit}
+
+#shell{display:grid;grid-template-rows:64px 1fr 96px;height:100vh;overflow:hidden}
+
+/* ═══ HEADER ═══ */
+#hdr{
+  display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;
+  padding:0 32px;border-bottom:none;
+  background:rgba(255,255,255,.92);backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);z-index:10;
+}
+.hdr-l{display:flex;align-items:baseline;gap:14px;visibility:hidden;pointer-events:none;justify-self:start}
+.hdr-center{
+  display:flex;flex-direction:row;align-items:center;justify-self:center;gap:8px;width:max-content;
+  transform:translateX(var(--parent-nav-offset,0px));
+  transition:none;
+}
+.hdr-page-label{
+  font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--g3);line-height:1;
+  display:none;
+}
+.logo{font-family:var(--display);font-size:19px;font-weight:400;letter-spacing:-.015em}
+.logo em{font-style:italic;color:var(--g3)}
+.proto-tag{font-family:var(--mono);font-size:10px;color:var(--g3);letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;background:var(--g6);border-radius:4px}
+
+/* zoom scale indicator */
+.zoom-scale{display:flex;align-items:center;gap:0;padding:3px;background:var(--g6);border-radius:10px}
+.zoom-btn{
+  font-size:11px;font-weight:500;padding:8px 14px;border-radius:7px;
+  color:var(--g3);letter-spacing:-.005em;transition:all .22s cubic-bezier(.22,1,.36,1);
+  font-family:var(--sans);white-space:nowrap;
+}
+.zoom-btn.on{background:var(--w);color:var(--b);box-shadow:0 1px 3px rgba(0,0,0,.06),0 0 0 .5px rgba(0,0,0,.04)}
+.zoom-btn:hover:not(.on){color:var(--b)}
+.zoom-btn[data-lvl="1"]{display:none}
+
+
+/* ── Parent tab row: Inside Map / Outside Map — independent pills ── */
+.map-tabs{
+  display:flex;align-items:center;gap:6px;
+  transition:none;animation:none;transform:none;
+}
+.map-tab{
+  font-size:11px;font-weight:600;padding:8px 16px;border-radius:999px;
+  color:var(--b);letter-spacing:-.01em;
+  border:1.5px solid var(--g4);
+  background:var(--w);
+  transition:none;
+  font-family:var(--sans);white-space:nowrap;cursor:pointer;
+  box-shadow:none;
+}
+.map-tab:hover:not(.on){background:var(--g6);border-color:var(--b);}
+.map-tab:active{transform:none;}
+.map-tab.on{
+  background:var(--b);color:#fff;
+  border-color:var(--b);
+  box-shadow:none;
+}
+.map-tab-divider{
+  display:none;
+}
+
+/* ── Sub zoom-scale: slides+fades out when Outside Map active ── */
+.zoom-scale-wrap{
+  display:flex;align-items:center;gap:8px;
+  overflow:hidden;
+  max-width:300px;
+  opacity:1;
+  transform:translateX(0);
+  transition:none;
+}
+.zoom-scale-wrap.collapsed{
+  max-width:0;
+  opacity:0;
+  transform:none;
+  pointer-events:none;
+}
+/* the inner divider between zoom-scale and map-tabs also fades with wrap */
+.zoom-scale-wrap .hdr-sub-divider{
+  width:.5px;height:18px;background:var(--g4);flex-shrink:0;
+}
+
+.hdr-r{display:flex;align-items:center;gap:20px;font-family:var(--mono);font-size:11px;color:var(--g3);justify-self:end}
+.hdr-r .val{color:var(--b);font-weight:700}
+#hdr.timeline-meta-hidden .hdr-r{display:none}
+html.embedded-phone #shell{grid-template-rows:60px 1fr 0}
+html.embedded-phone #hdr{padding:0 14px}
+html.embedded-phone .hdr-center{gap:6px}
+html.embedded-phone .zoom-btn{font-size:10px;padding:7px 10px}
+html.embedded-phone .map-tab{font-size:10px;padding:7px 12px}
+html.embedded-phone .txt-label{width:86px}
+html.embedded-phone .txt-title{font-size:8.5px;line-height:1.18}
+html.embedded-phone .txt-cat{display:none}
+html.embedded-phone .dtl-card{width:144px}
+html.embedded-phone .dtl-card-body{padding:8px 9px 10px}
+html.embedded-phone #ribbon{display:none!important}
+html.embedded-tablet .txt-label{width:94px}
+html.embedded-tablet .txt-title{font-size:9px}

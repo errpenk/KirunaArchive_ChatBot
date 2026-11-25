@@ -21,6 +21,7 @@
         const value=params.get(key);
         state[key]=value!==null&&/^\d+$/.test(value)?Number(value):null;
       }
+      if(state.source==='outside'||state.year<1900||state.year>2035) state.year=null;
     }
     if(state.page==='discourse'){
       state.panel=Object.keys(panels).find(key=>panels[key]===pathname.replace(/\/$/,''))||'xpost';
@@ -43,7 +44,8 @@
     }
     if(state.page==='timeline2'){
       path='/time/'+(state.source==='outside'?'outside':'inside')+'/'+(['overview','year','calendar',...(state.source==='outside'?['cards']:[])].includes(state.view)?state.view:'overview');
-      for(const key of ['year','event']) if(Number.isInteger(state[key]))query.set(key,state[key]);
+      if(state.source!=='outside'&&Number.isInteger(state.year)&&state.year>=1900&&state.year<=2035)query.set('year',state.year);
+      if(Number.isInteger(state.event))query.set('event',state.event);
     }
     if(state.page==='discourse'){
       path=panels[state.panel]||panels.xpost;

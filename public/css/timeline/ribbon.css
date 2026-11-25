@@ -1,0 +1,67 @@
+/* ═══ MINIMAP RIBBON ═══ */
+#ribbon{
+  border-top:.5px solid var(--g5);background:var(--w);
+  padding:18px 32px;display:flex;align-items:center;gap:20px;
+}
+.ribbon-label{
+  font-family:var(--mono);font-size:10px;color:var(--g3);
+  letter-spacing:.08em;text-transform:uppercase;font-weight:600;
+  flex-shrink:0;width:60px;
+}
+#ribbon-track{
+  position:relative;flex:1;height:64px;cursor:pointer;
+  user-select:none;-webkit-user-select:none;
+}
+#ribbon-track:active{cursor:pointer}
+#ribbon-bg{
+  position:absolute;top:22px;left:0;right:0;height:1px;
+  background:var(--g4);transform:translateY(-50%);
+  pointer-events:none;
+}
+.ribbon-dot{
+  position:absolute;top:22px;transform:translate(-50%,-50%);
+  width:6px;height:6px;border-radius:50%;background:var(--g3);
+  box-shadow:0 0 0 1px rgba(255,255,255,.9);
+  transition:background .2s ease,transform .2s ease,box-shadow .2s ease;
+  cursor:pointer;
+}
+.ribbon-dot.featured{width:8px;height:8px;box-shadow:0 0 0 2px rgba(191,90,242,.28),0 0 0 1px rgba(255,255,255,.92)}
+.ribbon-dot.in-view{transform:translate(-50%,-50%) scale(1.28);box-shadow:0 0 0 2px rgba(29,29,31,.12),0 0 0 1px rgba(255,255,255,.92)}
+.ribbon-dot.featured.in-view{box-shadow:0 0 0 2px rgba(191,90,242,.3),0 0 0 1px rgba(255,255,255,.92)}
+.ribbon-dot.flash{animation:ribbonDotFlash 1s cubic-bezier(.4,0,.2,1);}
+@keyframes ribbonDotFlash{
+  0%{transform:translate(-50%,-50%) scale(1);box-shadow:0 0 0 1px rgba(255,255,255,.9),0 0 0 0 rgba(0,102,204,.5);}
+  35%{transform:translate(-50%,-50%) scale(2.2);box-shadow:0 0 0 2px rgba(255,255,255,.9),0 0 0 8px rgba(0,102,204,.22);}
+  100%{transform:translate(-50%,-50%) scale(1);box-shadow:0 0 0 1px rgba(255,255,255,.9),0 0 0 0 rgba(0,102,204,0);}
+}
+.ribbon-dot.is-hover-linked{
+  transform:translate(-50%,-50%) scale(1.55);
+  box-shadow:0 0 0 2px rgba(0,102,204,.24),0 0 0 6px rgba(0,102,204,.08),0 0 0 1px rgba(255,255,255,.92);
+  z-index:3;
+}
+.ribbon-yr{
+  position:absolute;bottom:0;font-family:var(--mono);font-size:9px;
+  color:var(--b);pointer-events:none;font-weight:700;white-space:nowrap;
+}
+.ribbon-yr.start{text-align:left;transform:none}
+.ribbon-yr.end{text-align:right;transform:translateX(-100%)}
+#ribbon-hover-year{
+  position:absolute;bottom:0;left:50%;
+  font-family:var(--mono);font-size:9px;color:var(--g3);
+  transform:translateX(-50%);pointer-events:none;opacity:0;
+  transition:opacity .16s ease;white-space:nowrap;
+}
+#ribbon-hover-year.show{opacity:1}
+#ribbon-viewport{
+  position:absolute;top:4px;bottom:20px;
+  background:rgba(0,102,204,.08);border:1px solid var(--accent);
+  border-radius:4px;pointer-events:auto;cursor:pointer;touch-action:none;
+  box-shadow:inset 0 0 0 .5px rgba(0,102,204,.06),0 4px 14px rgba(0,102,204,.08);
+  will-change:left,width,transform,box-shadow;
+  transition:left .24s cubic-bezier(.22,1,.36,1),width .24s cubic-bezier(.22,1,.36,1),transform .22s cubic-bezier(.22,1,.36,1),box-shadow .22s ease;
+}
+#ribbon-viewport.animating{
+  transform:translateY(-1px) scaleY(1.03);
+  box-shadow:inset 0 0 0 .5px rgba(0,102,204,.1),0 10px 24px rgba(0,102,204,.15);
+}
+#ribbon-viewport.dragging{cursor:pointer;transition:none;transform:none}

@@ -1,0 +1,77 @@
+/* ═══ STAGE NAV ARROWS (overview + year modes) ═══ */
+.stage-nav{
+  position:absolute;top:50%;transform:translateY(-50%);
+  display:flex;align-items:center;
+  pointer-events:none;z-index:8;
+  opacity:0;
+  transition:opacity .32s cubic-bezier(.22,1,.36,1);
+}
+.stage-nav.show{pointer-events:auto}
+.stage-nav.left{left:14px}
+.stage-nav.right{right:14px}
+.stage-nav-btn{
+  width:40px;height:40px;border-radius:50%;
+  background:rgba(255,255,255,.88);
+  border:.5px solid rgba(0,0,0,.07);
+  box-shadow:0 2px 12px rgba(0,0,0,.09),0 1px 3px rgba(0,0,0,.06);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:20px;color:var(--g2);
+  transition:transform .18s cubic-bezier(.22,1,.36,1),
+             box-shadow .18s ease,
+             background .15s ease,
+             opacity .18s ease;
+  pointer-events:auto;
+  user-select:none;
+  line-height:1;
+}
+.stage-nav-btn:hover{
+  transform:scale(1.1);
+  background:rgba(255,255,255,.96);
+  box-shadow:0 4px 18px rgba(0,0,0,.13),0 1px 4px rgba(0,0,0,.07);
+  color:var(--b);
+}
+.stage-nav-btn:active{transform:scale(.96)}
+.stage-nav-btn:disabled{opacity:.28;cursor:default;pointer-events:none}
+/* Hide nav arrows in calendar mode */
+#shell.calendar-mode .stage-nav{opacity:0!important;pointer-events:none!important}
+
+/* ── Gesture hint: phone overview only ── */
+#gesture-hint{
+  display:none;
+  position:absolute;bottom:0;left:0;right:0;
+  flex-direction:column;align-items:center;gap:8px;
+  padding:10px 0 14px;pointer-events:none;
+  z-index:5;
+}
+html.embedded-phone #gesture-hint{display:flex;}
+html.embedded-phone #shell.calendar-mode #gesture-hint{display:none;}
+html.embedded-tablet #gesture-hint{display:flex;}
+html.embedded-tablet #shell.calendar-mode #gesture-hint,
+html.embedded-phone #shell.outside-active #gesture-hint,
+html.embedded-tablet #shell.outside-active #gesture-hint,
+html.embedded-tablet #gesture-hint .gh-row:first-child{display:none;}
+.gh-row{
+  display:flex;align-items:center;gap:9px;
+  font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
+  font-size:0.62rem;color:rgba(29,29,31,.45);letter-spacing:-.01em;
+}
+.gh-track{
+  display:inline-block;position:relative;
+  width:44px;height:3px;background:rgba(29,29,31,.14);
+  border-radius:2px;overflow:hidden;flex-shrink:0;
+}
+.gh-thumb{
+  position:absolute;left:0;top:0;height:100%;width:14px;
+  background:rgba(29,29,31,.45);border-radius:2px;
+  animation:gh-slide 2s cubic-bezier(.4,0,.2,1) infinite;
+}
+@keyframes gh-slide{
+  0%{left:0}45%{left:calc(100% - 14px)}55%{left:calc(100% - 14px)}100%{left:0}
+}
+.gh-pinch{
+  display:inline-flex;align-items:center;gap:3px;flex-shrink:0;
+  animation:gh-pinch 2.4s cubic-bezier(.4,0,.2,1) infinite;
+}
+.gh-f{width:7px;height:12px;border:1.5px solid rgba(29,29,31,.4);border-radius:4px;}
+@keyframes gh-pinch{0%,100%{gap:3px}40%{gap:9px}60%{gap:9px}}

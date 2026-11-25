@@ -38,8 +38,12 @@ function updateZoomButtons(){
   clearTimeout(routeUpdateTimer);
   routeUpdateTimer=setTimeout(()=>{
     if(shell.dataset.mapView==='outside')return;
+    const route=window.parent.KirunaRoutes?.parse(new URL(window.parent.location.href));
+    const view=ypv<=3?'calendar':ypv<=24?'year':'overview';
+    const eventYear=route?.event?EV_BY_ID.get(route.event)?.year:null;
     window.parent.KirunaRoutes?.update('timeline2',{
-      source:'inside',view:ypv<=3?'calendar':ypv<=24?'year':'overview',year:Math.round(centerYear)
+      source:'inside',view,
+      year:eventYear??(route?.year===null?null:view==='calendar'?(cpSel??cpBlock(cpYear).start):Math.round(centerYear))
     },true);
   },600);
 }

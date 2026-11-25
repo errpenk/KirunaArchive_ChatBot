@@ -1,0 +1,83 @@
+html.embedded-tablet #hdr{
+  padding:0 16px!important;
+}
+html.embedded-tablet .hdr-center{
+  gap:8px!important;
+  max-width:100%!important;
+  justify-content:center!important;
+  transform:translateX(0)!important;
+  margin:0 auto!important;
+}
+html.embedded-tablet .zoom-btn{
+  padding:8px 12px!important;
+}
+html.embedded-tablet .map-tab{
+  padding:8px 14px!important;
+}
+html.embedded-tablet .txt-col{
+  width:156px!important;
+}
+html.embedded-tablet .txt-label{
+  width:78px!important;
+  max-width:78px!important;
+}
+html.embedded-tablet .txt-yr{
+  font-size:10px!important;
+}
+html.embedded-tablet .txt-title{
+  display:-webkit-box!important;
+  -webkit-line-clamp:3!important;
+  -webkit-box-orient:vertical!important;
+  overflow:hidden!important;
+  font-size:7.2px!important;
+  line-height:1.14!important;
+  word-break:break-word!important;
+}
+html.embedded-tablet .txt-cat{
+  display:none!important;
+}
+html.embedded-tablet .cpbody{
+  min-height:0!important;
+  overflow:hidden!important;
+}
+html.embedded-tablet .cpgrid-panel,
+html.embedded-tablet .cpevs-panel{
+  min-height:0!important;
+}
+html.embedded-tablet .cpevs-panel{
+  width:min(320px,33vw)!important;
+  max-width:320px!important;
+  overflow:hidden!important;
+}
+html.embedded-tablet #cal-grid-wrap{
+  min-height:0!important;
+  overflow:hidden!important;
+}
+html.embedded-tablet .cp-day,
+html.embedded-tablet .cp-day-empty{
+  min-height:82px!important;
+}
+html.embedded-tablet .cp-day{
+  padding:9px 7px 6px!important;
+  gap:2px!important;
+}
+html.embedded-tablet .cp-ev-tag,
+html.embedded-tablet .cp-more{
+  display:none!important;
+}
+html.embedded-tablet .cp-dots{
+  gap:3px!important;
+  padding-top:8px!important;
+  padding-bottom:2px!important;
+}
+html.embedded-tablet .cpe-list{
+  min-height:0!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+  padding-bottom:12px!important;
+}
+html:not(.embedded-phone) .cpe-fullscreen-btn,
+html.embedded-tablet .cpe-fullscreen-btn{
+  display:none!important;
+}

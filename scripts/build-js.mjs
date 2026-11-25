@@ -4,7 +4,7 @@ const sourceRoot = new URL("../src/js/", import.meta.url);
 const output = new URL("../public/js/generated/", import.meta.url);
 await mkdir(output, { recursive: true });
 
-for (const name of ["archive", "chat", "discourse", "timeline", "outside-map"]) {
+for (const name of ["archive", "chat", "discourse", "timeline", "outside-map", "gallery"]) {
   const source = new URL(`${name}/`, sourceRoot);
   const parts = (await readdir(source)).filter(file => /^\d\d-.*\.js$/.test(file)).sort();
   if (!parts.length) throw new Error(`No source parts for ${name}`);
